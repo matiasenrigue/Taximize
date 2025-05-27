@@ -1,5 +1,19 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Project Structure
+```
+├── app/                        # app pages
+├── components/                 # reusable components
+├── public/                     # static assets
+├── .gitignore
+├── exlint.config.mjs
+├── next.config.ts
+├── next-env.d.ts
+├── package.json
+├── package-lock.json
+├── README.md
+└── tsconfig.json
+```
 ## Getting Started
 
 First, run the development server:
