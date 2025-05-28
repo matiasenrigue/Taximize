@@ -8,7 +8,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ├── components/                 # reusable components
 ├── public/                     # static assets
 ├── .gitignore
-├── babel.config.js             # testing - compiles .tsx and .jsx to .js
+├── .swcrc                      # testing - SWC configuration (SWC compiles .tsx and .jsx to .js)
 ├── eslint.config.mjs
 ├── jest.config.ts              # testing configuration
 ├── jest.setup.ts               # testing - setup environment

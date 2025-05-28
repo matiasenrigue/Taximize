@@ -4,6 +4,9 @@ const config: Config = {
     verbose: true,
     testEnvironment: 'jsdom',
     setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+    transform: {
+        '^.+\\.(t|j)sx?$': '@swc/jest',
+    },
     moduleNameMapper: {
         // mock CSS modules
         '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
