@@ -1,0 +1,4 @@
+node_modules
+dist
+apps/frontend/.next
+apps/frontend/node_modules
