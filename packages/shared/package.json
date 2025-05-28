@@ -1,0 +1,5 @@
+{
+  "name": "@comp47360_taxi/shared",
+  "version": "1.0.0",
+  "main": "src/index.ts"
+}

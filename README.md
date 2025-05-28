@@ -1,33 +1,63 @@
 # Taxi Driver App
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Project Structure
 ```
-├── __mocks__/                  # testing - mocks to replace css-modules and files
-├── app/                        # app pages
-├── components/                 # reusable components
-├── public/                     # static assets
+├── apps/
+│   ├── backend/
+│   │   ├── src/
+│   │   ├── jest.config.js      # testing configuration
+│   │   ├── package.json
+│   │   └── tsconfig.json       # backend typescript configuration
+│   └── frontend/
+│       ├── __mocks__/          # testing - mocks to replace css-modules and files
+│       ├── app/                # app pages
+│       ├── components/         # reusable components
+│       ├── public/             # static assets
+│       ├── .npmrc
+│       ├── .swcrc              # testing - SWC configuration (SWC compiles .tsx and .jsx to .js)
+│       ├── jest.config.ts      # testing configuration
+│       ├── jest.setup.ts       # testing - setup environment
+│       ├── next.config.ts
+│       ├── next.env.d.ts
+│       ├── package.json
+│       └── tsconfig.json       # frontend typescript configuration
+├── node_modules/               # shared modules, do not commit!
+├── packages/                   # shared code
 ├── .gitignore
-├── .swcrc                      # testing - SWC configuration (SWC compiles .tsx and .jsx to .js)
+├── .npmrc
 ├── eslint.config.mjs
-├── jest.config.ts              # testing configuration
-├── jest.setup.ts               # testing - setup environment
-├── next.config.ts
-├── next-env.d.ts
-├── package.json
+├── package.json                # workspace configuration
 ├── package-lock.json
 ├── README.md
-└── tsconfig.json               # typescript configuration
+└── tsconfig.base.json          # base typescript configuration
 ```
 
 ## Getting Started
+### Development
+To run the development server (for all workspaces):
 
-To run the development server:
+To run the development server for a specific workspace:
 ```bash
-npm run dev
+npm run dev --workspace=frontend
+```
+or
+```bash
+npm run dev --workspace=backend
 ```
 
-To run tests:
+### Testing
+To run tests for a specific workspace:
 ```bash
-npm test
+npm run test --workspace=frontend
+```
+or
+```bash
+npm run test --workspace=backend
+```
+
+### Installing Packages
+
+**Always** install packages for a specific workspace:
+```bash
+npm install <package> --workspace=apps/backend
 ```
