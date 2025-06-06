@@ -1,6 +1,7 @@
 import Link from "next/link";
 import styles from "./Header.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faUser} from "@fortawesome/free-solid-svg-icons";
 
 export const Header = () => {
     return (
@@ -15,8 +16,7 @@ export const Header = () => {
                 href={"/account"}
                 aria-label={"Account"}>
                 <FontAwesomeIcon
-                    icon={["fas", "user"]}
-                    style={{ fontSize: 16 }}
+                    icon={faUser}
                 />
             </Link>
         </header>
