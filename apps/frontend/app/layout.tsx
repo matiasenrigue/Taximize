@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import {Navbar} from "../components/Navbar/Navbar";
 import { Roboto, Roboto_Mono } from "next/font/google";
+import "../helpers/loadFontAwesomeIcons";
 
 const roboto = Roboto({
   subsets: ["latin"],
