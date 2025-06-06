@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import {Navbar} from "../components/Navbar/Navbar";
+import {Header} from "../components/Header/Header";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "../helpers/loadFontAwesomeIcons";
 
@@ -46,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en" prefix="og: https://ogp.me/ns#">
       <body className={`${roboto.variable} ${roboto_mono.variable}`}>
-        <Navbar/>
+        <Header/>
         {children}
       </body>
     </html>
