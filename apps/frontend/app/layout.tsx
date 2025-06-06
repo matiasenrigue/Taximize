@@ -1,6 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import {Navbar} from "../components/Navbar/Navbar";
+import { Roboto, Roboto_Mono } from "next/font/google";
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  variable: "--font-roboto"
+});
+
+const roboto_mono = Roboto_Mono({
+  subsets: ["latin"],
+  variable: "--font-roboto-mono",
+  fallback: ["roboto"]
+});
 
 export const metadata: Metadata = {
   title: "Taxi Driver App",
@@ -8,7 +20,7 @@ export const metadata: Metadata = {
   keywords: "taxi, passenger, routing",
 
   generator: "Next.js",
-  referrer: 'no-referrer',
+  referrer: "no-referrer",
 
   openGraph: {
     title: "Taxi Driver App",
@@ -18,10 +30,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  colorScheme: 'light dark',
+  colorScheme: "light dark",
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'cyan' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
+    { media: "(prefers-color-scheme: light)", color: "cyan" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
 }
 
@@ -32,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" prefix="og: https://ogp.me/ns#">
-      <body>
+      <body className={`${roboto.variable} ${roboto_mono.variable}`}>
         <Navbar/>
         {children}
       </body>

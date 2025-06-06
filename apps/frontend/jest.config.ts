@@ -14,6 +14,8 @@ const config: Config = {
         '^.+\\.(css|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
         // mock image imports
         '^.+\\.(jpg|jpeg|png|gif|webp|avif|svg)$': '<rootDir>/__mocks__/fileMock.js',
+        // mock next/font/google
+        '^next/font/google$': '<rootDir>/__mocks__/nextFontGoogleMock.js',
         // support aliases (@/ imports)
         '^@/(.*)$': '<rootDir>/$1',
     },

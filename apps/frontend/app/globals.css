@@ -1,8 +1,16 @@
 :root {
-  --color-background: #ffffff;
-  --color-on-background: #171717;
-  --color-primary: #0000ff;
-  --color-on-primary: #ffffff;
+  --color-background: #EEEEEE;
+  --color-surface: #FFFFFF;
+  --color-border: #DEDEDE;
+  --color-primary: #FBB93C;
+  --color-danger: #D01C1C;
+
+  --color-on-surface: #171717;
+  --color-on-surface-low-contrast: #9D9D9D;
+  --color-on-primary: #171717;
+
+  --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --border-radius: 6px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,14 +28,18 @@ body {
 }
 
 body {
-  color: var(--color-on-background);
+  color: var(--color-on-surface);
   background: var(--color-background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-roboto), sans-serif;
+  font-weight: 400;
+  line-height: 1.3em;
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 * {
+  font-family: unset;
   box-sizing: border-box;
   padding: 0;
   margin: 0;
