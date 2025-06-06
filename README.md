@@ -34,8 +34,6 @@
 
 ## Getting Started
 ### Development
-To run the development server (for all workspaces):
-
 To run the development server for a specific workspace:
 ```bash
 npm run dev --workspace=frontend
