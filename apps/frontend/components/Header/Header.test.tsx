@@ -5,22 +5,20 @@ import {Header} from './Header';
 describe("Header", () => {
     it("renders an element with role 'banner'", () => {
         render(<Header/>);
-        // @ts-ignore
-        const header = screen.getByRole("banner");
+        const header = screen.getByRole("banner", {});
         expect(header).toBeInTheDocument();
     });
 
     it("renders a logo", () => {
         render(<Header/>);
-        // @ts-ignore
-        const logo = screen.getByText("TaxiApp");
+        const logo = screen.getByText("TaxiApp", {});
         expect(logo).toBeInTheDocument();
     });
 
     it("renders link to account", () => {
         render(<Header/>);
-        // @ts-ignore
-        const account_link = screen.getByRole("link", {name: /account/i});
+        const account_link = screen.getByRole("link", {name: "Account"});
         expect(account_link).toBeInTheDocument();
+        expect(account_link).toHaveAttribute("href", "/account");
     });
 });

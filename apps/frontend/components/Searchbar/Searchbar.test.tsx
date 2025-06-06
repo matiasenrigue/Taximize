@@ -7,7 +7,7 @@ describe("Searchbar",  () => {
     it("renders an input component", () => {
         render(<Searchbar/>);
 
-        const input = document.getElementsByTagName("input")?.[0];
+        const input = screen.getByRole("textbox", {name: "Address"});
         expect(input).toBeInTheDocument();
     });
 
