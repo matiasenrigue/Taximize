@@ -1,0 +1,50 @@
+.container {
+    cursor: pointer;
+}
+
+.checkbox {
+    /* hides the element, while still making it focusable */
+    position: absolute;
+    width: 0;
+    height: 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.checkbox:checked ~ .switch {
+    background-color: var(--color-primary);
+    box-shadow: none;
+}
+
+.checkbox:checked ~ .switch::before {
+    margin-left: 16px;
+    background-color: var(--color-on-surface);
+}
+
+.switch {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 40px;
+    padding: 2px;
+    background-color: var(--color-background);
+    border: solid 1px var(--color-border);
+    border-radius: 20px;
+    box-shadow: var(--box-shadow-inset);
+    transition: .1s linear;
+}
+
+.switch::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--color-on-surface-low-contrast);
+    margin-left: 0;
+    transition: .1s ease-out;
+}
+
+.switch:hover::before {
+    background-color: var(--color-on-surface);
+}
