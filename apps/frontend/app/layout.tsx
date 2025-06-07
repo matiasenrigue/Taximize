@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import styles from "./layout.module.css";
 import {Header} from "../components/Header/Header";
 import { Roboto, Roboto_Mono } from "next/font/google";
-import {Searchbar} from "../components/Searchbar/Searchbar";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -46,8 +46,12 @@ export default function RootLayout({
   return (
     <html lang="en" prefix="og: https://ogp.me/ns#">
       <body className={`${roboto.variable} ${roboto_mono.variable}`}>
-        <Header/>
-        {children}
+        <div className={styles.container}>
+          <Header/>
+          <main className={styles.main}>
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );
