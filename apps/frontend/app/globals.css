@@ -12,6 +12,9 @@
   --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   --box-shadow-inset: 0 2px 4px rgba(0, 0, 0, 0.1)  inset;
   --border-radius: 6px;
+
+  --padding-md: 16px;
+  --icon-size-md: 18px;
 }
 
 @media (prefers-color-scheme: dark) {
