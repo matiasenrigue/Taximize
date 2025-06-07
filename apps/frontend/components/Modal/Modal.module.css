@@ -1,0 +1,46 @@
+.dialog {
+    position: absolute;
+    z-index: 300;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(calc(-50% - var(--padding-md)));
+    margin: var(--padding-md);
+    padding: var(--padding-md);
+    background-color: var(--color-surface);
+    border: solid 1px var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.dialog::backdrop {
+    background-color: rgba(0, 0, 0, .15);
+}
+
+.button_close {
+    position: absolute;
+    top: calc(.5 * var(--padding-md));
+    right: calc(.5 * var(--padding-md));
+    box-sizing: content-box;
+    padding: calc(.5 * var(--padding-md));
+    background: none;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: var(--icon-size-md);
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    color: var(--color-on-surface-low-contrast);
+    cursor: pointer;
+    transition: .2s;
+}
+
+.button_close:hover {
+    color: var(--color-on-surface);
+}
+
+.heading {
+    margin-bottom: var(--padding-md);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 100%;
+}
