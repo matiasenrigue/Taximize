@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import styles from "./layout.module.css";
-import {Header} from "../components/Header/Header";
+import {Header} from "../../components/Header/Header";
 import { Roboto, Roboto_Mono } from "next/font/google";
+import {hasLocale, NextIntlClientProvider} from "next-intl";
+import {routing} from "../../i18n/routing";
+import {notFound} from "next/navigation";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -38,20 +41,28 @@ export const viewport: Viewport = {
   ],
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{lang: string}>;
 }>) {
+  const {lang} = await params;
+  if (!hasLocale(routing.locales, lang))
+    notFound();
+
   return (
-    <html lang="en" prefix="og: https://ogp.me/ns#">
+    <html lang={lang} prefix="og: https://ogp.me/ns#">
       <body className={`${roboto.variable} ${roboto_mono.variable}`}>
-        <div className={styles.container}>
-          <Header/>
-          <main className={styles.main}>
-            {children}
-          </main>
-        </div>
+        <NextIntlClientProvider>
+          <div className={styles.container}>
+            <Header/>
+            <main className={styles.main}>
+              {children}
+            </main>
+          </div>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

@@ -10,13 +10,16 @@
 │   │   └── tsconfig.json       # backend typescript configuration
 │   └── frontend/
 │       ├── __mocks__/          # testing - mocks to replace css-modules and files
-│       ├── app/                # app pages
+│       ├── app/                # app & pages
 │       ├── components/         # reusable components
+│       ├── dictionaries/       # multi-language - dictionaries
+│       ├── hooks/              # custom hooks
 │       ├── public/             # static assets
 │       ├── .npmrc
 │       ├── .swcrc              # testing - SWC configuration (SWC compiles .tsx and .jsx to .js)
 │       ├── jest.config.ts      # testing configuration
 │       ├── jest.setup.ts       # testing - setup environment
+│       ├── middleware.ts       # multi-language - rerouting
 │       ├── next.config.ts
 │       ├── next.env.d.ts
 │       ├── package.json
