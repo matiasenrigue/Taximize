@@ -12,8 +12,9 @@
 │       ├── __mocks__/          # testing - mocks to replace css-modules and files
 │       ├── app/                # app & pages
 │       ├── components/         # reusable components
-│       ├── dictionaries/       # multi-language - dictionaries
+│       ├── dictionaries/       # multi-language - texts
 │       ├── hooks/              # custom hooks
+│       ├── i18n/               # multi-language - next-intl setup
 │       ├── public/             # static assets
 │       ├── .npmrc
 │       ├── .swcrc              # testing - SWC configuration (SWC compiles .tsx and .jsx to .js)
@@ -25,7 +26,8 @@
 │       ├── package.json
 │       └── tsconfig.json       # frontend typescript configuration
 ├── node_modules/               # shared modules, do not commit!
-├── packages/                   # shared code
+├── packages/
+│   └── shared/                 # shared code
 ├── .gitignore
 ├── .npmrc
 ├── eslint.config.mjs
