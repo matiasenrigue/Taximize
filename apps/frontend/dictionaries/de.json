@@ -1,5 +1,22 @@
 {
   "map": {
     "startRide": "Fahrt starten"
+  },
+  "signin": {
+    "email": "E-Mail",
+    "password": "Passwort",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "forgotPassword": "Passwort vergessen?",
+    "noAccount": "Haben Sie kein Konto?",
+    "error": "Bitte geben Sie ein gültiges Passwort ein (mindestens 8 Zeichen)."
+  },
+  "signup": {
+    "signUp": "Registrieren",
+    "signIn": "Anmelden",
+    "email": "E-Mail",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen"
   }
 }

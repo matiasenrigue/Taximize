@@ -1,5 +1,22 @@
 {
   "map": {
     "startRide": "Start Ride"
+  },
+  "signIn": {
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "error": "Please input a valid password(At least 8 characters)"
+  },
+  "signUp": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password"
   }
 }
