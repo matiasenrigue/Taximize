@@ -48,22 +48,6 @@ async function createRoleAndDb(adminClient: Client) {
 }
 
 
-async function createUserTable(appClient: Client) {
-  // Connect to your new DB as the app user and create users table
-  await appClient.connect();
-  await appClient.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      email VARCHAR(255) PRIMARY KEY,
-      password VARCHAR(255) NOT NULL,
-      first_name VARCHAR(100) NOT NULL,
-      last_name VARCHAR(100) NOT NULL
-    );
-  `);
-  console.log('✅ Table "users" is ready.');
-  await appClient.end();
-}
-
-
 async function main() {
   // Admin client for role & DB creation
   const adminClient = new Client({ connectionString: PG_ADMIN_URL });
@@ -75,10 +59,8 @@ async function main() {
     await adminClient.end();
   }
 
-  // Now use the app user to create the users table
-  const appClient = new Client({ connectionString: DATABASE_URL });
-  await createUserTable(appClient);
 }
+
 
 main().catch(err => {
   console.error('✖️  Error setting up database:', err);

@@ -1,3 +1,7 @@
 export function errorHandler(err: any, req: any, res: any, next: any) {
-    res.status(500).json({ message: err.message });
+  const status = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
+  res.status(status).json({
+    success: false,
+    error: err.message,
+  });
 }

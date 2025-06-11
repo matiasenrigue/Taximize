@@ -1,6 +1,9 @@
+// src/config/db.ts
 import { Sequelize } from 'sequelize';
 
 const isTest = process.env.NODE_ENV === 'test';
+const isProd = process.env.NODE_ENV === 'production';
+
 
 export const sequelize = isTest
   ? new Sequelize({ dialect: 'sqlite', storage: ':memory:', logging: false })
@@ -13,8 +16,16 @@ export const sequelize = isTest
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync(); // in prod/dev, you might use migrations instead
-    console.log('Database connected & synced');
+
+    if (!isProd) {
+      // in dev & test, auto-create/alter tables to match models
+      await sequelize.sync({ alter: true });
+      console.log('👉 DB synced (alter)');
+    } else {
+      console.log('⚠️  In production, run migrations instead of sync()');
+    }
+
+    console.log('✅ Database connected');
   } catch (err) {
     console.error('DB connection error:', (err as Error).message);
     process.exit(1);

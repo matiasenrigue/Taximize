@@ -1,0 +1,69 @@
+@host = http://localhost:5000
+
+###
+# 1) SIGNUP - success
+POST {{host}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "email": "user1@example.com",
+  "username": "user1",
+  "password": "password123"
+}
+
+###
+# 2) SIGNUP - missing fields
+POST {{host}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "email": "user2@example.com",
+  "username": "user2"
+}
+
+###
+# 3) SIGNUP - duplicate email (run after #1)
+POST {{host}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "email": "user1@example.com",
+  "username": "x",
+  "password": "password123"
+}
+
+###
+# 4) SIGNIN - success
+POST {{host}}/api/auth/signin
+Content-Type: application/json
+
+{
+  "email": "user1@example.com",
+  "password": "password123"
+}
+
+###
+# 5) SIGNIN - invalid password
+POST {{host}}/api/auth/signin
+Content-Type: application/json
+
+{
+  "email": "user1@example.com",
+  "password": "wrongpass"
+}
+
+###
+# 6) REFRESH - missing cookie
+POST {{host}}/api/auth/refresh
+
+###
+# 7) REFRESH - invalid token
+POST {{host}}/api/auth/refresh
+Cookie: refreshToken=invalid.token.here
+
+###
+# 8) REFRESH - success
+#    First run #4 to get a real refreshToken cookie in the REST Client “Cookie” tab,
+#    then uncomment the line below and paste your actual cookie value:
+# Cookie: refreshToken=<paste_token_here>
+POST {{host}}/api/auth/refresh

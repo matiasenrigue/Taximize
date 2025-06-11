@@ -31,12 +31,14 @@ User.init(
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: { len: [8, 100] }
     },
   },
   {
     sequelize,
     tableName: 'users',
     timestamps: true,
+    underscored: true,   // so createdAt → created_at in Postgres 
   }
 );
 
