@@ -18,6 +18,9 @@
 /.next/
 /out/
 
+# backend js code
+/apps/backend/dist
+
 # production
 /build
 
