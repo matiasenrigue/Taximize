@@ -1,4 +1,4 @@
-@host = http://localhost:5000
+@host = http://localhost:3000
 
 ###
 # 1) SIGNUP - success

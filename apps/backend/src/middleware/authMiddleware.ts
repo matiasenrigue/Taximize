@@ -3,12 +3,9 @@ import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel';
 
-interface AuthRequest extends Request {
-  user?: typeof User;
-}
-
+// Protect routes - verifies JWT and attaches user instance to req.user
 export const protect = asyncHandler(
-  async (req: AuthRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     let token: string | undefined;
 
     if (
@@ -17,21 +14,23 @@ export const protect = asyncHandler(
     ) {
       token = req.headers.authorization.split(' ')[1];
       try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-          id: string;
-          iat: number;
-          exp: number;
-        };
+        // Verify token and extract payload
+        const decoded = jwt.verify(
+          token,
+          process.env.JWT_SECRET!  
+        ) as { id: string; iat: number; exp: number };
 
+        // Fetch user instance by primary key
         const user = await User.findByPk(decoded.id);
         if (!user) {
           res.status(401);
           throw new Error('User not found');
         }
 
+        // Attach user instance to request for downstream handlers
         req.user = user;
         next();
-
+        
       } catch (error) {
         res.status(401);
         throw new Error('Not authorized, token failed');
