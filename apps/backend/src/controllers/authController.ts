@@ -1,35 +1,36 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel';
-import {
-  generateAccessToken,
-  generateRefreshToken,
-} from '../utils/generateTokens';
+import { generateAccessToken, generateRefreshToken } from '../utils/generateTokens';
 import jwt from 'jsonwebtoken';
-
-
 
 // @desc    Register a new user
 // @route   POST /api/auth/signup
 // @access  Public
 export const signup = asyncHandler(async (req: Request, res: Response) => {
-  
-  console.log('Received signup request:', req.body);
-  
   const { email, username, password } = req.body;
+
+  // Check required fields
   if (!email || !username || !password) {
     res.status(400);
     throw new Error('Please provide all fields');
   }
 
+  // Basic validation
+  const emailRegex = /^\S+@\S+\.\S+$/;
+  if (!emailRegex.test(email) || password.length < 8) {
+    res.status(400);
+    throw new Error('Invalid email or password');
+  }
+
+  // Ensure email is unique
   const exists = await User.findOne({ where: { email } });
   if (exists) {
-    res
-      .status(400)
-      .json({ success: false, error: 'User with this email already exists' });
+    res.status(400).json({ success: false, error: 'User with this email already exists' });
     return;
   }
 
+  // Create user
   const user = await User.create({ email, username, password });
   res.status(201).json({
     success: true,
@@ -38,14 +39,19 @@ export const signup = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-
 // @desc    Authenticate user & get token
 // @route   POST /api/auth/signin
 // @access  Public
 export const signin = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ where: { email } });
 
+  // Check required fields
+  if (!email || !password) {
+    res.status(400);
+    throw new Error('Invalid email or password');
+  }
+
+  const user = await User.findOne({ where: { email } });
   if (user && (await user.matchPassword(password))) {
     // 1) create tokens
     const accessToken = generateAccessToken(user.id);
@@ -70,16 +76,16 @@ export const signin = asyncHandler(async (req: Request, res: Response) => {
   }
 
   res.status(400).json({ success: false, error: 'Invalid email or password' });
-  return;
 });
 
-
-
-// refresh endpoint
+// @desc    Refresh access token
+// @route   POST /api/auth/refresh
+// @access  Public (via HttpOnly cookie)
 export const refresh = asyncHandler(async (req: Request, res: Response) => {
   const token = req.cookies.refreshToken;
 
-  if (!token) {res.status(401).json({ success: false, error: 'No refresh token' });
+  if (!token) {
+    res.status(401).json({ success: false, error: 'No refresh token' });
     return;
   }
 
@@ -87,14 +93,8 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
     const { id } = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET!) as { id: string };
     const newAccess = generateAccessToken(id);
 
-    res.json({
-      success: true,
-      data: { token: newAccess },
-    });
-    return;
-
+    res.json({ success: true, data: { token: newAccess } });
   } catch {
-      res.status(403).json({ success: false, error: 'Invalid refresh token' });
-      return;
+    res.status(403).json({ success: false, error: 'Invalid refresh token' });
   }
 });
