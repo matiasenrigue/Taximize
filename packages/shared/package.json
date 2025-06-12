@@ -1,5 +1,11 @@
 {
   "name": "@comp47360_taxi/shared",
   "version": "1.0.0",
-  "main": "src/index.ts"
+  "main": "src/index.ts",
+  "devDependencies": {
+    "@testing-library/user-event": "^14.6.1"
+  },
+  "dependencies": {
+    "axios": "^1.9.0"
+  }
 }
