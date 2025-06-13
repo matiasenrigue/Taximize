@@ -60,3 +60,26 @@
     margin-top: 18px;
     width: 100%;
 }
+
+.button:disabled {
+    opacity: 0.5;
+}
+
+.links_container {
+  width: 100%; /* same width with form */
+  display: flex;
+  justify-content: space-between; /* implement left and right alignment */
+  align-items: center;
+  margin-top: 16px; 
+}
+
+.link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600; 
+}
+
+.link:hover {
+    text-decoration: underline;
+}

@@ -2,47 +2,81 @@
 
 import styles from "./page.module.css";
 import { Button } from "../../../components/Button/Button";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Input } from "../../../components/Input/Input"; 
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { setToken } from "../../../lib/token";
+import Message from "../../../components/Message/Message";
+import api from "../../../lib/axios";
 
 
-export default function Signin() {
+export default function Signup() {
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    
+    const [msg, setMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
+    const router = useRouter();
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmailValid = emailRegex.test(email);
     const isPasswordValid = password.length >= 8;
     const isPasswordMatch = password === confirmPassword;
-    const canSubmit = email && username && isEmailValid && isPasswordValid && isPasswordMatch && !loading;
+    const canSubmit = email && username && isEmailValid && isPasswordValid && isPasswordMatch;
 
     const t = useTranslations('signup');
     const handleSubmit = async (e: React.FormEvent) => {
-         e.preventDefault();
+        e.preventDefault();
 
+        api.post("/signup", {
+            email,
+            username,
+            password
+        }).then((response) => { 
+            // when the status is 200, the response will contain a token
+            setMsg({type: "success", text: response.data.message || t("signupSuccess")});
+            // Redirect to signin page after successful signup
+            router.push("/signin");
+        }
+        ).catch((err) => {
+            // when the status is not 200, the response will contain an error message
+            console.error("Signup error:", err);
+            if (err.response && err.response.data && err.response.data.error) {
+                setMsg({type: "error", text: err.response.data.error});
+            } else {
+                setMsg({type: "error", text: t("signUpError")});
+            }
+        })       
     };
 
+
     return (
+        <>
+            { msg && (<Message 
+                type={msg.type}
+                text={msg.text}
+                onClose={() => {}}
+            />
+            )}
         <div className={styles.page}>
             <div className={styles.container}>
                 <form className={styles.form_container} onSubmit={handleSubmit} autoComplete="off">
-                    <label className={styles.label} htmlFor="email">{t("email")}</label>
+                    <label className={styles.label} htmlFor="email" style={{ color: !isEmailValid && email ? 'var(--color-danger)' : undefined }}>{t("email")}</label>
                     <Input
                         id="email"
-                        className={styles.input}
+                        className={`${styles.input} ${!isEmailValid && email ? 'error' : ''}`}
                         type="email"
                         placeholder="example@gmail.com"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         required
                     />
+                    { email && !isEmailValid && (
+                        <div className={styles.error_text}>
+                             {t("emailError")}
+                        </div>
+                    )}
 
                     <label className={styles.label} htmlFor="username">{t("username")}</label>
                     <Input
@@ -54,7 +88,7 @@ export default function Signin() {
                         required
                     />
 
-                    <label className={styles.label} htmlFor="password">{t("password")}</label>
+                    <label className={styles.label} htmlFor="password" style={{ color: !isPasswordValid && password ? 'var(--color-danger)' : undefined }}>{t("password")}</label>
                     <Input
                         id="password"
                         className={`${styles.input} ${!isPasswordValid && password ? 'error' : ''}`}
@@ -64,6 +98,11 @@ export default function Signin() {
                         required
                         minLength={8}
                     />
+                    { password && !isPasswordValid && (
+                        <div className={styles.error_text}>
+                            {t("passwordError")}
+                        </div>
+                    )}
 
                     <label className={styles.label} htmlFor="confirmPassword" style={{ color: !isPasswordMatch && confirmPassword ? 'var(--color-danger)' : undefined }}>{t("confirmPassword")}</label>
                     <Input
@@ -76,12 +115,12 @@ export default function Signin() {
                     />
                     {(!isPasswordMatch && confirmPassword) && (
                         <div className={styles.error_text}>
-                            Passwords do not match. Please try again.
+                            {t("passwordMatchError")}
                         </div>
                     )}
-                    {error && (
+                    {/* {error && (
                         <div className={styles.error_text}>{error}</div>
-                    )}
+                    )} */}
                     <Button
                         className={styles.button}
                         type="submit"
@@ -91,7 +130,16 @@ export default function Signin() {
                         {t("signUp")}
                     </Button>
                 </form>
+                <div className={styles.links_container}>
+                    <div className={styles.link}
+                    onClick ={() => router.push('/signin')}
+                    style={{ cursor: 'pointer' }}
+                    >
+                        {t("alreadyHaveAccount")}
+                    </div>
+                </div>
             </div>
         </div>
+    </>
     )
 }
