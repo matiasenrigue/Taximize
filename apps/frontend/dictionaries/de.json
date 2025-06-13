@@ -9,7 +9,9 @@
     "signUp": "Registrieren",
     "forgotPassword": "Passwort vergessen?",
     "noAccount": "Haben Sie kein Konto?",
-    "error": "Bitte geben Sie ein gültiges Passwort ein (mindestens 8 Zeichen)."
+    "passwordError": "Bitte geben Sie ein gültiges Passwort ein (mindestens 8 Zeichen).",
+    "emailError": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "signinFailed": "Anmeldung fehlgeschlagen"
   },
   "signup": {
     "signUp": "Registrieren",
@@ -17,6 +19,11 @@
     "email": "E-Mail",
     "username": "Benutzername",
     "password": "Passwort",
-    "confirmPassword": "Passwort bestätigen"
+    "confirmPassword": "Passwort bestätigen",
+    "passwordMatchError": "Die Passwörter stimmen nicht überein",
+    "passwordError": "Bitte geben Sie ein gültiges Passwort ein (mindestens 8 Zeichen).",
+    "emailError": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
+    "signUpError": "Signup fehlgeschlagen"
   }
 }

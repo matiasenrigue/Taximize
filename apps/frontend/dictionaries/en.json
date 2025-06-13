@@ -2,21 +2,28 @@
   "map": {
     "startRide": "Start Ride"
   },
-  "signIn": {
+  "signin": {
     "email": "Email",
     "password": "Password",
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "forgotPassword": "Forgot Password?",
     "noAccount": "Don't have an account?",
-    "error": "Please input a valid password(At least 8 characters)"
+    "passwordError": "Please input a valid password(At least 8 characters)",
+    "emailError": "Please input a valid email address",
+    "signinFailed": "Sign in failed"
   },
-  "signUp": {
+  "signup": {
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "email": "Email",
     "username": "Username",
     "password": "Password",
-    "confirmPassword": "Confirm Password"
+    "confirmPassword": "Confirm Password",
+    "passwordMatchError": "Passwords do not match",
+    "passwordError": "Please input a valid password(At least 8 characters)",
+    "emailError": "Please input a valid email address",
+    "alreadyHaveAccount": "Already have an account?",
+    "signUpError": "Sign up failed"
   }
 }
