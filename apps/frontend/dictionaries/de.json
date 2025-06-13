@@ -1,5 +1,29 @@
 {
   "map": {
     "startRide": "Fahrt starten"
+  },
+  "signin": {
+    "email": "E-Mail",
+    "password": "Passwort",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "forgotPassword": "Passwort vergessen?",
+    "noAccount": "Haben Sie kein Konto?",
+    "passwordError": "Bitte geben Sie ein gültiges Passwort ein (mindestens 8 Zeichen).",
+    "emailError": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "signinFailed": "Anmeldung fehlgeschlagen"
+  },
+  "signup": {
+    "signUp": "Registrieren",
+    "signIn": "Anmelden",
+    "email": "E-Mail",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "passwordMatchError": "Die Passwörter stimmen nicht überein",
+    "passwordError": "Bitte geben Sie ein gültiges Passwort ein (mindestens 8 Zeichen).",
+    "emailError": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
+    "signUpError": "Signup fehlgeschlagen"
   }
 }
