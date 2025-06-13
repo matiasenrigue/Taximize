@@ -60,3 +60,27 @@
     margin-top: 18px;
     width: 100%;
 }
+
+.button:disabled {
+    opacity: 0.5;
+}
+
+.links_container {
+  width: 100%; /* 确保容器宽度和表单一致 */
+  display: flex;
+  justify-content: space-between; /* 这是实现左右对齐的关键 */
+  align-items: center;
+  margin-top: 16px; /* 在按钮和链接之间添加一些间距 */
+}
+
+.link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600; 
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
