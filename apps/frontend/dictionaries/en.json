@@ -1,5 +1,18 @@
 {
   "map": {
-    "startRide": "Start Ride"
+    "startRide": "Start Ride",
+    "endRide": "End Ride",
+    "cancel": "Cancel",
+    "startRideModalTitle": "Evaluate Ride",
+    "startRideModalText": "This ride is below average. It will be difficult to find a new passenger near the target location.",
+    "endRideModalTitle": "End Ride",
+    "breakReminderModalTitle": "Take a break!",
+    "breakReminderModalText": "You’ve been driving for more than 3 hours without a break! We recommend that you take a short 15 minute break.",
+    "takeBreak": "Take a break",
+    "breakModalTitle": "Enjoy your break!",
+    "endBreak": "End break early"
+  },
+  "start-shift": {
+    "startShift": "Start Shift"
   }
 }

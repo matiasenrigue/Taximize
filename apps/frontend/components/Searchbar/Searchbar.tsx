@@ -3,13 +3,20 @@
 import styles from "./Searchbar.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faMagnifyingGlass, faXmarkCircle} from "@fortawesome/free-solid-svg-icons";
-import {useRef} from "react";
+import {InputHTMLAttributes, useRef} from "react";
 
-export interface SearchbarProps extends React.InputHTMLAttributes<HTMLInputElement>{
-
+export interface SearchbarProps extends InputHTMLAttributes<HTMLInputElement>{
+    onConfirm?: (value: string) => void;
 }
 
 export const Searchbar = (props: SearchbarProps) => {
+    const {
+        placeholder = "Search Address...",
+        onKeyDown,
+        onBlur,
+        onConfirm,
+        ...rest
+    } = props;
     const ref = useRef<HTMLInputElement>(null!);
 
     function focusInput() {
@@ -29,12 +36,20 @@ export const Searchbar = (props: SearchbarProps) => {
                 <FontAwesomeIcon icon={faMagnifyingGlass}/>
             </div>
             <input
-                {...props}
+                {...rest}
                 ref={ref}
                 className={styles.input}
                 type={"text"}
-                placeholder={"Search Address..."}
-                aria-label={"Address"}/>
+                placeholder={placeholder}
+                aria-label={"Address"}
+                onBlur={(e) => {
+                    if (onBlur) onBlur(e);
+                    if (onConfirm) onConfirm(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                    if (onKeyDown) onKeyDown(e);
+                    if (onConfirm && e.key === "Enter") onConfirm(e.target.value);
+                }}/>
             <button
                 className={styles.button_clear}
                 onClick={clearInput}
