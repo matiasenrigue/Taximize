@@ -1,0 +1,40 @@
+import {Modal, ModalHandle} from "../../../../components/Modal/Modal";
+import {FlexGroup} from "../../../../components/FlexGroup/FlexGroup";
+import {Button} from "../../../../components/Button/Button";
+import {useTranslations} from "next-intl";
+import {ForwardedRef, forwardRef} from "react";
+import {useShiftContext} from "../../../../contexts/ShiftContext/ShiftContext";
+import {CostInput} from "../../../../components/CostInput/CostInput";
+
+
+export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
+    const t = useTranslations('map');
+    const {endRide} = useShiftContext();
+
+    return (
+        <Modal
+            ref={ref}
+            title={t("endRideModalTitle")}>
+            <FlexGroup
+                align={"stretch"}>
+                <CostInput/>
+                <FlexGroup
+                    direction={"row"}
+                    align={"stretch"}>
+                    <Button
+                        theme={"secondary"}
+                        onClick={() => ref?.current?.close()}>
+                        {t("cancel")}
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            endRide();
+                            ref?.current?.close();
+                        }}>
+                        {t("endRide")}
+                    </Button>
+                </FlexGroup>
+            </FlexGroup>
+        </Modal>
+    );
+});
