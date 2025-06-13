@@ -1,6 +1,7 @@
 "use client"
 
-import {createContext, PropsWithChildren, useCallback, useContext, useState} from "react";
+import {createContext, PropsWithChildren, useCallback, useContext, useEffect, useState} from "react";
+import moment from "moment";
 
 interface ShiftContextType {
     address: string;
@@ -13,6 +14,7 @@ interface ShiftContextType {
     navigateToAddress: (address: string) => void;
     startRide: () => void;
     endRide: () => void;
+    getRemainingTime: () => string;
 }
 
 const ShiftContext = createContext<ShiftContextType|null>(null);
@@ -23,13 +25,13 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const [isShift, setIsShift] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [duration, setDuration] = useState(0);
-    const [startTime, setStartTime] = useState<Date|null>(null);
+    const [startTime, setStartTime] = useState<number|null>(() => moment.now());
     const [address, setAddress] = useState("");
     const [isOnRide, setIsOnRide] = useState(false);
 
     const startShift = useCallback((duration: number) => {
         setDuration(duration);
-        setStartTime(new Date());
+        setStartTime(moment.now());
         setIsShift(true);
     }, []);
 
@@ -57,18 +59,25 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         setAddress(address);
     }, []);
 
+    const getRemainingTime = useCallback(() => {
+        const passedTime = moment.now() - startTime;
+        const remainingTime = duration - passedTime;
+        return moment.utc(Math.max(0, remainingTime)).format('h:mm');
+    }, [duration, startTime]);
+
     return (
         <ShiftContext.Provider value={{
             address,
             duration,
             isOnRide,
-            navigateToAddress,
             startShift,
             endShift,
             pauseShift,
             unpauseShift,
+            navigateToAddress,
             startRide,
             endRide,
+            getRemainingTime,
         }}>
             {children}
         </ShiftContext.Provider>
