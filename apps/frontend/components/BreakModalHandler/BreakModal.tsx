@@ -1,9 +1,10 @@
 import {ForwardedRef, forwardRef} from "react";
-import {Modal, ModalHandle} from "../../../../components/Modal/Modal";
+import {Modal, ModalHandle} from "../Modal/Modal";
 import {useTranslations} from "next-intl";
-import {FlexGroup} from "../../../../components/FlexGroup/FlexGroup";
-import {Button} from "../../../../components/Button/Button";
-
+import {FlexGroup} from "../FlexGroup/FlexGroup";
+import {Button} from "../Button/Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faClock} from "@fortawesome/free-solid-svg-icons";
 
 export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('map');
@@ -17,7 +18,10 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
             <FlexGroup
                 direction={"column"}
                 align={"stretch"}>
-                {/* todo: timer */}
+                <FlexGroup direction={"row"}>
+                    <FontAwesomeIcon icon={faClock}/>
+                    <span>00:00 min</span>
+                </FlexGroup>
                 <FlexGroup
                     direction={"row"}
                     align={"stretch"}>

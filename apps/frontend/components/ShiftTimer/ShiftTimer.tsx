@@ -10,7 +10,7 @@ export const ShiftTimer = () => {
 
     useEffect(() => {
         setRemainingTime(getRemainingTime());
-        const delay = 1000 * 10; // in milliseconds
+        const delay = 1000 * 10;
         const intervalId = setInterval(() => {
             setRemainingTime(getRemainingTime());
         }, delay);

@@ -1,15 +1,25 @@
 
 import {useTranslations} from "next-intl";
 import {ForwardedRef, forwardRef} from "react";
-import {Modal, ModalHandle} from "../../../../components/Modal/Modal";
-import {FlexGroup} from "../../../../components/FlexGroup/FlexGroup";
-import {Button} from "../../../../components/Button/Button";
+import {Modal, ModalHandle} from "../Modal/Modal";
+import {FlexGroup} from "../FlexGroup/FlexGroup";
+import {Button} from "../Button/Button";
+import {useShiftContext} from "../../contexts/ShiftContext/ShiftContext";
 
+interface BreakReminderModalProps {
+    breakModalRef: ModalHandle;
+}
 
-export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
+export const BreakReminderModal = forwardRef((props: BreakReminderModalProps, ref: ForwardedRef<ModalHandle>) => {
+    const {breakModalRef} = props;
+    const {pauseShift} = useShiftContext();
     const t = useTranslations('map');
 
-    function takeBreak() {}
+    function takeBreak() {
+        pauseShift();
+        ref.current.close();
+        breakModalRef.current.open();
+    }
 
     return (
         <Modal

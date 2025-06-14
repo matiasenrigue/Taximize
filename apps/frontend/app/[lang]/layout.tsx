@@ -8,6 +8,7 @@ import {routing} from "../../i18n/routing";
 import {notFound} from "next/navigation";
 import {ShiftContextProvider} from "../../contexts/ShiftContext/ShiftContext";
 import clsx from "clsx";
+import {BreakModalHandler} from "../../components/BreakModalHandler/BreakModalHandler";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -59,6 +60,7 @@ export default async function RootLayout({
       <body className={clsx(roboto.variable, roboto_mono.variable)}>
         <NextIntlClientProvider>
           <ShiftContextProvider>
+            <BreakModalHandler/>
             <div className={styles.container}>
               <Header/>
               <main className={styles.main}>
