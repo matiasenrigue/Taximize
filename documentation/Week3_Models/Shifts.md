@@ -203,20 +203,10 @@ src/
 
 ---
 
-## Testing
-
-Write unit & integration tests to cover:
-
-1. **Signal validation**: all valid/invalid combos
-2. **Lifecycle**: start → pause → continue → stop → database writes
-3. **Cleanup**: `deleteOldSignals` removes only >2-day-old entries
-4. **Status endpoint** returns correct booleans and timestamps
-
----
 
 
 
-### **POST** `/api/shifts/signal`
+#### **POST** `/api/shifts/signal`
 
 * **Body**
 

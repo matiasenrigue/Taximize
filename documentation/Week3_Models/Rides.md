@@ -297,24 +297,6 @@ src/
     └── ride.tests.ts
 ```
 
----
 
-## Testing
-
-In **`src/tests/ride.tests.ts`**, cover:
-
-1. **evaluateRide** returns 1–5
-2. **startRide**
-
-   * rejects when no active shift
-   * rejects if ride already in progress
-   * creates a row with correct fields
-3. **getRideStatus**
-
-   * returns accurate elapsed time & fare estimate
-4. **endRide**
-
-   * rejects without active ride
-   * updates row with `end_time`, `earning_cents`, `earning_per_min`, `distance_km`
 
 

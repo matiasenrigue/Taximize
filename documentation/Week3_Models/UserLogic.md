@@ -78,16 +78,6 @@ All wrapped with `express-async-handler` to catch errors and forward to `errorMi
 
 ---
 
-## Tests
-
-Located under **`src/tests/auth.tests.ts`**, covering:
-
-* **Signup**: success, missing fields, duplicate email, invalid inputs
-* **Signin**: success (token + cookie), missing/invalid creds
-* **Refresh**: missing cookie, invalid token, valid refresh → new access token
-
-
----
 
 ### Request / Response Details
 
