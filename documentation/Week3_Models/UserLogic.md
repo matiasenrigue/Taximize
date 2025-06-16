@@ -50,9 +50,6 @@ All wrapped with `express-async-handler` to catch errors and forward to `errorMi
   * Checks `Authorization: Bearer <token>` header
   * Verifies JWT → looks up `User.findByPk(id)` → attaches `req.user`
 
-* **`roleMiddleware.authorize(...roles)`**
-  * Ensures `req.user.role` is one of allowed roles → else 403
-
 * **`errorMiddleware.errorHandler`**
   * Catches thrown errors, sends JSON `{ success: false, error: err.message }`
 

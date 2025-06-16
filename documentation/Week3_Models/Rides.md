@@ -10,18 +10,27 @@ Tracks each passenger trip taken by a driver.
 | ----------------------- | --------------------- | ---------------------------- | ------------------------------------------ |
 | `id`                    | UUID (PK)             | default UUIDV4, not null     | Primary key                                |
 | `shift_id`              | UUID (FK → shifts.id) | not null                     | Which shift this ride belongs to           |
+| `driver_id`             | UUID (FK → user.id)   | not null                     | Which driver this ride belongs to           |
 | `start_latitude`        | DOUBLE PRECISION      | not null                     | Latitude where ride began                  |
 | `start_longitude`       | DOUBLE PRECISION      | not null                     | Longitude where ride began                 |
 | `destination_latitude`  | DOUBLE PRECISION      | not null                     | Planned destination latitude               |
 | `destination_longitude` | DOUBLE PRECISION      | not null                     | Planned destination longitude              |
-| `start_time`            | BIGINT                | not null                     | Epoch ms when ride started                 |
+| `start_time`            | TIMESTAMP (UTC)       | not null                     | Epoch ms when ride started                 |
 | `predicted_score`       | SMALLINT              | not null, default random 1–5 | ML-model score (1–5) to help driver decide |
-| `end_time`              | BIGINT                | nullable                     | Epoch ms when ride ended                   |
+| `end_time`              | TIMESTAMP (UTC)       | nullable                     | Epoch ms when ride ended                   |
 | `earning_cents`         | INTEGER               | nullable                     | Actual fare in cents                       |
 | `earning_per_min`       | INTEGER               | nullable                     | Fare-per-minute in cents                   |
 | `distance_km`           | DOUBLE PRECISION      | nullable                     | Total kilometers driven                    |
-| `created_at`            | TIMESTAMP             | default now()                | Record creation timestamp                  |
-| `updated_at`            | TIMESTAMP             |                              | Record last update timestamp               |
+| `created_at`            | TIMESTAMP (UTC)       | default now()                | Record creation timestamp                  |
+| `updated_at`            | TIMESTAMP (UTC)       |                              | Record last update timestamp               |
+
+> Avoid Race condition: 2 rides starting simultaneously:
+
+ ```sql
+ALTER TABLE rides
+ADD CONSTRAINT one_active_ride_per_shift
+UNIQUE (shift_id) WHERE end_time IS NULL;
+```
 
 #### Service-Layer Methods
 
@@ -57,6 +66,8 @@ Tracks each passenger trip taken by a driver.
    * **Checks:**
 
      * `canStartRide(driverId)`
+     * `coordinateValidation()`: if (lat < -90 || lat > 90 || lng < -180 || lng > 180) throw BadRequest;
+
    * **Action:**
 
      * Call `evaluateRide(...)`
@@ -76,6 +87,13 @@ Tracks each passenger trip taken by a driver.
 6. **getRideStatus(driverId, \[overrideDestination])**
 
    * **Purpose:** returns current trip summary, recalculating distance/time/fare if the driver’s final dropoff differs.
+
+
+7. **manageExpiredRides** (Runs every hour --> No need to configure that logic to auto run now)
+
+   - **Purpose:** auto-close or purge any active Ride who is going on for the last 4 hours
+   - **Logic:**
+     1. Nullify every ride and put duration 0
 
 ---
 
@@ -164,7 +182,6 @@ All endpoints under **`/api/rides`**, protected by `protect` middleware.
       "elapsed_time_ms":   900000,
       "distance_km":       3.5,
       "estimated_fare_cents": 1050,
-      "currency":          "USD"
     }
   }
   ```

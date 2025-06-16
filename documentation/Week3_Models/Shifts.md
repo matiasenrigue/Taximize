@@ -8,18 +8,18 @@ Records every heartbeat (“signal”) a driver emits about their shift.
 | Column       | Type                    | Constraints                                            | Description                  |
 | ------------ | ----------------------- | ------------------------------------------------------ | ---------------------------- |
 | `id`         | UUID (PK)               | default UUIDV4, not null                               | Primary key                  |
-| `timestamp`  | BIGINT (ms since epoch) | not null                                               | When the signal was sent     |
-| `driver_id`  | UUID (FK → users.id)    | not null                                               | Which driver sent the signal |
+| `timestamp`  | TIMESTAMP (UTC)         | not null                                               | When the signal was sent     |
+| `shift_id`   | UUID (FK → shift.id)    | not null                                               | Which shift sent the signal |
 | `signal`     | ENUM                    | values: `start`, `stop`, `pause`, `continue`; not null | What kind of signal this is  |
-| `created_at` | TIMESTAMP               | default now()                                          | Record creation time         |
-| `updated_at` | TIMESTAMP               |                                                        | Record update time           |
+| `created_at` | TIMESTAMP (UTC)         | default now()                                          | Record creation time         |
+| `updated_at` | TIMESTAMP (UTC)         |                                                        | Record update time           |
 
 
 #### Methods / Procedures
 
 1. **manageExpiredShifts** (Runs every hour --> No need to configure that logic to auto run now)
 
-   - **Purpose:** auto-close or purge any shift whose last signal is `start` or `continue` older than the “expiration” threshold (2 days?)
+   - **Purpose:** auto-close or purge any shift whose last signal is not `stop` older than the “expiration” threshold (2 days?)
    - **Logic:**
      1. Find each driver with no `stop` signal and last signal > N hours ago.
      2. If they have rides recorded during that window:
@@ -64,6 +64,7 @@ function canReceiveSignal(driverId: string, newSignal: Signal): boolean {
 3. **handleSignal(driverId, timestamp, signal)**
 
    * Validate via **isValidSignal**
+   * If `signal === 'start'` → register entry in ShiftDB, only adding ShiftID and StartDate
   * If `signal === 'stop'` → call **saveShift** (then purge that shift’s signals)
   * If `signal === 'continue'` → call **saveShiftPause**
    * Insert into `ShiftSignals`
@@ -96,12 +97,12 @@ Logs each break interval within a shift.
 | Column        | Type                 | Constraints              | Description               |
 | ------------- | -------------------- | ------------------------ | ------------------------- |
 | `id`          | UUID (PK)            | default UUIDV4, not null | Primary key               |
-| `driver_id`   | UUID (FK → users.id) | not null                 | Which driver              |
-| `pause_start` | BIGINT (ms)          | not null                 | When pause began          |
-| `pause_end`   | BIGINT (ms)          | not null                 | When pause ended          |
+| `shift_id`    | UUID (FK → shift.id)  | not null                | Which shift sent the signal |
+| `pause_start` | TIMESTAMP (UTC)      | not null                 | When pause began          |
+| `pause_end`   | TIMESTAMP (UTC)      | not null                 | When pause ended          |
 | `duration_ms` | BIGINT               | not null                 | `pause_end - pause_start` |
-| `created_at`  | TIMESTAMP            | default now()            |                           |
-| `updated_at`  | TIMESTAMP            |                          |                           |
+| `created_at`  | TIMESTAMP (UTC)      | default now()            |                           |
+| `updated_at`  | TIMESTAMP (UTC)      |                          |                           |
 
 ---
 
@@ -113,22 +114,22 @@ Summarizes a completed shift once the driver sends `stop`.
 | ------------------- | -------------------- | ------------------------ | ------------------------------------------------- |
 | `id`                | UUID (PK)            | default UUIDV4, not null | Primary key                                       |
 | `driver_id`         | UUID (FK → users.id) | not null                 | Which driver                                      |
-| `shift_start`       | BIGINT (ms)          | not null                 | Timestamp of `start`                              |
-| `shift_end`         | BIGINT (ms)          | not null                 | Timestamp of `stop`                               |
-| `total_duration_ms` | BIGINT               | not null                 | `shift_end - shift_start`                         |
-| `work_time_ms`      | BIGINT               | not null                 | `total_duration_ms - sum(pause durations)`        |
-| `break_time_ms`     | BIGINT               | not null                 | sum of all pause durations                        |
-| `num_breaks`        | INT                  | not null                 | number of entries in `ShiftPauses` for this shift |
+| `shift_start`       | TIMESTAMP (UTC)      | not null                 | Timestamp of `start`                              |
+| `shift_end`         | TIMESTAMP (UTC)      |                          | Timestamp of `stop`                               |
+| `total_duration_ms` | BIGINT               |                          | `shift_end - shift_start`                         |
+| `work_time_ms`      | BIGINT               |                          | `total_duration_ms - sum(pause durations)`        |
+| `break_time_ms`     | BIGINT               |                          | sum of all pause durations                        |
+| `num_breaks`        | INT                  |                          | number of entries in `ShiftPauses` for this shift |
 | `avg_break_ms`      | BIGINT               |                          | `break_time_ms / num_breaks`                      |
-| `created_at`        | TIMESTAMP            | default now()            |                                                   |
-| `updated_at`        | TIMESTAMP            |                          |                                                   |
+| `created_at`        | TIMESTAMP (UTC)      | default now()            |                                                   |
+| `updated_at`        | TIMESTAMP (UTC)      |                          |                                                   |
 
 #### Save-Time Computations
 
 * **computeBreaks(shiftStart, shiftEnd, driverId):**
   gathers all `ShiftPauses` between those timestamps → sums durations, counts, computes average
 * **computeWorkTime:**
-  gather all `Rides for the shift` and computes: total earnings, average earnings, rides numbers, avg ride score
+  gather all `Rides for the shift` and computes: total earnings, average earnings, rides numbers, avg ride score, iddle time (time where taxi driver was looking for passenger, but not paused nor doing a ride)
 
 ---
 
