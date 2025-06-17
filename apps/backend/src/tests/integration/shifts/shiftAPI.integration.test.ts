@@ -5,6 +5,22 @@ import User from '../../../models/userModel';
 import Shift from '../../../models/shiftModel';
 import ShiftSignal from '../../../models/shiftSignalModel';
 import ShiftPause from '../../../models/shiftPauseModel';
+import { generateAccessToken } from '../../../utils/generateTokens';
+
+// Set up environment variables for testing
+process.env.ACCESS_TOKEN_SECRET = 'test-access-token-secret';
+process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
+
+// Helper function to create authenticated user and get token
+async function createAuthenticatedUser(email: string = 'driver@test.com', username: string = 'testdriver') {
+  const user = await User.create({
+    email,
+    username,
+    password: 'password123'
+  });
+  const token = generateAccessToken(user.id);
+  return { user, token };
+}
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'test';
@@ -25,18 +41,11 @@ afterAll(async () => {
 describe('Shift API Integration Tests', () => {
 
   describe('POST /api/shifts/signal', () => {
-    it('should return 200 and handle valid signal transition', async () => {
-      // Test POST /api/shifts/signal returns 200 and handles valid signal transition
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
+    it('should return 401 when no authentication provided', async () => {
+      // Test POST /api/shifts/signal returns 401 when no authentication provided
       const requestBody = {
-        driverId: user.id,
-        timestamp: Date.now(),
-        signal: 'start'
+        signal: 'start',
+        timestamp: Date.now()
       };
 
       const res = await request(app)
@@ -47,69 +56,49 @@ describe('Shift API Integration Tests', () => {
       expect(res.status).toBe(401);
     });
 
-    it('should return 400 when signal transition is invalid', async () => {
-      // Test POST /api/shifts/signal returns 400 when signal transition is invalid
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
-      // Create a shift that's already started
-      const shift = await Shift.create({
-        driver_id: user.id,
-        shift_start: new Date(),
-        shift_end: null
-      });
-
-      await ShiftSignal.create({
-        timestamp: new Date(),
-        shift_id: shift.id,
-        signal: 'start'
-      });
-
+    it('should return 400 when authenticated but invalid signal provided', async () => {
+      // Test authenticated user gets validation error for invalid signal
+      const { token } = await createAuthenticatedUser();
+      
       const requestBody = {
-        driverId: user.id,
-        timestamp: Date.now(),
-        signal: 'start' // Invalid: can't start again
+        signal: 'invalid-signal',
+        timestamp: Date.now()
       };
 
       const res = await request(app)
         .post('/api/shifts/signal')
+        .set('Authorization', `Bearer ${token}`)
         .send(requestBody);
         
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toContain('Invalid signal type');
     });
 
-    it('should return 400 when required fields are missing', async () => {
-      // Test POST /api/shifts/signal returns 400 when required fields are missing
+    it('should return 400 when authenticated but missing signal', async () => {
+      // Test authenticated user gets validation error for missing signal
+      const { token } = await createAuthenticatedUser();
+      
       const requestBody = {
-        timestamp: Date.now(),
-        signal: 'start'
-        // Missing driverId
+        timestamp: Date.now()
+        // Missing signal
       };
 
       const res = await request(app)
         .post('/api/shifts/signal')
+        .set('Authorization', `Bearer ${token}`)
         .send(requestBody);
         
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toContain('Signal is required');
     });
   });
 
   describe('POST /api/shifts/start-shift', () => {
-    it('should return 200 and create new shift when driver has no active shift', async () => {
-      // Test POST /api/shifts/start-shift returns 200 and creates new shift when driver has no active shift
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
+    it('should return 401 when no authentication provided', async () => {
+      // Test POST /api/shifts/start-shift returns 401 when no authentication provided
       const requestBody = {
-        driverId: user.id,
         timestamp: Date.now()
       };
 
@@ -121,52 +110,29 @@ describe('Shift API Integration Tests', () => {
       expect(res.status).toBe(401);
     });
 
-    it('should return 400 when driver already has active shift', async () => {
-      // Test POST /api/shifts/start-shift returns 400 when driver already has active shift
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
-      // Create an active shift
-      await Shift.create({
-        driver_id: user.id,
-        shift_start: new Date(),
-        shift_end: null
-      });
-
+    it('should return 200 when authenticated driver starts first shift', async () => {
+      // Test authenticated driver can successfully start first shift
+      const { token } = await createAuthenticatedUser();
+      
       const requestBody = {
-        driverId: user.id,
         timestamp: Date.now()
       };
 
       const res = await request(app)
         .post('/api/shifts/start-shift')
+        .set('Authorization', `Bearer ${token}`)
         .send(requestBody);
         
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toContain('successfully');
     });
   });
 
   describe('POST /api/shifts/pause-shift', () => {
-    it('should return 200 and pause active shift when driver has active shift', async () => {
-      // Test POST /api/shifts/pause-shift returns 200 and pauses active shift when driver has active shift
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
-      const shift = await Shift.create({
-        driver_id: user.id,
-        shift_start: new Date(),
-        shift_end: null
-      });
-
+    it('should return 401 when no authentication provided', async () => {
+      // Test POST /api/shifts/pause-shift returns 401 when no authentication provided
       const requestBody = {
-        driverId: user.id,
         timestamp: Date.now()
       };
 
@@ -178,86 +144,29 @@ describe('Shift API Integration Tests', () => {
       expect(res.status).toBe(401);
     });
 
-    it('should return 400 when driver has no active shift', async () => {
-      // Test POST /api/shifts/pause-shift returns 400 when driver has no active shift
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
+    it('should return 400 when authenticated driver has no active shift', async () => {
+      // Test authenticated driver cannot pause non-existent shift
+      const { token } = await createAuthenticatedUser();
+      
       const requestBody = {
-        driverId: user.id,
         timestamp: Date.now()
       };
 
       const res = await request(app)
         .post('/api/shifts/pause-shift')
+        .set('Authorization', `Bearer ${token}`)
         .send(requestBody);
         
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
-    });
-
-    it('should return 400 when shift is already paused', async () => {
-      // Test POST /api/shifts/pause-shift returns 400 when shift is already paused
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
-      const shift = await Shift.create({
-        driver_id: user.id,
-        shift_start: new Date(),
-        shift_end: null
-      });
-
-      // Add a pause signal
-      await ShiftSignal.create({
-        timestamp: new Date(),
-        shift_id: shift.id,
-        signal: 'pause'
-      });
-
-      const requestBody = {
-        driverId: user.id,
-        timestamp: Date.now()
-      };
-
-      const res = await request(app)
-        .post('/api/shifts/pause-shift')
-        .send(requestBody);
-        
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toContain('No active shift');
     });
   });
 
   describe('POST /api/shifts/continue-shift', () => {
-    it('should return 200 and continue paused shift when driver has paused shift', async () => {
-      // Test POST /api/shifts/continue-shift returns 200 and continues paused shift when driver has paused shift
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
-      const shift = await Shift.create({
-        driver_id: user.id,
-        shift_start: new Date(),
-        shift_end: null
-      });
-
-      // Add a pause signal
-      await ShiftSignal.create({
-        timestamp: new Date(),
-        shift_id: shift.id,
-        signal: 'pause'
-      });
-
+    it('should return 401 when no authentication provided', async () => {
+      // Test POST /api/shifts/continue-shift returns 401 when no authentication provided
       const requestBody = {
-        driverId: user.id,
         timestamp: Date.now()
       };
 
@@ -269,79 +178,29 @@ describe('Shift API Integration Tests', () => {
       expect(res.status).toBe(401);
     });
 
-    it('should return 400 when driver has no active shift', async () => {
-      // Test POST /api/shifts/continue-shift returns 400 when driver has no active shift
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
+    it('should return 400 when authenticated driver has no paused shift', async () => {
+      // Test authenticated driver cannot continue non-paused shift
+      const { token } = await createAuthenticatedUser();
+      
       const requestBody = {
-        driverId: user.id,
         timestamp: Date.now()
       };
 
       const res = await request(app)
         .post('/api/shifts/continue-shift')
+        .set('Authorization', `Bearer ${token}`)
         .send(requestBody);
         
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
-    });
-
-    it('should return 400 when shift is not paused', async () => {
-      // Test POST /api/shifts/continue-shift returns 400 when shift is not paused
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
-      const shift = await Shift.create({
-        driver_id: user.id,
-        shift_start: new Date(),
-        shift_end: null
-      });
-
-      // Add a start signal (not paused)
-      await ShiftSignal.create({
-        timestamp: new Date(),
-        shift_id: shift.id,
-        signal: 'start'
-      });
-
-      const requestBody = {
-        driverId: user.id,
-        timestamp: Date.now()
-      };
-
-      const res = await request(app)
-        .post('/api/shifts/continue-shift')
-        .send(requestBody);
-        
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toContain('No paused shift');
     });
   });
 
   describe('POST /api/shifts/end-shift', () => {
-    it('should return 200 and end active shift with computed statistics', async () => {
-      // Test POST /api/shifts/end-shift returns 200 and ends active shift with computed statistics
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
-      const shift = await Shift.create({
-        driver_id: user.id,
-        shift_start: new Date(),
-        shift_end: null
-      });
-
+    it('should return 401 when no authentication provided', async () => {
+      // Test POST /api/shifts/end-shift returns 401 when no authentication provided
       const requestBody = {
-        driverId: user.id,
         timestamp: Date.now()
       };
 
@@ -353,106 +212,46 @@ describe('Shift API Integration Tests', () => {
       expect(res.status).toBe(401);
     });
 
-    it('should return 400 when driver has no active shift', async () => {
-      // Test POST /api/shifts/end-shift returns 400 when driver has no active shift
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
+    it('should return 400 when authenticated driver has no active shift', async () => {
+      // Test authenticated driver cannot end non-existent shift
+      const { token } = await createAuthenticatedUser();
+      
       const requestBody = {
-        driverId: user.id,
         timestamp: Date.now()
       };
 
       const res = await request(app)
         .post('/api/shifts/end-shift')
+        .set('Authorization', `Bearer ${token}`)
         .send(requestBody);
         
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
-    });
-
-    it('should return 400 when shift is already ended', async () => {
-      // Test POST /api/shifts/end-shift returns 400 when shift is already ended
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
-      // Create an already ended shift
-      await Shift.create({
-        driver_id: user.id,
-        shift_start: new Date(),
-        shift_end: new Date(), // Already ended
-        total_duration_ms: 8 * 60 * 60 * 1000,
-        work_time_ms: 7 * 60 * 60 * 1000,
-        break_time_ms: 60 * 60 * 1000
-      });
-
-      const requestBody = {
-        driverId: user.id,
-        timestamp: Date.now()
-      };
-
-      const res = await request(app)
-        .post('/api/shifts/end-shift')
-        .send(requestBody);
-        
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toContain('No active shift');
     });
   });
 
   describe('GET /api/shifts/current', () => {
-    it('should return 200 and current shift status when driver has active shift', async () => {
-      // Test GET /api/shifts/current returns 200 and current shift status when driver has active shift
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
-      const shift = await Shift.create({
-        driver_id: user.id,
-        shift_start: new Date(),
-        shift_end: null
-      });
-
-      const res = await request(app)
-        .get('/api/shifts/current')
-        .query({ driverId: user.id });
-        
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
-    });
-
-    it('should return 200 and null when driver has no active shift', async () => {
-      // Test GET /api/shifts/current returns 200 and null when driver has no active shift
-      const user = await User.create({
-        email: 'driver@test.com',
-        username: 'testdriver',
-        password: 'password123'
-      });
-
-      const res = await request(app)
-        .get('/api/shifts/current')
-        .query({ driverId: user.id });
-        
-      // Expecting 401 since routes are implemented but require authentication (Green phase)
-      expect(res.status).toBe(401);
-    });
-
-    it('should return 400 when driverId is missing', async () => {
-      // Test GET /api/shifts/current returns 400 when driverId is missing
+    it('should return 401 when no authentication provided', async () => {
+      // Test GET /api/shifts/current returns 401 when no authentication provided
       const res = await request(app)
         .get('/api/shifts/current');
         
       // Expecting 401 since routes are implemented but require authentication (Green phase)
       expect(res.status).toBe(401);
     });
-  });
 
+    it('should return 200 with no shift status when authenticated driver has no shift', async () => {
+      // Test authenticated driver with no shift gets appropriate response
+      const { token } = await createAuthenticatedUser();
+
+      const res = await request(app)
+        .get('/api/shifts/current')
+        .set('Authorization', `Bearer ${token}`);
+        
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.isOnShift).toBe(false);
+    });
+  });
 }); 
