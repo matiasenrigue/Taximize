@@ -17,7 +17,7 @@ export const protect = asyncHandler(
         // Verify token and extract payload
         const decoded = jwt.verify(
           token,
-          process.env.JWT_SECRET!  
+          process.env.ACCESS_TOKEN_SECRET!  
         ) as { id: string; iat: number; exp: number };
 
         // Fetch user instance by primary key
