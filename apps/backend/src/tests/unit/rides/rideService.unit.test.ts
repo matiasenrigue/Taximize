@@ -1,4 +1,15 @@
 import { RideService } from '../../../services/rideService';
+import { sequelize } from '../../../config/db';
+
+// Set up test database before running tests
+beforeAll(async () => {
+  process.env.NODE_ENV = 'test';
+  await sequelize.sync({ force: true });
+});
+
+afterAll(async () => {
+  await sequelize.close();
+});
 
 describe('RideService Unit Tests', () => {
 
