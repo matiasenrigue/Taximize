@@ -159,6 +159,30 @@ describe('ShiftService Unit Tests', () => {
       await expect(ShiftService.manageExpiredShifts())
         .rejects.toThrow('Method not implemented');
     });
+
+    it('should purge shifts older than 2 days with no rides', async () => {
+      // Test that manageExpiredShifts purges shifts older than 2 days with no rides
+      await expect(ShiftService.manageExpiredShifts())
+        .rejects.toThrow('Method not implemented');
+    });
+
+    it('should generate synthetic stop for stale shifts that have rides', async () => {
+      // Test that manageExpiredShifts generates synthetic stop for stale shifts that have rides
+      await expect(ShiftService.manageExpiredShifts())
+        .rejects.toThrow('Method not implemented');
+    });
+
+    it('should not affect active or recently stopped shifts', async () => {
+      // Test that manageExpiredShifts does not affect active or recently stopped shifts
+      await expect(ShiftService.manageExpiredShifts())
+        .rejects.toThrow('Method not implemented');
+    });
+
+    it('should log each cleanup action performed', async () => {
+      // Test that manageExpiredShifts logs each cleanup action performed
+      await expect(ShiftService.manageExpiredShifts())
+        .rejects.toThrow('Method not implemented');
+    });
   });
 
   describe('computeBreaks', () => {

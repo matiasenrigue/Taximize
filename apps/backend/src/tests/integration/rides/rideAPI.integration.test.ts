@@ -391,4 +391,47 @@ describe('Ride API Integration Tests', () => {
     });
   });
 
+  describe('Database Constraints', () => {
+    it('should violate unique constraint when creating second active ride for same shift', async () => {
+      // Test that inserting a second ride for the same shift_id with end_time IS NULL violates the one_active_ride_per_shift unique constraint
+      const user = await User.create({
+        email: 'driver@test.com',
+        username: 'testdriver',
+        password: 'password123'
+      });
+
+      const shift = await Shift.create({
+        driver_id: user.id,
+        shift_start: new Date(),
+        shift_end: null
+      });
+
+      // Create first active ride
+      await Ride.create({
+        shift_id: shift.id,
+        driver_id: user.id,
+        start_latitude: 53.349805,
+        start_longitude: -6.260310,
+        destination_latitude: 53.359805,
+        destination_longitude: -6.270310,
+        start_time: new Date(),
+        predicted_score: 3,
+        end_time: null // Active ride
+      });
+
+      // Attempt to create second active ride for same shift - should fail
+      await expect(Ride.create({
+        shift_id: shift.id, // Same shift
+        driver_id: user.id,
+        start_latitude: 53.359805,
+        start_longitude: -6.270310,
+        destination_latitude: 53.369805,
+        destination_longitude: -6.280310,
+        start_time: new Date(),
+        predicted_score: 4,
+        end_time: null // Active ride - should violate constraint
+      })).rejects.toThrow(); // Expecting constraint violation
+    });
+  });
+
 }); 

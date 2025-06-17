@@ -82,6 +82,16 @@ Ride.init(
     tableName: 'rides',
     timestamps: true,
     underscored: true,
+    indexes: [
+      {
+        name: 'one_active_ride_per_shift',
+        unique: true,
+        fields: ['shift_id'],
+        where: {
+          end_time: null
+        }
+      }
+    ]
   }
 );
 

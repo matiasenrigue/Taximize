@@ -84,6 +84,36 @@ describe('RideService Unit Tests', () => {
         .rejects.toThrow('Method not implemented');
     });
 
+    it('should throw BadRequest when invalid latitude/longitude provided', async () => {
+      // Test that startRide throws BadRequest on invalid latitude/longitude
+      const driverId = 'test-driver-1';
+      const shiftId = 'test-shift-1';
+      const coordsInvalidLat = {
+        startLat: 95, // Invalid: > 90
+        startLng: -6.260310,
+        destLat: 53.359805,
+        destLng: -6.270310
+      };
+
+      await expect(RideService.startRide(driverId, shiftId, coordsInvalidLat))
+        .rejects.toThrow('Method not implemented');
+    });
+
+    it('should throw BadRequest when invalid longitude provided', async () => {
+      // Test that startRide throws BadRequest on invalid longitude
+      const driverId = 'test-driver-1';
+      const shiftId = 'test-shift-1';
+      const coordsInvalidLng = {
+        startLat: 53.349805,
+        startLng: -185, // Invalid: < -180
+        destLat: 53.359805,
+        destLng: -6.270310
+      };
+
+      await expect(RideService.startRide(driverId, shiftId, coordsInvalidLng))
+        .rejects.toThrow('Method not implemented');
+    });
+
     it('should throw error when driver cannot start ride', async () => {
       // Test that startRide throws error when driver cannot start ride
       const driverId = 'test-driver-2';
@@ -95,6 +125,22 @@ describe('RideService Unit Tests', () => {
         destLng: -6.270310
       };
 
+      await expect(RideService.startRide(driverId, shiftId, coords))
+        .rejects.toThrow('Method not implemented');
+    });
+
+    it('should violate unique constraint when inserting second active ride for same shift', async () => {
+      // Test that inserting a second ride for the same shift_id with end_time IS NULL violates the one_active_ride_per_shift unique constraint
+      const driverId = 'test-driver-1';
+      const shiftId = 'test-shift-1';
+      const coords = {
+        startLat: 53.349805,
+        startLng: -6.260310,
+        destLat: 53.359805,
+        destLng: -6.270310
+      };
+
+      // This test will verify the unique constraint violation in the GREEN phase
       await expect(RideService.startRide(driverId, shiftId, coords))
         .rejects.toThrow('Method not implemented');
     });
@@ -162,6 +208,18 @@ describe('RideService Unit Tests', () => {
   describe('manageExpiredRides', () => {
     it('should end expired rides that have exceeded time limit', async () => {
       // Test that manageExpiredRides ends expired rides that have exceeded time limit
+      await expect(RideService.manageExpiredRides())
+        .rejects.toThrow('Method not implemented');
+    });
+
+    it('should not alter any active ride that began less than 4 hours ago', async () => {
+      // Test that manageExpiredRides does not alter any active ride that began less than 4 hours ago
+      await expect(RideService.manageExpiredRides())
+        .rejects.toThrow('Method not implemented');
+    });
+
+    it('should close rides older than 4 hours by setting duration 0', async () => {
+      // Test that manageExpiredRides closes rides older than 4 hours by setting duration 0
       await expect(RideService.manageExpiredRides())
         .rejects.toThrow('Method not implemented');
     });
