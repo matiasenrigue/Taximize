@@ -8,6 +8,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/authRoutes';
+import rideRoutes from './routes/rideRoutes';
+import shiftRoutes from './routes/shiftRoutes';
 import { errorHandler } from './middleware/errorMiddleware';
 
 const app = express();
@@ -43,6 +45,8 @@ app.use(cookieParser());
 
 
 app.use('/api/auth', authRoutes);
+app.use('/api/rides', rideRoutes);
+app.use('/api/shifts', shiftRoutes);
 
 app.use(errorHandler);
 

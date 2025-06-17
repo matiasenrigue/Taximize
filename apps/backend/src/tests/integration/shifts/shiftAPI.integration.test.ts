@@ -43,8 +43,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/signal')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when signal transition is invalid', async () => {
@@ -78,8 +78,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/signal')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when required fields are missing', async () => {
@@ -94,8 +94,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/signal')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
   });
 
@@ -117,8 +117,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/start-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when driver already has active shift', async () => {
@@ -145,8 +145,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/start-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
   });
 
@@ -174,8 +174,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/pause-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when driver has no active shift', async () => {
@@ -195,8 +195,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/pause-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when shift is already paused', async () => {
@@ -229,8 +229,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/pause-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
   });
 
@@ -265,8 +265,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/continue-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when driver has no active shift', async () => {
@@ -286,8 +286,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/continue-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when shift is not paused', async () => {
@@ -320,8 +320,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/continue-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
   });
 
@@ -349,8 +349,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/end-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when driver has no active shift', async () => {
@@ -370,8 +370,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/end-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when shift is already ended', async () => {
@@ -401,8 +401,8 @@ describe('Shift API Integration Tests', () => {
         .post('/api/shifts/end-shift')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
   });
 
@@ -425,8 +425,8 @@ describe('Shift API Integration Tests', () => {
         .get('/api/shifts/current')
         .query({ driverId: user.id });
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 200 and null when driver has no active shift', async () => {
@@ -441,8 +441,8 @@ describe('Shift API Integration Tests', () => {
         .get('/api/shifts/current')
         .query({ driverId: user.id });
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when driverId is missing', async () => {
@@ -450,8 +450,8 @@ describe('Shift API Integration Tests', () => {
       const res = await request(app)
         .get('/api/shifts/current');
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
   });
 

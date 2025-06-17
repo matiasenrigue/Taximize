@@ -1,14 +1,16 @@
 // Placeholder file for TDD Red phase - routes will be implemented in Green phase
 import { Router } from 'express';
+import { ShiftController } from '../controllers/shiftController';
+import { protect } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// Routes will be implemented in Green phase
-// POST /api/shifts/signal
-// POST /api/shifts/start-shift
-// POST /api/shifts/pause-shift
-// POST /api/shifts/continue-shift
-// POST /api/shifts/end-shift
-// GET /api/shifts/current
+// All routes are protected by JWT authentication
+router.post('/signal', protect, ShiftController.emitSignal);
+router.post('/start-shift', protect, ShiftController.startShift);
+router.post('/pause-shift', protect, ShiftController.pauseShift);
+router.post('/continue-shift', protect, ShiftController.continueShift);
+router.post('/end-shift', protect, ShiftController.endShift);
+router.get('/current', protect, ShiftController.getCurrentShift);
 
 export default router; 

@@ -44,8 +44,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/evaluate-ride')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when invalid coordinates provided', async () => {
@@ -61,8 +61,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/evaluate-ride')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when missing required coordinates', async () => {
@@ -77,8 +77,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/evaluate-ride')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
   });
 
@@ -112,8 +112,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/start-ride')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when driver already has active ride', async () => {
@@ -157,8 +157,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/start-ride')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when driver has no active shift', async () => {
@@ -184,8 +184,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/start-ride')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
   });
 
@@ -224,8 +224,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/get-ride-status')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 200 and null when driver has no active ride', async () => {
@@ -244,8 +244,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/get-ride-status')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should use override destination when provided', async () => {
@@ -286,8 +286,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/get-ride-status')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
   });
 
@@ -328,8 +328,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/end-ride')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 404 when ride is not found', async () => {
@@ -344,8 +344,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/end-ride')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
 
     it('should return 400 when ride is already ended', async () => {
@@ -386,8 +386,8 @@ describe('Ride API Integration Tests', () => {
         .post('/api/rides/end-ride')
         .send(requestBody);
         
-      // Expecting 404 since routes are not implemented yet (Red phase)
-      expect(res.status).toBe(404);
+      // Expecting 401 since routes are implemented but require authentication (Green phase)
+      expect(res.status).toBe(401);
     });
   });
 
