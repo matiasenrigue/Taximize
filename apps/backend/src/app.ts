@@ -7,10 +7,10 @@ import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
-import authRoutes from './routes/authRoutes';
-import rideRoutes from './routes/rideRoutes';
-import shiftRoutes from './routes/shiftRoutes';
-import { errorHandler } from './middleware/errorMiddleware';
+import authRoutes from './entities/auth/auth.routes';
+import rideRoutes from './entities/rides/ride.routes';
+import shiftRoutes from './entities/shifts/shift.routes';
+import { errorHandler } from './shared/middleware/error.middleware';
 
 const app = express();
 
