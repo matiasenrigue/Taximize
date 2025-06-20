@@ -48,6 +48,7 @@
     border: solid 1px var(--color-border);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
+    z-index: 1000; /* ensure that the options are displayed above other elements */
 }
 
 .options_container[data-open=false] {
