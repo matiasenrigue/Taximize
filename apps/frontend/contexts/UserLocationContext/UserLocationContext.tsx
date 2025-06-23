@@ -1,8 +1,8 @@
 import {createContext, PropsWithChildren, useContext, useEffect, useState} from "react";
 
 interface Location {
-    latitude: number;
-    longitude: number;
+    lat: number;
+    lng: number;
 }
 
 interface UserLocationContextType {
@@ -20,8 +20,8 @@ export const UserLocationContextProvider = (props: PropsWithChildren) => {
             return;
 
         const watchId = navigator.geolocation.watchPosition((position) => {
-            const {latitude, longitude} = position.coords;
-            setLocation({latitude, longitude});
+            const {latitude: lat, longitude: lng} = position.coords;
+            setLocation({lat, lng});
         }, (error) => {
             console.warn("Error:", error);
         }, {});

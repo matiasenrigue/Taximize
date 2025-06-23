@@ -14,7 +14,6 @@ export const BreakModalHandler = () => {
     useEffect(() => {
         const delay = 1000 * 10;
         const intervalId = setInterval(() => {
-            console.log("check break time");
             if (checkBreakTime())
                 breakReminderModalRef.current.open();
         }, delay);

@@ -3,41 +3,66 @@
 import styles from "./Searchbar.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faMagnifyingGlass, faXmarkCircle} from "@fortawesome/free-solid-svg-icons";
-import {InputHTMLAttributes, useRef} from "react";
+import {ForwardedRef, forwardRef, InputHTMLAttributes, useImperativeHandle, useRef} from "react";
 
 export interface SearchbarProps extends InputHTMLAttributes<HTMLInputElement>{
     onConfirm?: (value: string) => void;
+    onClear?: () => void;
 }
 
-export const Searchbar = (props: SearchbarProps) => {
+export interface SearchbarHandle {
+    focus: () => void;
+    blur: () => void;
+    clear: () => void;
+    setValue: (value) => void;
+}
+
+export const Searchbar = forwardRef((props: SearchbarProps, ref: ForwardedRef<SearchbarHandle>) => {
     const {
         placeholder = "Search Address...",
         onKeyDown,
         onBlur,
         onConfirm,
+        onClear,
         ...rest
     } = props;
-    const ref = useRef<HTMLInputElement>(null!);
+    const inputRef = useRef<HTMLInputElement>(null!);
 
-    function focusInput() {
-        ref.current.focus();
+    function focus() {
+        inputRef.current.focus();
     }
 
-    function clearInput() {
-        ref.current.value = "";
-        focusInput();
+    function blur() {
+        inputRef.current.blur();
     }
+
+    function clear() {
+        inputRef.current.value = "";
+        focus();
+        if (onClear) onClear();
+    }
+
+    function setValue(value) {
+        inputRef.current.value = value;
+    }
+
+    useImperativeHandle(ref, () => ({
+        focus,
+        blur,
+        clear,
+        setValue
+    }));
 
     return (
         <div className={styles.searchbar}>
             <div
-                onClick={focusInput}
+                onClick={focus}
                 className={styles.icon}>
                 <FontAwesomeIcon icon={faMagnifyingGlass}/>
             </div>
             <input
                 {...rest}
-                ref={ref}
+                ref={inputRef}
                 className={styles.input}
                 type={"text"}
                 placeholder={placeholder}
@@ -52,10 +77,10 @@ export const Searchbar = (props: SearchbarProps) => {
                 }}/>
             <button
                 className={styles.button_clear}
-                onClick={clearInput}
+                onClick={clear}
                 aria-label={"Clear Input"}>
                 <FontAwesomeIcon icon={faXmarkCircle}/>
             </button>
         </div>
     );
-};
+});

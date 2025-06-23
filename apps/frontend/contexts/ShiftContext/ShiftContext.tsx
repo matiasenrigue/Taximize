@@ -3,15 +3,21 @@
 import {createContext, PropsWithChildren, useCallback, useContext, useEffect, useState} from "react";
 import moment from "moment";
 
+interface Location {
+    placeId: string;
+    name: string;
+}
+
 interface ShiftContextType {
-    address: string;
+    destination: Location | null;
     duration: number;
+    isShift: boolean;
     isOnRide: boolean;
     startShift: (duration: number) => void;
     endShift: () => void;
     pauseShift: () => void;
     unpauseShift: () => void;
-    navigateToAddress: (address: string) => void;
+    updateDestination: (location: Location | null) => void;
     startRide: () => void;
     endRide: () => void;
     getRemainingTime: () => string;
@@ -28,7 +34,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const [duration, setDuration] = useState(0);
     const [startTime, setStartTime] = useState<number|null>(() => moment.now());
     const [lastBreakTime, setLastBreakTime] = useState<number|null>(() => moment.now());
-    const [address, setAddress] = useState("");
+    const [destination, setDestination] = useState<Location|null>(null);
     const [isOnRide, setIsOnRide] = useState(false);
 
     const breakModalTime = 3 * 60 * 60 * 1000;
@@ -60,10 +66,11 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     const endRide = useCallback(() => {
         setIsOnRide(false);
+        setDestination(null);
     }, []);
 
-    const navigateToAddress = useCallback((address: string) => {
-        setAddress(address);
+    const updateDestination = useCallback((location: Location) => {
+        setDestination(location);
     }, []);
 
     const getRemainingTime = useCallback(() => {
@@ -82,14 +89,15 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     return (
         <ShiftContext.Provider value={{
-            address,
+            destination,
             duration,
+            isShift,
             isOnRide,
             startShift,
             endShift,
             pauseShift,
             unpauseShift,
-            navigateToAddress,
+            updateDestination,
             startRide,
             endRide,
             getRemainingTime,
