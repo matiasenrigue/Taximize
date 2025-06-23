@@ -13,6 +13,8 @@ import {UserLocationContextProvider} from "../../../contexts/UserLocationContext
 import {APIProvider} from "@vis.gl/react-google-maps";
 import {LocationSearchbar} from "./components/LocationSearchbar";
 import {useRouter} from "next/navigation";
+import {TaxiMeter} from "../../../components/TaxiMeter/TaxiMeter";
+import {FlexGroup} from "../../../components/FlexGroup/FlexGroup";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -47,16 +49,21 @@ export default function MapPage() {
 
                     <div className={styles.button_container}>
                         {isOnRide
-                            ? <Button
-                                elevated={true}
-                                onClick={() => endModalRef.current?.open()}>
-                                {t("endRide")}
-                            </Button>
-                            : destination && <Button
+                            ? <FlexGroup
+                                direction={"column"}
+                                align={"start"}>
+                                <TaxiMeter/>
+                                <Button
+                                    elevated={true}
+                                    onClick={() => endModalRef.current?.open()}>
+                                    {t("endRide")}
+                                </Button>
+                            </FlexGroup>
+                            : (destination && <Button
                                 elevated={true}
                                 onClick={() => startModalRef.current?.open()}>
                                 {t("startRide")}
-                            </Button>}
+                            </Button>)}
                     </div>
                 </div>
             </APIProvider>
