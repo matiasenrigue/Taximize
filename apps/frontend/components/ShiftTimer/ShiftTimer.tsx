@@ -5,7 +5,7 @@ import styles from "./ShiftTimer.module.css";
 import {useEffect, useState} from "react";
 
 export const ShiftTimer = () => {
-    const {getRemainingTime} = useShiftContext();
+    const {isShift, getRemainingTime} = useShiftContext();
     const [remainingTime, setRemainingTime] = useState(() => getRemainingTime());
 
     useEffect(() => {
@@ -17,6 +17,9 @@ export const ShiftTimer = () => {
 
         return () => clearInterval(intervalId);
     }, [getRemainingTime]);
+
+    if (!isShift)
+        return null;
 
     /* suppressHydrationWarning is used to hide the warning that occurs because the Date() used within getRemainingTime
      * will be different on the server-side (pre-rendered) and client-side

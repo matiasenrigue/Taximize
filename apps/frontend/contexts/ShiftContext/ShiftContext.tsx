@@ -1,6 +1,6 @@
 "use client"
 
-import {createContext, PropsWithChildren, useCallback, useContext, useEffect, useState} from "react";
+import {createContext, PropsWithChildren, useCallback, useContext, useState} from "react";
 import moment from "moment";
 
 interface Location {
@@ -73,17 +73,20 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         setDestination(location);
     }, []);
 
+    // returns the remaining shift time, formatted "h:mm"
     const getRemainingTime = useCallback(() => {
         const passedTime = moment.now() - startTime;
-        const remainingTime = duration - passedTime;
-        return moment.utc(Math.max(0, remainingTime)).format('h:mm');
+        const remainingTime = Math.max(0, duration - passedTime);
+        const remainingTimeObj = moment.duration(remainingTime);
+        const hours = Math.floor(remainingTimeObj.asHours()).toString();
+        const minutes = remainingTimeObj.minutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
     }, [duration, startTime]);
 
     const checkBreakTime = useCallback(() => {
         if (!isShift || isPaused)
             return false;
         const time = moment.now() - lastBreakTime;
-        console.log(time, breakModalTime);
         return (time >= breakModalTime);
     }, [lastBreakTime, isShift, isPaused, breakModalTime]);
 
