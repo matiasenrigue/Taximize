@@ -2,7 +2,7 @@
 .menuItem {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 1rem;
     background-color: var(--color-surface);
     padding: 1rem;
     border-bottom: 1px solid var(--color-border);
@@ -20,9 +20,14 @@
 }
 
 .menuItemText {
+    flex-grow: 1;
     font-size: 1rem;
     font-weight: 400;
     color: var(--color-on-surface);
+}
+
+.icon {
+    color: var(--color-on-surface-low-contrast);
 }
 
  /* h-5 w-5 text-gray-400 */
