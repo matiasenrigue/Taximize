@@ -25,5 +25,29 @@
     "emailError": "Please input a valid email address",
     "alreadyHaveAccount": "Already have an account?",
     "signUpError": "Sign up failed"
-  }
+  },
+  "account": {
+    "account": "Account",
+    "shiftSettings": "Shift Settings",
+    "preferences": "Preferences",
+    "statistics": "Statistics"
+  },
+  "preferences": {
+    "preferences": "Preferences",
+    "colorScheme": "Color Scheme",
+    "language": "Language",
+    "geolocation": "Geolocation",
+    "breakWarnings": "Break Warnings",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "profile": {
+  "personalInformation": "Personal Information",
+  "username": "Username",
+  "email": "Email",
+  "manageAccount": "Manage Account",
+  "deleteAccount": "Delete Account",
+  "signout": "Sign Out"
+}
 }

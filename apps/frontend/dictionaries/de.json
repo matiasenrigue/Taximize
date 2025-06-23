@@ -25,5 +25,29 @@
     "emailError": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
     "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
     "signUpError": "Signup fehlgeschlagen"
+  },
+  "account": {
+    "account": "Konto",
+    "shiftSettings": "Schichteinstellungen",
+    "preferences": "Einstellungen",
+    "statistics": "Statistiken"
+  },
+  "preferences": {
+    "preferences": "Einstellungen",
+    "colorScheme": "Farbschema",
+    "language": "Sprache",
+    "geolocation": "Geolocation",
+    "breakWarnings": "Pause Warnungen",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  },
+  "profile": {
+    "profile": "Profil",
+    "username": "Benutzername",
+    "email": "E-Mail",
+    "manageAccount": "Konto verwalten",
+    "deleteAccount": "Konto löschen",
+    "signout": "Abmelden"
   }
 }
