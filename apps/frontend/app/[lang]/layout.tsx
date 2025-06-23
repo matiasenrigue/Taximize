@@ -6,6 +6,7 @@ import { Roboto, Roboto_Mono } from "next/font/google";
 import {hasLocale, NextIntlClientProvider} from "next-intl";
 import {routing} from "../../i18n/routing";
 import {notFound} from "next/navigation";
+import { ThemeProvider } from "../../components/ThemeProvider/ThemeProvider";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -55,14 +56,16 @@ export default async function RootLayout({
   return (
     <html lang={lang} prefix="og: https://ogp.me/ns#">
       <body className={`${roboto.variable} ${roboto_mono.variable}`}>
-        <NextIntlClientProvider>
-          <div className={styles.container}>
-            <Header/>
-            <main className={styles.main}>
-              {children}
-            </main>
-          </div>
-        </NextIntlClientProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <NextIntlClientProvider>
+            <div className={styles.container}>
+              <Header/>
+              <main className={styles.main}>
+                {children}
+              </main>
+            </div>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
