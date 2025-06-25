@@ -153,18 +153,23 @@ export class ShiftService {
   static async manageExpiredShifts(): Promise<void> {
     const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
-    // Find drivers with stale shifts (last signal not 'stop' and older than 2 days)
-    const staleSignals = await ShiftSignal.findAll({
-      where: {
-        timestamp: { [Op.lt]: twoDaysAgo }
-      },
-      order: [['timestamp', 'DESC']]
+    // Find each driver with no 'stop' signal and last signal > 2 days ago
+    // First get all active shifts (shift_end is null)
+    const activeShifts = await Shift.findAll({
+      where: { shift_end: null }
     });
 
-    for (const signal of staleSignals) {
-      // Get the shift directly using shift_id since associations might not be set up
-      const shift = await Shift.findByPk(signal.shift_id);
-      if (!shift) continue;
+    for (const shift of activeShifts) {
+      // Get the last signal for this shift
+      const lastSignal = await ShiftSignal.findOne({
+        where: { shift_id: shift.id },
+        order: [['timestamp', 'DESC']]
+      });
+
+      // Skip if no signals or last signal is 'stop' or within 2 days
+      if (!lastSignal || lastSignal.signal === 'stop' || lastSignal.timestamp.getTime() > twoDaysAgo.getTime()) {
+        continue;
+      }
 
       // Check if they have rides during this period
       const ridesCount = await Ride.count({
@@ -188,7 +193,7 @@ export class ShiftService {
             signal: 'stop'
           });
 
-          // Save shift
+          // Save shift using the existing method
           await this.saveShiftByShiftId(shift.id);
         }
       } else {
@@ -347,6 +352,18 @@ export class ShiftService {
   }
 
   private static async handleStartSignal(driverId: string, timestamp: number): Promise<void> {
+    // Check for existing active shift
+    const existingShift = await Shift.findOne({
+      where: { 
+        driver_id: driverId,
+        shift_end: null
+      }
+    });
+
+    if (existingShift) {
+      throw new Error('Driver already has an active shift');
+    }
+
     // Create new shift
     await Shift.create({
       driver_id: driverId,

@@ -60,7 +60,7 @@ Shift.init(
     sequelize,
     tableName: 'shifts',
     timestamps: true,
-    underscored: true,
+    underscored: true
   }
 );
 

@@ -58,7 +58,7 @@ export class ShiftController {
   // @route   POST /api/shifts/start-shift
   // @access  Protected
   static startShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { timestamp } = req.body;
+    const { timestamp } = req.body || {};
     const driverId = req.user?.id;
 
     // Validate authentication
@@ -91,7 +91,7 @@ export class ShiftController {
   // @route   POST /api/shifts/pause-shift
   // @access  Protected
   static pauseShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { timestamp } = req.body;
+    const { timestamp } = req.body || {};
     const driverId = req.user?.id;
 
     // Validate authentication
@@ -124,7 +124,7 @@ export class ShiftController {
   // @route   POST /api/shifts/continue-shift
   // @access  Protected
   static continueShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { timestamp } = req.body;
+    const { timestamp } = req.body || {};
     const driverId = req.user?.id;
 
     // Validate authentication
@@ -157,7 +157,7 @@ export class ShiftController {
   // @route   POST /api/shifts/end-shift
   // @access  Protected
   static endShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { timestamp } = req.body;
+    const { timestamp } = req.body || {};
     const driverId = req.user?.id;
 
     // Validate authentication
