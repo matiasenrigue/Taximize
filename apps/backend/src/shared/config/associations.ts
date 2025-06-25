@@ -1,0 +1,41 @@
+// Initialize all Sequelize associations
+export const initializeAssociations = () => {
+  // Import models to trigger registration
+  const { Shift } = require('../../entities/shifts/shift.model');
+  const { ShiftSignal } = require('../../entities/shifts/shift-signal.model');
+  const { ShiftPause } = require('../../entities/shifts/shift-pause.model');
+  const User = require('../../entities/users/user.model').default;
+
+  // Define associations directly here to avoid circular dependencies
+  // Shift has many signals
+  Shift.hasMany(ShiftSignal, { 
+    foreignKey: 'shift_id',
+    as: 'signals'
+  });
+
+  // Shift has many pauses
+  Shift.hasMany(ShiftPause, { 
+    foreignKey: 'shift_id',
+    as: 'pauses'
+  });
+
+  // Shift belongs to user (driver)
+  Shift.belongsTo(User, { 
+    foreignKey: 'driver_id',
+    as: 'driver'
+  });
+
+  // ShiftSignal belongs to shift
+  ShiftSignal.belongsTo(Shift, { 
+    foreignKey: 'shift_id',
+    as: 'shift'
+  });
+
+  // ShiftPause belongs to shift
+  ShiftPause.belongsTo(Shift, { 
+    foreignKey: 'shift_id',
+    as: 'shift'
+  });
+  
+  console.log('✅ Model associations initialized');
+};

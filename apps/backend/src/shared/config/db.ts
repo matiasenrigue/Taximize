@@ -1,5 +1,6 @@
 // src/config/db.ts
 import { Sequelize } from 'sequelize';
+import { initializeAssociations } from './associations';
 
 const isTest = process.env.NODE_ENV === 'test';
 const isProd = process.env.NODE_ENV === 'production';
@@ -16,6 +17,9 @@ export const sequelize = isTest
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
+
+    // Initialize model associations before sync
+    initializeAssociations();
 
     if (!isProd) {
       // in dev & test, auto-create/alter tables to match models
