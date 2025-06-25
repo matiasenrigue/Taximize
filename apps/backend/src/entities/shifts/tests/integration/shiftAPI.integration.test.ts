@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { sequelize } from '../../../../shared/config/db';
+import { initializeAssociations } from '../../../../shared/config/associations';
 import app from '../../../../app';
 import User from '../../../users/user.model';
 import Shift from '../../shift.model';
@@ -24,14 +25,16 @@ async function createAuthenticatedUser(email: string = 'driver@test.com', userna
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'test';
+  initializeAssociations();
   await sequelize.sync({ force: true });
 });
 
 afterEach(async () => {
-  await User.destroy({ where: {} });
-  await Shift.destroy({ where: {} });
-  await ShiftSignal.destroy({ where: {} });
-  await ShiftPause.destroy({ where: {} });
+  // Clean up in correct order due to foreign key constraints
+  await ShiftSignal.destroy({ where: {}, cascade: true });
+  await ShiftPause.destroy({ where: {}, cascade: true });
+  await Shift.destroy({ where: {}, cascade: true });
+  await User.destroy({ where: {}, cascade: true });
 });
 
 afterAll(async () => {
@@ -252,6 +255,55 @@ describe('Shift API Integration Tests', () => {
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.data.isOnShift).toBe(false);
+    });
+  });
+
+  describe('Database Constraints', () => {
+    it('should prevent multiple active shifts for same driver', async () => {
+      // Test that database constraint prevents multiple active shifts per driver
+      const { user, token } = await createAuthenticatedUser('driver1@test.com', 'driver1');
+
+      // Create first shift
+      const firstShiftRes = await request(app)
+        .post('/api/shifts/start-shift')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(firstShiftRes.status).toBe(200);
+
+      // Try to create second shift - should fail due to unique constraint
+      const res = await request(app)
+        .post('/api/shifts/start-shift')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toContain('already an active Shift');
+    });
+
+    it('should allow new shift after ending previous shift', async () => {
+      // Test that driver can start new shift after properly ending previous one
+      const { user, token } = await createAuthenticatedUser();
+
+      // Start first shift
+      await request(app)
+        .post('/api/shifts/start-shift')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      // End first shift
+      await request(app)
+        .post('/api/shifts/end-shift')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      // Start second shift - should succeed
+      const res = await request(app)
+        .post('/api/shifts/start-shift')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toContain('started successfully');
     });
   });
 }); 
