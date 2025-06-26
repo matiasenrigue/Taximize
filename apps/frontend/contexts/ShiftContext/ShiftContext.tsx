@@ -3,6 +3,7 @@
 import {createContext, PropsWithChildren, useCallback, useContext, useState} from "react";
 import moment from "moment";
 import {formatDuration} from "../../utility/formatDuration";
+import {BREAK_MODAL_TIMEOUT} from "../../constants/constants";
 
 interface ShiftContextType {
     isShift: boolean;
@@ -25,8 +26,6 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const [duration, setDuration] = useState(0);
     const [startTime, setStartTime] = useState<number|null>(null);
     const [lastBreakTime, setLastBreakTime] = useState<number|null>(null);
-
-    const breakModalTime = 3 * 60 * 60 * 1000;
 
     const startShift = useCallback((duration: number) => {
         setDuration(duration);
@@ -60,8 +59,8 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         if (!isShift || isPaused)
             return false;
         const time = moment.now() - lastBreakTime;
-        return (time >= breakModalTime);
-    }, [lastBreakTime, isShift, isPaused, breakModalTime]);
+        return (time >= BREAK_MODAL_TIMEOUT);
+    }, [lastBreakTime, isShift, isPaused]);
 
     const checkIsShiftOver = useCallback((): boolean => {
         if (!isShift || isPaused)

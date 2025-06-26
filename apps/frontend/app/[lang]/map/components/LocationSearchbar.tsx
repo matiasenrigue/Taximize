@@ -5,8 +5,7 @@ import {useLocale} from "next-intl";
 import {SearchResult, SearchResults} from "../../../../components/Searchbar/SearchResults";
 import debounce from "lodash.debounce";
 import {useRide} from "../../../../contexts/RideContext/RideContext";
-
-const NYC_CENTER = {lat: 40.7831, lng: -73.9712};
+import {MAP_CENTER} from "../../../../constants/constants";
 
 export const LocationSearchbar = (props: SearchbarProps) => {
     const searchbarRef = useRef<SearchbarHandle>(null!);
@@ -35,7 +34,7 @@ export const LocationSearchbar = (props: SearchbarProps) => {
             language: locale,
             openNow: false,
             // bias search results towards NYC Manhattan
-            location: NYC_CENTER,
+            location: MAP_CENTER,
             radius: 500.
         };
         placesService.textSearch(request, (results, status) => {
