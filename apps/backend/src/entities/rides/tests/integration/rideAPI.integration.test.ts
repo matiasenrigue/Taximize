@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { sequelize } from '../../../../shared/config/db';
+import { initializeAssociations } from '../../../../shared/config/associations';
 import app from '../../../../app';
 import User from '../../../users/user.model';
 import Ride from '../../ride.model';
@@ -24,14 +25,16 @@ async function createAuthenticatedUser(email: string = 'driver@test.com', userna
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'test';
+  initializeAssociations();
   await sequelize.sync({ force: true });
 });
 
 afterEach(async () => {
-  await User.destroy({ where: {} });
-  await Ride.destroy({ where: {} });
-  await Shift.destroy({ where: {} });
-  await ShiftSignal.destroy({ where: {} });
+  // Clean up in correct order due to foreign key constraints
+  await Ride.destroy({ where: {}, cascade: true });
+  await ShiftSignal.destroy({ where: {}, cascade: true });
+  await Shift.destroy({ where: {}, cascade: true });
+  await User.destroy({ where: {}, cascade: true });
 });
 
 afterAll(async () => {

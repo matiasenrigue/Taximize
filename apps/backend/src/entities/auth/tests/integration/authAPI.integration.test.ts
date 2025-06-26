@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { sequelize } from '../../../../shared/config/db';
+import { initializeAssociations } from '../../../../shared/config/associations';
 import app from '../../../../app';
 import User from '../../../users/user.model';
 import { generateRefreshToken } from '../../utils/generateTokens';
@@ -10,6 +11,7 @@ process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'test';
+  initializeAssociations();
   await sequelize.sync({ force: true });
 });
 
