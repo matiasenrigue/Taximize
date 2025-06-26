@@ -1,7 +1,7 @@
 "use client"
 
 import styles from "./Modal.module.css";
-import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useRef} from "react";
+import React, {ForwardedRef, forwardRef, useCallback, useEffect, useImperativeHandle, useRef} from "react";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
@@ -14,7 +14,7 @@ interface ModalProps extends React.PropsWithChildren {
     title?: string;
 }
 
-export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref) => {
+export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref: ForwardedRef<ModalHandle>) => {
     const {
         title,
         children
@@ -30,6 +30,7 @@ export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref) => {
     }, []);
 
     useImperativeHandle(ref, () => ({
+        test: "hello world",
         open,
         close
     }));

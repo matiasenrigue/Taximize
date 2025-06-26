@@ -2,7 +2,7 @@
 
 import {BreakModal} from "./BreakModal";
 import {BreakReminderModal} from "./BreakReminderModal";
-import {useEffect, useRef} from "react";
+import {useCallback, useEffect, useRef} from "react";
 import {useShiftContext} from "../../contexts/ShiftContext/ShiftContext";
 import {ModalHandle} from "../Modal/Modal";
 
@@ -11,14 +11,19 @@ export const BreakModalHandler = () => {
     const breakReminderModalRef = useRef<ModalHandle>(null!);
     const breakModalRef = useRef<ModalHandle>(null!);
 
+    const triggerBreakReminderModal = useCallback(() => {
+        if (!breakReminderModalRef.current)
+            return;
+        if (checkBreakTime())
+            breakReminderModalRef.current.open();
+    }, [checkBreakTime, breakReminderModalRef.current]);
+
     useEffect(() => {
         const delay = 1000 * 10;
-        const intervalId = setInterval(() => {
-            if (checkBreakTime())
-                breakReminderModalRef.current.open();
-        }, delay);
+        triggerBreakReminderModal();
+        const intervalId = setInterval(triggerBreakReminderModal, delay);
         return () => clearInterval(intervalId);
-    }, [checkBreakTime]);
+    }, [triggerBreakReminderModal]);
 
     return (
         <>

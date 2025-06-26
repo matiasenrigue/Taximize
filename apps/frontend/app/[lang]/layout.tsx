@@ -9,6 +9,7 @@ import {notFound} from "next/navigation";
 import {ShiftContextProvider} from "../../contexts/ShiftContext/ShiftContext";
 import clsx from "clsx";
 import {BreakModalHandler} from "../../components/BreakModalHandler/BreakModalHandler";
+import {ShiftEndModalHandler} from "../../components/ShiftEndModalHandler/ShiftEndModalHandler";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -60,13 +61,17 @@ export default async function RootLayout({
       <body className={clsx(roboto.variable, roboto_mono.variable)}>
         <NextIntlClientProvider>
           <ShiftContextProvider>
+
             <BreakModalHandler/>
+            <ShiftEndModalHandler/>
+
             <div className={styles.container}>
               <Header/>
               <main className={styles.main}>
                 {children}
               </main>
             </div>
+
           </ShiftContextProvider>
         </NextIntlClientProvider>
       </body>

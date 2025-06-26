@@ -25,6 +25,7 @@ interface ShiftContextType {
     checkBreakTime: () => boolean;
     getRideTime: () => string | null;
     getRideFare: () => string | null;
+    checkIsShiftOver: () => boolean;
 }
 
 const ShiftContext = createContext<ShiftContextType|null>(null);
@@ -111,6 +112,14 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         return fare.toFixed(2);
     }, [isOnRide, rideStartTime]);
 
+    const checkIsShiftOver = useCallback((): boolean => {
+        if (!isShift || isPaused || isOnRide)
+            return;
+        const passedTime = moment.now() - startTime;
+        return passedTime >= duration;
+    }, [startTime, duration, isShift, isPaused, isOnRide]);
+
+
     return (
         <ShiftContext.Provider value={{
             destination,
@@ -128,6 +137,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             checkBreakTime,
             getRideTime,
             getRideFare,
+            checkIsShiftOver,
         }}>
             {children}
         </ShiftContext.Provider>

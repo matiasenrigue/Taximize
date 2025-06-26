@@ -14,5 +14,10 @@
   },
   "start-shift": {
     "startShift": "Start Shift"
+  },
+  "ShiftEndModal": {
+    "title": "Shift Over",
+    "text": "Your shift is over.",
+    "confirmButton": "End Shift"
   }
 }
