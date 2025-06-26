@@ -17,6 +17,6 @@ describe("UserLocationContext", () => {
 
     it("throws an error when useUserLocationContext is used outside of UserLocationContextProvider", () => {
         expect(() => render(<UserLocationContextConsumerTest/>))
-            .toThrowError("useUserLocationContext can only be used within <UserLocationContextProvider>!");
+            .toThrowError("useUserLocationContext can only be used within UserLocationContextProvider!");
     });
 });

@@ -91,6 +91,6 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 export const useShift = () => {
     const context = useContext(ShiftContext);
     if (!context)
-        throw new Error("useShiftContext can only be used within <ShiftContextProvider>!");
+        throw new Error("useShiftContext can only be used within ShiftContextProvider!");
     return context;
 };

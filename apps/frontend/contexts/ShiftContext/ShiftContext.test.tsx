@@ -17,6 +17,6 @@ describe("ShiftContext", () => {
 
     it("throws an error when useShiftContext is used outside of ShiftContextProvider", () => {
         expect(() => render(<ShiftContextConsumerTest/>))
-            .toThrowError('useShiftContext can only be used within <ShiftContextProvider>!');
+            .toThrowError('useShiftContext can only be used within ShiftContextProvider!');
     });
 });

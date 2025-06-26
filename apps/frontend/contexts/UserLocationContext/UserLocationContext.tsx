@@ -39,6 +39,6 @@ export const UserLocationContextProvider = (props: PropsWithChildren) => {
 export const useUserLocationContext = () => {
     const context = useContext(UserLocationContext);
     if (!context)
-        throw new Error("useUserLocationContext can only be used within <UserLocationContextProvider>!");
+        throw new Error("useUserLocationContext can only be used within UserLocationContextProvider!");
     return context;
 };

@@ -18,6 +18,9 @@
   --padding-sm: 12px;
   --padding-xs: 6px;
   --icon-size-md: 18px;
+
+  --font-roboto: Roboto, sans-serif;
+  --font-roboto-mono: Roboto Mono, monospaced;
 }
 
 @media (prefers-color-scheme: dark) {

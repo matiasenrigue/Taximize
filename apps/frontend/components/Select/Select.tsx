@@ -88,7 +88,7 @@ export const Option = (props: OptionProps) => {
     const context = useContext(SelectContext);
 
     if (!context)
-        throw new Error('<Option> can only be used as a child of <Select>!');
+        throw new Error('Option can only be used as a child of Select!');
 
     useEffect(() => {
         if (selected)

@@ -82,6 +82,6 @@ export const RideContextProvider = (props: PropsWithChildren) => {
 export const useRide = () => {
     const context = useContext(RideContext);
     if (!context)
-        throw new Error("useRide can only be used within <RideContextProvider>!");
+        throw new Error("useRide can only be used within RideContextProvider!");
     return context;
 };

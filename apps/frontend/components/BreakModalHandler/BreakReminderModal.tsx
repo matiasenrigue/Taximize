@@ -1,13 +1,13 @@
 
 import {useTranslations} from "next-intl";
-import {ForwardedRef, forwardRef} from "react";
+import {ForwardedRef, forwardRef, Ref} from "react";
 import {Modal, ModalHandle} from "../Modal/Modal";
 import {FlexGroup} from "../FlexGroup/FlexGroup";
 import {Button} from "../Button/Button";
 import {useShift} from "../../contexts/ShiftContext/ShiftContext";
 
 interface BreakReminderModalProps {
-    breakModalRef: ModalHandle;
+    breakModalRef: Ref<ModalHandle>;
 }
 
 export const BreakReminderModal = forwardRef((props: BreakReminderModalProps, ref: ForwardedRef<ModalHandle>) => {
@@ -15,10 +15,22 @@ export const BreakReminderModal = forwardRef((props: BreakReminderModalProps, re
     const {pauseShift} = useShift();
     const t = useTranslations('map');
 
+    function closeModal() {
+        if (!ref || typeof ref === "function")
+            return;
+        ref.current.close()
+    }
+
+    function openBreakModal() {
+        if (!breakModalRef || typeof breakModalRef === "function")
+            return;
+        breakModalRef.current.open();
+    }
+
     function takeBreak() {
         pauseShift();
-        ref.current.close();
-        breakModalRef.current.open();
+        closeModal();
+        openBreakModal();
     }
 
     return (
@@ -34,7 +46,7 @@ export const BreakReminderModal = forwardRef((props: BreakReminderModalProps, re
                     align={"stretch"}>
                     <Button
                         theme={"secondary"}
-                        onClick={() => ref?.current?.close()}>
+                        onClick={closeModal}>
                         {t("cancel")}
                     </Button>
                     <Button

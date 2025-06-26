@@ -1,4 +1,4 @@
-import {expect, test} from "@jest/globals";
+import {expect} from "@jest/globals";
 import { render, screen } from '@testing-library/react';
 import {Header} from './Header';
 import {ShiftContextProvider} from "../../contexts/ShiftContext/ShiftContext";

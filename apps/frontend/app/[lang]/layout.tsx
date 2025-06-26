@@ -11,6 +11,7 @@ import clsx from "clsx";
 import {BreakModalHandler} from "../../components/BreakModalHandler/BreakModalHandler";
 import {ShiftEndModalHandler} from "../../components/ShiftEndModalHandler/ShiftEndModalHandler";
 import {RideContextProvider} from "../../contexts/RideContext/RideContext";
+import React from "react";
 
 const roboto = Roboto({
   subsets: ["latin"],

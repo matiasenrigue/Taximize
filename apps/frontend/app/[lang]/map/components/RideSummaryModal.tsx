@@ -11,6 +11,17 @@ export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle
     const t = useTranslations('map');
     const {endRide} = useRide();
 
+    function closeModal() {
+        if (!ref || typeof ref === "function")
+            return;
+        ref.current.close();
+    }
+
+    function endRideAndCloseModal() {
+        endRide();
+        closeModal();
+    }
+
     return (
         <Modal
             ref={ref}
@@ -23,14 +34,11 @@ export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle
                     align={"stretch"}>
                     <Button
                         theme={"secondary"}
-                        onClick={() => ref?.current?.close()}>
+                        onClick={closeModal}>
                         {t("cancel")}
                     </Button>
                     <Button
-                        onClick={() => {
-                            endRide();
-                            ref?.current?.close();
-                        }}>
+                        onClick={endRideAndCloseModal}>
                         {t("endRide")}
                     </Button>
                 </FlexGroup>

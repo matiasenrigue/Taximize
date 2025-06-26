@@ -1,7 +1,7 @@
 "use client"
 
 import styles from "./Modal.module.css";
-import React, {ForwardedRef, forwardRef, useCallback, useEffect, useImperativeHandle, useRef} from "react";
+import React, {ForwardedRef, forwardRef, useCallback, useImperativeHandle, useRef} from "react";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
