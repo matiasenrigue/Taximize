@@ -1,30 +1,17 @@
-"use client"
+"use client";
 
 import {createContext, PropsWithChildren, useCallback, useContext, useState} from "react";
 import moment from "moment";
 import {formatDuration} from "../../utility/formatDuration";
 
-interface Location {
-    placeId: string;
-    name: string;
-}
-
 interface ShiftContextType {
-    destination: Location | null;
-    duration: number;
     isShift: boolean;
-    isOnRide: boolean;
     startShift: (duration: number) => void;
     endShift: () => void;
     pauseShift: () => void;
     unpauseShift: () => void;
-    updateDestination: (location: Location | null) => void;
-    startRide: () => void;
-    endRide: () => void;
     getRemainingTime: () => string;
     checkBreakTime: () => boolean;
-    getRideTime: () => string | null;
-    getRideFare: () => string | null;
     checkIsShiftOver: () => boolean;
 }
 
@@ -38,9 +25,6 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const [duration, setDuration] = useState(0);
     const [startTime, setStartTime] = useState<number|null>(null);
     const [lastBreakTime, setLastBreakTime] = useState<number|null>(null);
-    const [destination, setDestination] = useState<Location|null>(null);
-    const [isOnRide, setIsOnRide] = useState(false);
-    const [rideStartTime, setRideStartTime] = useState<number|null>(null);
 
     const breakModalTime = 3 * 60 * 60 * 1000;
 
@@ -65,21 +49,6 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         setIsPaused(false);
     }, []);
 
-    const startRide = useCallback(() => {
-        setIsOnRide(true);
-        setRideStartTime(moment.now());
-    }, []);
-
-    const endRide = useCallback(() => {
-        setIsOnRide(false);
-        setRideStartTime(null);
-        setDestination(null);
-    }, []);
-
-    const updateDestination = useCallback((location: Location) => {
-        setDestination(location);
-    }, []);
-
     // returns the remaining shift duration, formatted "h:mm"
     const getRemainingTime = useCallback(() => {
         const passedTime = moment.now() - startTime;
@@ -94,49 +63,24 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         return (time >= breakModalTime);
     }, [lastBreakTime, isShift, isPaused, breakModalTime]);
 
-    // returns the duration of the current ride, formatted "h:mm"
-    const getRideTime = useCallback(() => {
-        if (!isOnRide)
-            return null;
-        const passedTime = moment.now() - rideStartTime;
-        return formatDuration(passedTime);
-    }, [isOnRide, rideStartTime]);
-
-    // returns the cost of the ride, formatted with 2 fraction digits
-    // todo: implement proper algorithm
-    const getRideFare = useCallback(() => {
-        if (!isOnRide)
-            return null;
-        const passedTime = moment.now() - rideStartTime;
-        const fare = passedTime * .0001;
-        return fare.toFixed(2);
-    }, [isOnRide, rideStartTime]);
-
     const checkIsShiftOver = useCallback((): boolean => {
-        if (!isShift || isPaused || isOnRide)
-            return;
+        if (!isShift || isPaused)
+            return false;
         const passedTime = moment.now() - startTime;
         return passedTime >= duration;
-    }, [startTime, duration, isShift, isPaused, isOnRide]);
+    }, [startTime, duration, isShift, isPaused]);
 
 
     return (
         <ShiftContext.Provider value={{
-            destination,
             duration,
             isShift,
-            isOnRide,
             startShift,
             endShift,
             pauseShift,
             unpauseShift,
-            updateDestination,
-            startRide,
-            endRide,
             getRemainingTime,
             checkBreakTime,
-            getRideTime,
-            getRideFare,
             checkIsShiftOver,
         }}>
             {children}
@@ -144,7 +88,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     );
 };
 
-export const useShiftContext = () => {
+export const useShift = () => {
     const context = useContext(ShiftContext);
     if (!context)
         throw new Error("useShiftContext can only be used within <ShiftContextProvider>!");

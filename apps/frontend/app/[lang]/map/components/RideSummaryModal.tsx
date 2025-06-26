@@ -3,13 +3,13 @@ import {FlexGroup} from "../../../../components/FlexGroup/FlexGroup";
 import {Button} from "../../../../components/Button/Button";
 import {useTranslations} from "next-intl";
 import {ForwardedRef, forwardRef} from "react";
-import {useShiftContext} from "../../../../contexts/ShiftContext/ShiftContext";
 import {CostInput} from "../../../../components/CostInput/CostInput";
+import {useRide} from "../../../../contexts/RideContext/RideContext";
 
 
 export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('map');
-    const {endRide} = useShiftContext();
+    const {endRide} = useRide();
 
     return (
         <Modal

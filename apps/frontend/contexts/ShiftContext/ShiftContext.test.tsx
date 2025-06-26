@@ -1,9 +1,9 @@
 import {render} from "@testing-library/react";
-import {ShiftContextProvider, useShiftContext} from "./ShiftContext";
+import {ShiftContextProvider, useShift} from "./ShiftContext";
 import {expect} from "@jest/globals";
 
 const ShiftContextConsumerTest = () => {
-    const context = useShiftContext();
+    const context = useShift();
     return null;
 };
 

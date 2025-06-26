@@ -2,7 +2,7 @@
 
 import styles from "./page.module.css";
 import {Button} from "../../../components/Button/Button";
-import {useShiftContext} from "../../../contexts/ShiftContext/ShiftContext";
+import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
 import {useRouter} from "next/navigation";
 import {useState} from "react";
 import {TimeInput} from "../../../components/TimeInput/TimeInput";
@@ -11,7 +11,7 @@ import {useTranslations} from "next-intl";
 
 export default function StartShift() {
     const router = useRouter();
-    const {startShift} = useShiftContext();
+    const {startShift} = useShift();
     const [durationInMilliseconds, setDurationInMilliseconds] = useState<number>(0);
     const t = useTranslations("start-shift");
 

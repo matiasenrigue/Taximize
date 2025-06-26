@@ -1,11 +1,11 @@
 "use client"
 
-import {useShiftContext} from "../../contexts/ShiftContext/ShiftContext";
+import {useShift} from "../../contexts/ShiftContext/ShiftContext";
 import styles from "./ShiftTimer.module.css";
 import {useEffect, useState} from "react";
 
 export const ShiftTimer = () => {
-    const {isShift, getRemainingTime} = useShiftContext();
+    const {isShift, getRemainingTime} = useShift();
     const [remainingTime, setRemainingTime] = useState(() => getRemainingTime());
 
     useEffect(() => {

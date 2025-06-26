@@ -3,8 +3,9 @@ import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useMap, useMapsLibrary} from "@vis.gl/react-google-maps";
 import {useLocale} from "next-intl";
 import {SearchResult, SearchResults} from "../../../../components/Searchbar/SearchResults";
-import {useShiftContext} from "../../../../contexts/ShiftContext/ShiftContext";
+import {useShift} from "../../../../contexts/ShiftContext/ShiftContext";
 import debounce from "lodash.debounce";
+import {useRide} from "../../../../contexts/RideContext/RideContext";
 
 const NYC_CENTER = {lat: 40.7831, lng: -73.9712};
 
@@ -16,7 +17,7 @@ export const LocationSearchbar = (props: SearchbarProps) => {
 
     const locale = useLocale();
     const map = useMap();
-    const {updateDestination} = useShiftContext();
+    const {updateDestination} = useRide();
 
     // initialize places service
     useEffect(() => {

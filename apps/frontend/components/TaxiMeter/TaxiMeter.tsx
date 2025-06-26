@@ -3,11 +3,11 @@
 import styles from "./TaxiMeter.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faClock, faEuroSign} from "@fortawesome/free-solid-svg-icons";
-import {useShiftContext} from "../../contexts/ShiftContext/ShiftContext";
 import {useEffect, useState} from "react";
+import {useRide} from "../../contexts/RideContext/RideContext";
 
 export const TaxiMeter = () => {
-    const {getRideTime, getRideFare} = useShiftContext();
+    const {getRideTime, getRideFare} = useRide();
     const [rideTime, setRideTime] = useState(() => getRideTime());
     const [rideFare, setRideFare] = useState(() => getRideFare());
 

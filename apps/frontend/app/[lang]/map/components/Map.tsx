@@ -3,7 +3,7 @@
 import styles from "./Map.module.css";
 import {AdvancedMarker, Map as GoogleMap, useMap, useMapsLibrary} from "@vis.gl/react-google-maps";
 import { useEffect, useState} from "react";
-import {useShiftContext} from "../../../../contexts/ShiftContext/ShiftContext";
+import {useRide} from "../../../../contexts/RideContext/RideContext";
 
 const MAP_ID = "f1310920ec56c7b65c64dec9";
 const MAP_CENTER = {lat: 40.7831, lng: -73.9712};
@@ -12,7 +12,7 @@ const TEST_TARGET = {lat: 40.7431, lng: -73.8712};
 export const Map = (props) => {
     const {className} = props;
     const origin = MAP_CENTER;
-    const {destination} = useShiftContext();
+    const {destination} = useRide();
 
     const map = useMap();
     const routesLibrary = useMapsLibrary('routes');

@@ -4,7 +4,7 @@ import {ForwardedRef, forwardRef} from "react";
 import {Modal, ModalHandle} from "../Modal/Modal";
 import {FlexGroup} from "../FlexGroup/FlexGroup";
 import {Button} from "../Button/Button";
-import {useShiftContext} from "../../contexts/ShiftContext/ShiftContext";
+import {useShift} from "../../contexts/ShiftContext/ShiftContext";
 
 interface BreakReminderModalProps {
     breakModalRef: ModalHandle;
@@ -12,7 +12,7 @@ interface BreakReminderModalProps {
 
 export const BreakReminderModal = forwardRef((props: BreakReminderModalProps, ref: ForwardedRef<ModalHandle>) => {
     const {breakModalRef} = props;
-    const {pauseShift} = useShiftContext();
+    const {pauseShift} = useShift();
     const t = useTranslations('map');
 
     function takeBreak() {

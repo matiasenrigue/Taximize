@@ -10,6 +10,7 @@ import {ShiftContextProvider} from "../../contexts/ShiftContext/ShiftContext";
 import clsx from "clsx";
 import {BreakModalHandler} from "../../components/BreakModalHandler/BreakModalHandler";
 import {ShiftEndModalHandler} from "../../components/ShiftEndModalHandler/ShiftEndModalHandler";
+import {RideContextProvider} from "../../contexts/RideContext/RideContext";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -61,17 +62,19 @@ export default async function RootLayout({
       <body className={clsx(roboto.variable, roboto_mono.variable)}>
         <NextIntlClientProvider>
           <ShiftContextProvider>
+            <RideContextProvider>
 
-            <BreakModalHandler/>
-            <ShiftEndModalHandler/>
+              <BreakModalHandler/>
+              <ShiftEndModalHandler/>
 
-            <div className={styles.container}>
-              <Header/>
-              <main className={styles.main}>
-                {children}
-              </main>
-            </div>
+              <div className={styles.container}>
+                <Header/>
+                <main className={styles.main}>
+                  {children}
+                </main>
+              </div>
 
+            </RideContextProvider>
           </ShiftContextProvider>
         </NextIntlClientProvider>
       </body>
