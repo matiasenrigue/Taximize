@@ -19,5 +19,20 @@
     "title": "Shift Over",
     "text": "Your shift is over.",
     "confirmButton": "End Shift"
+  },
+  "NoRouteFoundModal": {
+    "title": "No Route",
+    "text": "No route was found to your specified destination.",
+    "confirmButton": "Ok"
+  },
+  "UnknownLocationModal": {
+    "title": "Unknown Destination",
+    "text": "The location you specified could not be found. The route cannot be displayed.",
+    "confirmButton": "Ok"
+  },
+  "RouteErrorModal": {
+    "title": "Internal Error",
+    "text": "An unknown error occurred. The route cannot be displayed.",
+    "confirmButton": "Ok"
   }
 }
