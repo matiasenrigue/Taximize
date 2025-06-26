@@ -2,6 +2,7 @@ import { Shift } from './shift.model';
 import { ShiftSignal } from './shift-signal.model';
 import { ShiftPause } from './shift-pause.model';
 import { Ride } from '../rides/ride.model';
+import { RideService } from '../rides/ride.service';
 import { SignalValidation, Signal } from './utils/signalValidation';
 import { ShiftCalculator } from './utils/shiftCalculator';
 import { Op } from 'sequelize';
@@ -29,31 +30,37 @@ export class ShiftService {
     return SignalValidation.isValidTransition(lastSignal, newSignal as Signal);
   }
 
-  static async handleSignal(driverId: string, timestamp: number, signal: string): Promise<void> {
+  static async handleSignal(driverId: string, timestamp: number, signal: string): Promise<any> {
     // Validate the signal
     const isValid = await this.isValidSignal(driverId, signal);
     if (!isValid) {
       throw new Error(`Invalid signal transition: ${signal}`);
     }
 
+    let result = null;
+
     // Handle different signal types
     if (signal === 'start') {
       await this.handleStartSignal(driverId, timestamp);
     } else if (signal === 'stop') {
-      await this.handleStopSignal(driverId, timestamp);
+      result = await this.handleStopSignal(driverId, timestamp);
     } else if (signal === 'continue') {
       await this.handleContinueSignal(driverId, timestamp);
     }
 
-    // Insert signal record (for all signal types)
-    const activeShift = await this.getActiveShift(driverId);
-    if (activeShift) {
-      await ShiftSignal.create({
-        timestamp: new Date(timestamp),
-        shift_id: activeShift.id,
-        signal: signal as Signal
-      });
+    // Insert signal record (for all signal types except stop - stop signals are handled in saveShift)
+    if (signal !== 'stop') {
+      const activeShift = await this.getActiveShift(driverId);
+      if (activeShift) {
+        await ShiftSignal.create({
+          timestamp: new Date(timestamp),
+          shift_id: activeShift.id,
+          signal: signal as Signal
+        });
+      }
     }
+
+    return result;
   }
 
   static async getCurrentShiftStatus(driverId: string): Promise<ShiftStatus | null> {
@@ -249,24 +256,7 @@ export class ShiftService {
 
   // Helper methods
   private static async hasActiveRide(driverId: string): Promise<boolean> {
-    // Get active shift for driver first
-    const activeShift = await Shift.findOne({
-      where: { 
-        driver_id: driverId,
-        shift_end: null
-      }
-    });
-
-    if (!activeShift) return false;
-
-    const activeRide = await Ride.findOne({
-      where: { 
-        shift_id: activeShift.id,
-        end_time: null 
-      }
-    });
-    
-    return !!activeRide;
+    return await RideService.hasActiveRide(driverId);
   }
 
   private static async getLastSignal(driverId: string): Promise<Signal | null> {
@@ -377,9 +367,9 @@ export class ShiftService {
     });
   }
 
-  private static async handleStopSignal(driverId: string, timestamp: number): Promise<void> {
+  private static async handleStopSignal(driverId: string, timestamp: number): Promise<any> {
     // Save the shift with all computed statistics
-    await this.saveShift(driverId);
+    return await this.saveShift(driverId);
   }
 
   private static async handleContinueSignal(driverId: string, timestamp: number): Promise<void> {

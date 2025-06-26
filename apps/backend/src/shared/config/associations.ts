@@ -1,6 +1,6 @@
 // Initialize all Sequelize associations
 export const initializeAssociations = () => {
-  // Import models to trigger registration
+  // Use dynamic imports to avoid circular dependencies
   const { Shift } = require('../../entities/shifts/shift.model');
   const { ShiftSignal } = require('../../entities/shifts/shift-signal.model');
   const { ShiftPause } = require('../../entities/shifts/shift-pause.model');

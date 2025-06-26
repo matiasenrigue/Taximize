@@ -170,19 +170,19 @@ export class ShiftController {
     const signalTimestamp = timestamp || Date.now();
 
     try {
-      await ShiftService.handleSignal(driverId, signalTimestamp, 'stop');
+      const savedShift = await ShiftService.handleSignal(driverId, signalTimestamp, 'stop');
       
-      // Return shift summary (this would be enhanced with actual statistics)
+      // Return actual shift summary from saved shift data
       res.status(200).json({
         success: true,
         message: 'Shift ended successfully',
         data: {
-          totalDuration: 28800000,
-          workTime: 26000000,
-          breakTime: 2800000,
-          numBreaks: 2,
-          averageBreak: 1400000,
-          totalEarnings: 45.50
+          totalDuration: savedShift.total_duration_ms,
+          workTime: savedShift.work_time_ms,
+          breakTime: savedShift.break_time_ms,
+          numBreaks: savedShift.num_breaks,
+          averageBreak: savedShift.avg_break_ms,
+          totalEarnings: 0 // TODO: Calculate from rides when ride integration is complete
         }
       });
     } catch (error: any) {

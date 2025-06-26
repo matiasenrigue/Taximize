@@ -60,7 +60,17 @@ Shift.init(
     sequelize,
     tableName: 'shifts',
     timestamps: true,
-    underscored: true
+    underscored: true,
+    indexes: [
+      {
+        name: 'one_active_shift_per_driver',
+        unique: true,
+        fields: ['driver_id'],
+        where: {
+          shift_end: null
+        }
+      }
+    ]
   }
 );
 
