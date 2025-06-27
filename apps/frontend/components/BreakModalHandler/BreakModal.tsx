@@ -5,16 +5,24 @@ import {FlexGroup} from "../FlexGroup/FlexGroup";
 import {Button} from "../Button/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faClock} from "@fortawesome/free-solid-svg-icons";
+import {useShift} from "../../contexts/ShiftContext/ShiftContext";
 
 export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('map');
+    const {continueShift} = useShift();
 
-    function endBreak() {}
+    function endBreak() {
+        if (!ref || typeof ref === "function")
+            return;
+        ref.current.close();
+        continueShift();
+    }
 
     return (
         <Modal
             ref={ref}
-            title={t("breakModalTitle")}>
+            title={t("breakModalTitle")}
+            onClick={continueShift}>
             <FlexGroup
                 direction={"column"}
                 align={"stretch"}>

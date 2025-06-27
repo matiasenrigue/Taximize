@@ -7,13 +7,17 @@ import {BREAK_MODAL_TIMEOUT} from "../../constants/constants";
 
 interface ShiftContextType {
     isShift: boolean;
+    isPaused: boolean;
+    isOvertime: boolean;
     startShift: (duration: number) => void;
     endShift: () => void;
     pauseShift: () => void;
-    unpauseShift: () => void;
+    continueShift: () => void;
     getRemainingTime: () => string;
     checkBreakTime: () => boolean;
     checkIsShiftOver: () => boolean;
+    skipBreak: () => void;
+    startOvertime: () => void;
 }
 
 const ShiftContext = createContext<ShiftContextType|null>(null);
@@ -21,11 +25,13 @@ const ShiftContext = createContext<ShiftContextType|null>(null);
 export const ShiftContextProvider = (props: PropsWithChildren) => {
     const {children} = props;
 
-    const [isShift, setIsShift] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
-    const [duration, setDuration] = useState(0);
+    const [isShift, setIsShift] = useState<boolean>(false);
+    const [isPaused, setIsPaused] = useState<boolean>(false);
+    const [duration, setDuration] = useState<number>(0);
     const [startTime, setStartTime] = useState<number|null>(null);
     const [lastBreakTime, setLastBreakTime] = useState<number|null>(null);
+    const [totalBreakDuration, setTotalBreakDuration] = useState<number>(0);
+    const [isOvertime, setIsOvertime] = useState<boolean>(false);
 
     const startShift = useCallback((duration: number) => {
         setDuration(duration);
@@ -43,17 +49,23 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         setIsPaused(true);
     }, []);
 
-    const unpauseShift = useCallback(() => {
+    const continueShift = useCallback(() => {
+        const breakDuration = moment.now() - lastBreakTime;
+        setTotalBreakDuration(prev => prev + breakDuration);
         setLastBreakTime(moment.now());
         setIsPaused(false);
-    }, []);
+    }, [lastBreakTime]);
 
     // returns the remaining shift duration, formatted "h:mm"
     const getRemainingTime = useCallback(() => {
-        const passedTime = moment.now() - startTime;
+        const passedTime = moment.now() - startTime - totalBreakDuration;
         const remainingTime = Math.max(0, duration - passedTime);
         return formatDuration(remainingTime);
-    }, [duration, startTime]);
+    }, [duration, startTime, totalBreakDuration]);
+
+    const skipBreak = useCallback(() => {
+        setLastBreakTime(moment.now());
+    }, []);
 
     const checkBreakTime = useCallback(() => {
         if (!isShift || isPaused)
@@ -65,22 +77,30 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const checkIsShiftOver = useCallback((): boolean => {
         if (!isShift || isPaused)
             return false;
-        const passedTime = moment.now() - startTime;
+        const passedTime = moment.now() - startTime - totalBreakDuration;
         return passedTime >= duration;
     }, [startTime, duration, isShift, isPaused]);
+    
+    const startOvertime = useCallback(() => {
+        setIsOvertime(true);
+    }, []);
 
 
     return (
         <ShiftContext.Provider value={{
             duration,
             isShift,
+            isPaused,
+            isOvertime,
             startShift,
             endShift,
             pauseShift,
-            unpauseShift,
+            continueShift,
             getRemainingTime,
             checkBreakTime,
             checkIsShiftOver,
+            skipBreak,
+            startOvertime,
         }}>
             {children}
         </ShiftContext.Provider>

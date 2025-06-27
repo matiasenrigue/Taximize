@@ -1,3 +1,7 @@
 .timer {
     font-family: var(--font-roboto-mono);
 }
+
+._overtime {
+    color: var(--color-danger);
+}

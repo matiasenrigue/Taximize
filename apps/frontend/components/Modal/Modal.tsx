@@ -12,11 +12,13 @@ export type ModalHandle = {
 
 interface ModalProps extends React.PropsWithChildren {
     title?: string;
+    onClose?: () => void;
 }
 
 export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref: ForwardedRef<ModalHandle>) => {
     const {
         title,
+        onClose,
         children
     } = props;
     const dialogRef = useRef<HTMLDialogElement>(null!);
@@ -42,7 +44,11 @@ export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref: ForwardedR
             data-testid={"modal"}>
             <button
                 className={styles.button_close}
-                onClick={close}
+                onClick={() => {
+                    if (onClose)
+                        onClose();
+                    close();
+                }}
                 aria-label={"close"}>
                 <FontAwesomeIcon icon={faXmark}/>
             </button>

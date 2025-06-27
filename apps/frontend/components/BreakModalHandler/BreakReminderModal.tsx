@@ -12,13 +12,13 @@ interface BreakReminderModalProps {
 
 export const BreakReminderModal = forwardRef((props: BreakReminderModalProps, ref: ForwardedRef<ModalHandle>) => {
     const {breakModalRef} = props;
-    const {pauseShift} = useShift();
+    const {pauseShift, skipBreak} = useShift();
     const t = useTranslations('map');
 
     function closeModal() {
         if (!ref || typeof ref === "function")
             return;
-        ref.current.close()
+        ref.current.close();
     }
 
     function openBreakModal() {
@@ -33,10 +33,16 @@ export const BreakReminderModal = forwardRef((props: BreakReminderModalProps, re
         openBreakModal();
     }
 
+    function skipBreakAndCloseModal() {
+        skipBreak();
+        closeModal();
+    }
+
     return (
         <Modal
             ref={ref}
-            title={t("breakReminderModalTitle")}>
+            title={t("breakReminderModalTitle")}
+            onClose={skipBreak}>
             <FlexGroup
                 direction={"column"}
                 align={"stretch"}>
@@ -46,7 +52,7 @@ export const BreakReminderModal = forwardRef((props: BreakReminderModalProps, re
                     align={"stretch"}>
                     <Button
                         theme={"secondary"}
-                        onClick={closeModal}>
+                        onClick={skipBreakAndCloseModal}>
                         {t("cancel")}
                     </Button>
                     <Button

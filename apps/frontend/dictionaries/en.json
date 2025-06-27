@@ -18,7 +18,8 @@
   "ShiftEndModal": {
     "title": "Shift Over",
     "text": "Your shift is over.",
-    "confirmButton": "End Shift"
+    "confirmButton": "End Shift",
+    "cancelButton": "Cancel"
   },
   "NoRouteFoundModal": {
     "title": "No Route",

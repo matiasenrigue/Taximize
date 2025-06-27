@@ -3,12 +3,15 @@
 import {useShift} from "../../contexts/ShiftContext/ShiftContext";
 import styles from "./ShiftTimer.module.css";
 import {useEffect, useState} from "react";
+import clsx from "clsx";
 
 export const ShiftTimer = () => {
-    const {isShift, getRemainingTime} = useShift();
+    const {isShift, isOvertime, isPaused, getRemainingTime} = useShift();
     const [remainingTime, setRemainingTime] = useState(() => getRemainingTime());
 
     useEffect(() => {
+        if (isPaused)
+            return;
         setRemainingTime(getRemainingTime());
         const delay = 1000 * 10;
         const intervalId = setInterval(() => {
@@ -16,7 +19,7 @@ export const ShiftTimer = () => {
         }, delay);
 
         return () => clearInterval(intervalId);
-    }, [getRemainingTime]);
+    }, [isPaused, getRemainingTime]);
 
     if (!isShift)
         return null;
@@ -27,7 +30,9 @@ export const ShiftTimer = () => {
      */
     return (
         <span
-            className={styles.timer}
+            className={clsx(
+                styles.timer,
+                isOvertime && styles._overtime)}
             suppressHydrationWarning>
             {remainingTime}
         </span>

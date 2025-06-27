@@ -8,7 +8,7 @@ import {useRide} from "../../contexts/RideContext/RideContext";
 
 
 export const ShiftEndModalHandler = () => {
-    const {checkIsShiftOver} = useShift();
+    const {isOvertime, checkIsShiftOver} = useShift();
     const {isOnRide} = useRide();
     const shiftEndModalRef = useRef<ModalHandle>(null!);
 
@@ -20,11 +20,13 @@ export const ShiftEndModalHandler = () => {
     }, [isOnRide, checkIsShiftOver, shiftEndModalRef.current]);
 
     useEffect(() => {
-        const delay = 1000 * 10;
+        if (isOvertime)
+            return;
         triggerShiftEndModal();
+        const delay = 1000 * 10;
         const intervalId = setInterval(triggerShiftEndModal, delay);
         return () => clearInterval(intervalId);
-    }, [triggerShiftEndModal]);
+    }, [isOvertime, triggerShiftEndModal]);
 
     return (
         <>
