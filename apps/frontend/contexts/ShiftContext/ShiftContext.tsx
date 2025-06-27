@@ -3,7 +3,7 @@
 import {createContext, PropsWithChildren, useCallback, useContext, useState} from "react";
 import moment from "moment";
 import {formatDuration} from "../../utility/formatDuration";
-import {BREAK_MODAL_TIMEOUT} from "../../constants/constants";
+import {BREAK_MODAL_TIMEOUT, DEFAULT_BREAK_DURATION} from "../../constants/constants";
 
 interface ShiftContextType {
     isShift: boolean;
@@ -18,6 +18,7 @@ interface ShiftContextType {
     checkIsShiftOver: () => boolean;
     skipBreak: () => void;
     startOvertime: () => void;
+    getRemainingBreakDuration: () => number;
 }
 
 const ShiftContext = createContext<ShiftContextType|null>(null);
@@ -63,6 +64,11 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         return formatDuration(remainingTime);
     }, [duration, startTime, totalBreakDuration]);
 
+    const getRemainingBreakDuration = useCallback((): number => {
+        const passedTime = moment.now() - lastBreakTime;
+        return Math.max(0, DEFAULT_BREAK_DURATION - passedTime)
+    }, [lastBreakTime]);
+
     const skipBreak = useCallback(() => {
         setLastBreakTime(moment.now());
     }, []);
@@ -80,7 +86,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         const passedTime = moment.now() - startTime - totalBreakDuration;
         return passedTime >= duration;
     }, [startTime, duration, isShift, isPaused]);
-    
+
     const startOvertime = useCallback(() => {
         setIsOvertime(true);
     }, []);
@@ -101,6 +107,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             checkIsShiftOver,
             skipBreak,
             startOvertime,
+            getRemainingBreakDuration,
         }}>
             {children}
         </ShiftContext.Provider>

@@ -1,4 +1,4 @@
-import {ForwardedRef, forwardRef} from "react";
+import {ForwardedRef, forwardRef, useEffect, useState} from "react";
 import {Modal, ModalHandle} from "../Modal/Modal";
 import {useTranslations} from "next-intl";
 import {FlexGroup} from "../FlexGroup/FlexGroup";
@@ -6,10 +6,12 @@ import {Button} from "../Button/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faClock} from "@fortawesome/free-solid-svg-icons";
 import {useShift} from "../../contexts/ShiftContext/ShiftContext";
+import {formatDuration} from "../../utility/formatDuration";
 
 export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('map');
-    const {continueShift} = useShift();
+    const {isPaused, continueShift, getRemainingBreakDuration} = useShift();
+    const [remainingDuration, setRemainingDuration] = useState(() => getRemainingBreakDuration());
 
     function endBreak() {
         if (!ref || typeof ref === "function")
@@ -17,6 +19,18 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
         ref.current.close();
         continueShift();
     }
+
+    useEffect(() => {
+        if (isPaused)
+            return;
+        setRemainingDuration(getRemainingBreakDuration());
+        const delay = 1000 * 10;
+        const intervalId = setInterval(() => {
+            setRemainingDuration(getRemainingBreakDuration());
+        }, delay);
+
+        return () => clearInterval(intervalId);
+    }, [isPaused, getRemainingBreakDuration]);
 
     return (
         <Modal
@@ -28,7 +42,7 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
                 align={"stretch"}>
                 <FlexGroup direction={"row"}>
                     <FontAwesomeIcon icon={faClock}/>
-                    <span>00:00 min</span>
+                    <span>{formatDuration(remainingDuration)}</span>
                 </FlexGroup>
                 <FlexGroup
                     direction={"row"}
