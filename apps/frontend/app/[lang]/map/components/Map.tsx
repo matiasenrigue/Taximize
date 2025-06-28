@@ -57,7 +57,9 @@ export const Map = (props) => {
         directionsService
             .route({
                 origin,
-                destination: {placeId: destination.placeId},
+                destination: (!!destination.placeId
+                    ? {placeId: destination.placeId}
+                    : {query: destination.name}),
                 travelMode: google.maps.TravelMode.DRIVING,
                 provideRouteAlternatives: false
             }, (result, status) => {

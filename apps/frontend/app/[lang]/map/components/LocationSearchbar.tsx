@@ -67,7 +67,8 @@ export const LocationSearchbar = (props: SearchbarProps) => {
                 onChange={(e) => {
                     updateDestination(null);
                     debounceSearchAddress(e.target.value);
-                }}/>
+                }}
+                onConfirm={(name) => selectLocation({name})}/>
             <SearchResults>
                 {searchResults.map((result, i) => (
                     <SearchResult
