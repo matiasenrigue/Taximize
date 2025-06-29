@@ -1,20 +1,32 @@
 {
   "map": {
     "startRide": "Start Ride",
-    "endRide": "End Ride",
-    "cancel": "Cancel",
-    "startRideModalTitle": "Evaluate Ride",
-    "startRideModalText": "This ride is below average. It will be difficult to find a new passenger near the target location.",
-    "endRideModalTitle": "End Ride",
-    "breakReminderModalTitle": "Take a break!",
-    "breakReminderModalText": "You’ve been driving for more than 3 hours without a break! We recommend that you take a short 15 minute break.",
-    "takeBreak": "Take a break",
-    "breakModalTitle": "Enjoy your break!",
-    "endBreak": "End break",
-    "endBreakEarly": "End break early"
+    "endRide": "End Ride"
   },
   "start-shift": {
     "startShift": "Start Shift"
+  },
+  "RideEvaluationModal": {
+    "title": "Evaluate Ride",
+    "text": "This ride is below average. It will be difficult to find a new passenger near the target location.",
+    "confirmButton": "Start Ride",
+    "cancelButton": "Cancel"
+  },
+  "RideSummaryModal": {
+    "title": "End Ride",
+    "confirmButton": "End Ride",
+    "cancelButton": "Cancel"
+  },
+  "BreakReminderModal": {
+    "title": "Take a break!",
+    "text": "You’ve been driving for more than 3 hours without a break! We recommend that you take a short 15 minute break.",
+    "confirmButton": "Take a break",
+    "cancelButton": "Cancel"
+  },
+  "BreakModal": {
+    "title": "Enjoy your break!",
+    "endButton": "End break",
+    "endEarlyButton": "End break early"
   },
   "ShiftEndModal": {
     "title": "Shift Over",

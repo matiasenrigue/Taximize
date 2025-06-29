@@ -8,7 +8,7 @@ import {useRide} from "../../../../contexts/RideContext/RideContext";
 
 
 export const RideEvaluationModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
-    const t = useTranslations('map');
+    const t = useTranslations('RideEvaluationModal');
     const {startRide} = useRide();
 
     function closeModal() {
@@ -25,22 +25,22 @@ export const RideEvaluationModal = forwardRef((props, ref: ForwardedRef<ModalHan
     return (
         <Modal
             ref={ref}
-            title={t("startRideModalTitle")}>
+            title={t("title")}>
             <FlexGroup
                 align={"stretch"}>
                 <Rating rating={3}/>
-                <p>{t("startRideModalText")}</p>
+                <p>{t("text")}</p>
                 <FlexGroup
                     direction={"row"}
                     align={"stretch"}>
                     <Button
                         theme={"secondary"}
                         onClick={closeModal}>
-                        {t("cancel")}
+                        {t("cancelButton")}
                     </Button>
                     <Button
                         onClick={startRideAndCloseModal}>
-                        {t("startRide")}
+                        {t("confirmButton")}
                     </Button>
                 </FlexGroup>
             </FlexGroup>

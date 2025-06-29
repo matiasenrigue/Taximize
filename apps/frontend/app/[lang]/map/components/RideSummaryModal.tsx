@@ -8,7 +8,7 @@ import {useRide} from "../../../../contexts/RideContext/RideContext";
 
 
 export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
-    const t = useTranslations('map');
+    const t = useTranslations('RideSummaryModal');
     const {endRide} = useRide();
 
     function closeModal() {
@@ -25,7 +25,7 @@ export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle
     return (
         <Modal
             ref={ref}
-            title={t("endRideModalTitle")}>
+            title={t("title")}>
             <FlexGroup
                 align={"stretch"}>
                 <CostInput/>
@@ -35,11 +35,11 @@ export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle
                     <Button
                         theme={"secondary"}
                         onClick={closeModal}>
-                        {t("cancel")}
+                        {t("cancelButton")}
                     </Button>
                     <Button
                         onClick={endRideAndCloseModal}>
-                        {t("endRide")}
+                        {t("confirmButton")}
                     </Button>
                 </FlexGroup>
             </FlexGroup>

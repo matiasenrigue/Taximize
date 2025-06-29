@@ -9,7 +9,7 @@ import {useShift} from "../../contexts/ShiftContext/ShiftContext";
 export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const {} = props;
     const {pauseShift, skipBreak} = useShift();
-    const t = useTranslations('map');
+    const t = useTranslations('BreakReminderModal');
 
     function closeModal() {
         if (!ref || typeof ref === "function")
@@ -30,23 +30,23 @@ export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHand
     return (
         <Modal
             ref={ref}
-            title={t("breakReminderModalTitle")}
+            title={t("title")}
             onClose={skipBreak}>
             <FlexGroup
                 direction={"column"}
                 align={"stretch"}>
-                <p>{t("breakReminderModalText")}</p>
+                <p>{t("text")}</p>
                 <FlexGroup
                     direction={"row"}
                     align={"stretch"}>
                     <Button
                         theme={"secondary"}
                         onClick={skipBreakAndCloseModal}>
-                        {t("cancel")}
+                        {t("cancelButton")}
                     </Button>
                     <Button
                         onClick={takeBreak}>
-                        {t("takeBreak")}
+                        {t("confirmButton")}
                     </Button>
                 </FlexGroup>
             </FlexGroup>

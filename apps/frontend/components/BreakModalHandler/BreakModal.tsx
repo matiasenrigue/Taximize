@@ -9,7 +9,7 @@ import {useShift} from "../../contexts/ShiftContext/ShiftContext";
 import {formatDuration} from "../../utility/formatDuration";
 
 export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
-    const t = useTranslations('map');
+    const t = useTranslations('BreakModal');
     const {isPaused, continueShift, getRemainingBreakDuration} = useShift();
     const [remainingDuration, setRemainingDuration] = useState(() => getRemainingBreakDuration());
 
@@ -35,7 +35,7 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
     return (
         <Modal
             ref={ref}
-            title={t("breakModalTitle")}
+            title={t("title")}
             onClick={continueShift}>
             <FlexGroup
                 direction={"column"}
@@ -50,7 +50,7 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
                     <Button
                         theme={(remainingDuration > 0 ? "secondary" : "primary")}
                         onClick={endBreak}>
-                        {t(remainingDuration > 0 ? "endBreakEarly" : "endBreak")}
+                        {t(remainingDuration > 0 ? "endEarlyButton" : "endButton")}
                     </Button>
                 </FlexGroup>
             </FlexGroup>
