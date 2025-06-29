@@ -1,7 +1,10 @@
 {
   "map": {
     "startRide": "Start Ride",
-    "endRide": "End Ride"
+    "endRide": "End Ride",
+    "pauseShift": "Take a break",
+    "endShift": "End Shift",
+    "locationSearchPlaceholder": "Search Address..."
   },
   "start-shift": {
     "startShift": "Start Shift"

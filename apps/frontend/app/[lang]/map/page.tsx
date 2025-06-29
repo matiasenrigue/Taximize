@@ -46,7 +46,8 @@ export default function MapPage() {
                     <Map className={styles.map}/>
 
                     <div className={styles.search_container}>
-                        <LocationSearchbar/>
+                        <LocationSearchbar
+                            placeholder={t("locationSearchPlaceholder")}/>
                     </div>
 
                     <div className={styles.button_container}>
@@ -72,10 +73,10 @@ export default function MapPage() {
                                 </Button>)}
                             <OptionsMenu>
                                 <MenuOption onClick={pauseShift}>
-                                    Take a Break
+                                    {t("pauseShift")}
                                 </MenuOption>
                                 <MenuOption onClick={endShift}>
-                                    End Shift
+                                    {t("endShift")}
                                 </MenuOption>
                             </OptionsMenu>
                         </FlexGroup>

@@ -36,7 +36,7 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
         <Modal
             ref={ref}
             title={t("title")}
-            onClick={continueShift}>
+            onClose={continueShift}>
             <FlexGroup
                 direction={"column"}
                 align={"stretch"}>
