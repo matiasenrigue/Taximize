@@ -11,7 +11,6 @@ export const BreakModalHandler = () => {
     const {checkBreakTime} = useShift();
     const {isOnRide} = useRide();
     const breakReminderModalRef = useRef<ModalHandle>(null!);
-    const breakModalRef = useRef<ModalHandle>(null!);
 
     const triggerBreakReminderModal = useCallback(() => {
         if (!breakReminderModalRef.current || isOnRide)
@@ -29,11 +28,7 @@ export const BreakModalHandler = () => {
 
     return (
         <>
-            <BreakReminderModal
-                ref={breakReminderModalRef}
-                breakModalRef={breakModalRef}/>
-            <BreakModal
-                ref={breakModalRef}/>
+            <BreakReminderModal ref={breakReminderModalRef}/>
         </>
     )
 };

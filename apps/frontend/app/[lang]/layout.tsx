@@ -8,10 +8,10 @@ import {routing} from "../../i18n/routing";
 import {notFound} from "next/navigation";
 import {ShiftContextProvider} from "../../contexts/ShiftContext/ShiftContext";
 import clsx from "clsx";
-import {BreakModalHandler} from "../../components/BreakModalHandler/BreakModalHandler";
-import {ShiftEndModalHandler} from "../../components/ShiftEndModalHandler/ShiftEndModalHandler";
 import {RideContextProvider} from "../../contexts/RideContext/RideContext";
 import React from "react";
+import {BreakModalHandler} from "../../components/BreakModalHandler/BreakModalHandler";
+import {ShiftEndModalHandler} from "../../components/ShiftEndModalHandler/ShiftEndModalHandler";
 
 const roboto = Roboto({
   subsets: ["latin"],

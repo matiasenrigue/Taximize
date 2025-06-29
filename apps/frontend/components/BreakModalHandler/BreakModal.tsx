@@ -21,7 +21,7 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
     }
 
     useEffect(() => {
-        if (isPaused)
+        if (!isPaused)
             return;
         setRemainingDuration(getRemainingBreakDuration());
         const delay = 1000 * 10;
@@ -48,8 +48,9 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
                     direction={"row"}
                     align={"stretch"}>
                     <Button
+                        theme={(remainingDuration > 0 ? "secondary" : "primary")}
                         onClick={endBreak}>
-                        {t("endBreak")}
+                        {t(remainingDuration > 0 ? "endBreakEarly" : "endBreak")}
                     </Button>
                 </FlexGroup>
             </FlexGroup>

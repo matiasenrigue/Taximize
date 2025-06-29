@@ -1,9 +1,13 @@
 "use client";
 
-import {createContext, PropsWithChildren, useCallback, useContext, useState} from "react";
+import React, {createContext, PropsWithChildren, useCallback, useContext, useRef, useState} from "react";
 import moment from "moment";
 import {formatDuration} from "../../utility/formatDuration";
 import {BREAK_MODAL_TIMEOUT, DEFAULT_BREAK_DURATION} from "../../constants/constants";
+import {BreakModalHandler} from "../../components/BreakModalHandler/BreakModalHandler";
+import {ShiftEndModalHandler} from "../../components/ShiftEndModalHandler/ShiftEndModalHandler";
+import {ModalHandle} from "../../components/Modal/Modal";
+import {BreakModal} from "../../components/BreakModalHandler/BreakModal";
 
 interface ShiftContextType {
     isShift: boolean;
@@ -25,6 +29,8 @@ const ShiftContext = createContext<ShiftContextType|null>(null);
 
 export const ShiftContextProvider = (props: PropsWithChildren) => {
     const {children} = props;
+
+    const breakModalRef = useRef<ModalHandle>(null!);
 
     const [isShift, setIsShift] = useState<boolean>(false);
     const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -48,6 +54,9 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const pauseShift = useCallback(() => {
         setLastBreakTime(moment.now());
         setIsPaused(true);
+        if (!breakModalRef || typeof breakModalRef === "function")
+            return;
+        breakModalRef.current.open();
     }, []);
 
     const continueShift = useCallback(() => {
@@ -109,6 +118,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             startOvertime,
             getRemainingBreakDuration,
         }}>
+            <BreakModal ref={breakModalRef}/>
             {children}
         </ShiftContext.Provider>
     );

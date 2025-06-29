@@ -6,12 +6,8 @@ import {FlexGroup} from "../FlexGroup/FlexGroup";
 import {Button} from "../Button/Button";
 import {useShift} from "../../contexts/ShiftContext/ShiftContext";
 
-interface BreakReminderModalProps {
-    breakModalRef: Ref<ModalHandle>;
-}
-
-export const BreakReminderModal = forwardRef((props: BreakReminderModalProps, ref: ForwardedRef<ModalHandle>) => {
-    const {breakModalRef} = props;
+export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
+    const {} = props;
     const {pauseShift, skipBreak} = useShift();
     const t = useTranslations('map');
 
@@ -21,16 +17,9 @@ export const BreakReminderModal = forwardRef((props: BreakReminderModalProps, re
         ref.current.close();
     }
 
-    function openBreakModal() {
-        if (!breakModalRef || typeof breakModalRef === "function")
-            return;
-        breakModalRef.current.open();
-    }
-
     function takeBreak() {
         pauseShift();
         closeModal();
-        openBreakModal();
     }
 
     function skipBreakAndCloseModal() {

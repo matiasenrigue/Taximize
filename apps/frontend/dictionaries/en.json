@@ -10,7 +10,8 @@
     "breakReminderModalText": "You’ve been driving for more than 3 hours without a break! We recommend that you take a short 15 minute break.",
     "takeBreak": "Take a break",
     "breakModalTitle": "Enjoy your break!",
-    "endBreak": "End break early"
+    "endBreak": "End break",
+    "endBreakEarly": "End break early"
   },
   "start-shift": {
     "startShift": "Start Shift"
