@@ -3,12 +3,12 @@
 import styles from "./Map.module.css";
 import {AdvancedMarker, Map as GoogleMap, useMap, useMapsLibrary} from "@vis.gl/react-google-maps";
 import {useCallback, useEffect, useRef, useState} from "react";
-import {useRide} from "../../../../contexts/RideContext/RideContext";
-import {MAP_CENTER, MAP_ID} from "../../../../constants/constants";
-import {NoRouteFoundModal} from "../../../../components/NoRouteFoundModal";
-import {ModalHandle} from "../../../../components/Modal/Modal";
-import {UnknownLocationModal} from "../../../../components/UnknownLocationModal";
-import {RouteErrorModal} from "../../../../components/RouteErrorModal";
+import {useRide} from "../../contexts/RideContext/RideContext";
+import {MAP_CENTER, MAP_ID} from "../../constants/constants";
+import {NoRouteFoundModal} from "../modals/NoRouteFoundModal";
+import {ModalHandle} from "../Modal/Modal";
+import {UnknownLocationModal} from "../modals/UnknownLocationModal";
+import {RouteErrorModal} from "../modals/RouteErrorModal";
 
 export const Map = (props) => {
     const {className} = props;

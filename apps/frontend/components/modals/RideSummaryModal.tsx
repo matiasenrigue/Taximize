@@ -1,15 +1,15 @@
-import {ForwardedRef, forwardRef} from "react";
+import {Modal, ModalHandle} from "../Modal/Modal";
+import {FlexGroup} from "../FlexGroup/FlexGroup";
+import {Button} from "../Button/Button";
 import {useTranslations} from "next-intl";
-import {Modal, ModalHandle} from "../../../../components/Modal/Modal";
-import {FlexGroup} from "../../../../components/FlexGroup/FlexGroup";
-import {Button} from "../../../../components/Button/Button";
-import {Rating} from "../../../../components/Rating/Rating";
-import {useRide} from "../../../../contexts/RideContext/RideContext";
+import {ForwardedRef, forwardRef} from "react";
+import {CostInput} from "../CostInput/CostInput";
+import {useRide} from "../../contexts/RideContext/RideContext";
 
 
-export const RideEvaluationModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
-    const t = useTranslations('RideEvaluationModal');
-    const {startRide} = useRide();
+export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
+    const t = useTranslations('RideSummaryModal');
+    const {endRide} = useRide();
 
     function closeModal() {
         if (!ref || typeof ref === "function")
@@ -17,8 +17,8 @@ export const RideEvaluationModal = forwardRef((props, ref: ForwardedRef<ModalHan
         ref.current.close();
     }
 
-    function startRideAndCloseModal() {
-        startRide();
+    function endRideAndCloseModal() {
+        endRide();
         closeModal();
     }
 
@@ -28,8 +28,7 @@ export const RideEvaluationModal = forwardRef((props, ref: ForwardedRef<ModalHan
             title={t("title")}>
             <FlexGroup
                 align={"stretch"}>
-                <Rating rating={3}/>
-                <p>{t("text")}</p>
+                <CostInput/>
                 <FlexGroup
                     direction={"row"}
                     align={"stretch"}>
@@ -39,7 +38,7 @@ export const RideEvaluationModal = forwardRef((props, ref: ForwardedRef<ModalHan
                         {t("cancelButton")}
                     </Button>
                     <Button
-                        onClick={startRideAndCloseModal}>
+                        onClick={endRideAndCloseModal}>
                         {t("confirmButton")}
                     </Button>
                 </FlexGroup>

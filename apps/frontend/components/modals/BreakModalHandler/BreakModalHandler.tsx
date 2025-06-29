@@ -3,9 +3,9 @@
 import {BreakModal} from "./BreakModal";
 import {BreakReminderModal} from "./BreakReminderModal";
 import {useCallback, useEffect, useRef} from "react";
-import {useShift} from "../../contexts/ShiftContext/ShiftContext";
-import {ModalHandle} from "../Modal/Modal";
-import {useRide} from "../../contexts/RideContext/RideContext";
+import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
+import {ModalHandle} from "../../Modal/Modal";
+import {useRide} from "../../../contexts/RideContext/RideContext";
 
 export const BreakModalHandler = () => {
     const {checkBreakTime} = useShift();

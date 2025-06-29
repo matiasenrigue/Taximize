@@ -1,8 +1,8 @@
 import {ForwardedRef, forwardRef} from "react";
-import {Modal, ModalHandle} from "./Modal/Modal";
+import {Modal, ModalHandle} from "../Modal/Modal";
 import {useTranslations} from "next-intl";
-import {FlexGroup} from "./FlexGroup/FlexGroup";
-import {Button} from "./Button/Button";
+import {FlexGroup} from "../FlexGroup/FlexGroup";
+import {Button} from "../Button/Button";
 
 export const NoRouteFoundModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('NoRouteFoundModal');

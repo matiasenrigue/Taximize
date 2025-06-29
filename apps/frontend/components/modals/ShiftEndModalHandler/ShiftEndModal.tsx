@@ -1,9 +1,9 @@
 import {ForwardedRef, forwardRef} from "react";
-import {Modal, ModalHandle} from "../Modal/Modal";
+import {Modal, ModalHandle} from "../../Modal/Modal";
 import {useTranslations} from "next-intl";
-import {FlexGroup} from "../FlexGroup/FlexGroup";
-import {Button} from "../Button/Button";
-import {useShift} from "../../contexts/ShiftContext/ShiftContext";
+import {FlexGroup} from "../../FlexGroup/FlexGroup";
+import {Button} from "../../Button/Button";
+import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
 
 export const ShiftEndModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('ShiftEndModal');

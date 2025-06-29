@@ -1,12 +1,12 @@
 import {ForwardedRef, forwardRef, useEffect, useState} from "react";
-import {Modal, ModalHandle} from "../Modal/Modal";
+import {Modal, ModalHandle} from "../../Modal/Modal";
 import {useTranslations} from "next-intl";
-import {FlexGroup} from "../FlexGroup/FlexGroup";
-import {Button} from "../Button/Button";
+import {FlexGroup} from "../../FlexGroup/FlexGroup";
+import {Button} from "../../Button/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faClock} from "@fortawesome/free-solid-svg-icons";
-import {useShift} from "../../contexts/ShiftContext/ShiftContext";
-import {formatDuration} from "../../utility/formatDuration";
+import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
+import {formatDuration} from "../../../utility/formatDuration";
 
 export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('BreakModal');

@@ -1,11 +1,11 @@
 import {ForwardedRef, forwardRef} from "react";
-import {Modal, ModalHandle} from "./Modal/Modal";
+import {Modal, ModalHandle} from "../Modal/Modal";
 import {useTranslations} from "next-intl";
-import {FlexGroup} from "./FlexGroup/FlexGroup";
-import {Button} from "./Button/Button";
+import {FlexGroup} from "../FlexGroup/FlexGroup";
+import {Button} from "../Button/Button";
 
-export const RouteErrorModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
-    const t = useTranslations('RouteErrorModal');
+export const UnknownLocationModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
+    const t = useTranslations('UnknownLocationModal');
 
     function closeModal() {
         if (!ref || typeof ref === "function")

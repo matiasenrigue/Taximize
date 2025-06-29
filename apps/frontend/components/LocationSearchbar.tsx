@@ -1,11 +1,11 @@
-import {Searchbar, SearchbarHandle, SearchbarProps} from "../../../../components/Searchbar/Searchbar";
+import {Searchbar, SearchbarHandle, SearchbarProps} from "./Searchbar/Searchbar";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useMap, useMapsLibrary} from "@vis.gl/react-google-maps";
 import {useLocale} from "next-intl";
-import {SearchResult, SearchResults} from "../../../../components/Searchbar/SearchResults";
+import {SearchResult, SearchResults} from "./Searchbar/SearchResults";
 import debounce from "lodash.debounce";
-import {useRide} from "../../../../contexts/RideContext/RideContext";
-import {MAP_CENTER} from "../../../../constants/constants";
+import {useRide} from "../contexts/RideContext/RideContext";
+import {MAP_CENTER} from "../constants/constants";
 
 export const LocationSearchbar = (props: SearchbarProps) => {
     const searchbarRef = useRef<SearchbarHandle>(null!);

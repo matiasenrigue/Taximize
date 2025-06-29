@@ -1,10 +1,10 @@
 
 import {useTranslations} from "next-intl";
 import {ForwardedRef, forwardRef, Ref} from "react";
-import {Modal, ModalHandle} from "../Modal/Modal";
-import {FlexGroup} from "../FlexGroup/FlexGroup";
-import {Button} from "../Button/Button";
-import {useShift} from "../../contexts/ShiftContext/ShiftContext";
+import {Modal, ModalHandle} from "../../Modal/Modal";
+import {FlexGroup} from "../../FlexGroup/FlexGroup";
+import {Button} from "../../Button/Button";
+import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
 
 export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const {} = props;

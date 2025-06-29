@@ -2,9 +2,9 @@
 
 import {ShiftEndModal} from "./ShiftEndModal";
 import {useCallback, useEffect, useRef} from "react";
-import {ModalHandle} from "../Modal/Modal";
-import {useShift} from "../../contexts/ShiftContext/ShiftContext";
-import {useRide} from "../../contexts/RideContext/RideContext";
+import {ModalHandle} from "../../Modal/Modal";
+import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
+import {useRide} from "../../../contexts/RideContext/RideContext";
 
 
 export const ShiftEndModalHandler = () => {

@@ -4,10 +4,10 @@ import React, {createContext, PropsWithChildren, useCallback, useContext, useRef
 import moment from "moment";
 import {formatDuration} from "../../utility/formatDuration";
 import {BREAK_MODAL_TIMEOUT, DEFAULT_BREAK_DURATION} from "../../constants/constants";
-import {BreakModalHandler} from "../../components/BreakModalHandler/BreakModalHandler";
-import {ShiftEndModalHandler} from "../../components/ShiftEndModalHandler/ShiftEndModalHandler";
+import {BreakModalHandler} from "../../components/modals/BreakModalHandler/BreakModalHandler";
+import {ShiftEndModalHandler} from "../../components/modals/ShiftEndModalHandler/ShiftEndModalHandler";
 import {ModalHandle} from "../../components/Modal/Modal";
-import {BreakModal} from "../../components/BreakModalHandler/BreakModal";
+import {BreakModal} from "../../components/modals/BreakModalHandler/BreakModal";
 
 interface ShiftContextType {
     isShift: boolean;

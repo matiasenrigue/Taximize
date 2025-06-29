@@ -10,8 +10,8 @@ import {ShiftContextProvider} from "../../contexts/ShiftContext/ShiftContext";
 import clsx from "clsx";
 import {RideContextProvider} from "../../contexts/RideContext/RideContext";
 import React from "react";
-import {BreakModalHandler} from "../../components/BreakModalHandler/BreakModalHandler";
-import {ShiftEndModalHandler} from "../../components/ShiftEndModalHandler/ShiftEndModalHandler";
+import {BreakModalHandler} from "../../components/modals/BreakModalHandler/BreakModalHandler";
+import {ShiftEndModalHandler} from "../../components/modals/ShiftEndModalHandler/ShiftEndModalHandler";
 
 const roboto = Roboto({
   subsets: ["latin"],
