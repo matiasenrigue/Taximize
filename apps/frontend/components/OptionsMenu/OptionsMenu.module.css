@@ -1,0 +1,47 @@
+.button {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--color-primary);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+}
+
+.container {
+    position: relative;
+}
+
+.options_container {
+    position: absolute;
+    bottom: 100%;
+    margin-bottom: 8px;
+    padding: 4px;
+    right: 0;
+    width: max-content;
+    height: fit-content;
+    background-color: var(--color-surface);
+    border: solid 1px var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    visibility: hidden;
+}
+
+.options_container[data-open=true] {
+    visibility: visible;
+}
+
+.option {
+    display: block;
+    width: 100%;
+    padding: 4px;
+    background: none;
+    border: none;
+    border-radius: var(--border-radius);
+    text-align: left;
+    cursor: pointer;
+}
+
+.option:hover {
+    background-color: var(--color-primary);
+}

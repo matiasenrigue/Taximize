@@ -1,7 +1,7 @@
 "use client"
 
 import styles from "./Modal.module.css";
-import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useRef} from "react";
+import React, {ForwardedRef, forwardRef, useCallback, useImperativeHandle, useRef} from "react";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
@@ -12,11 +12,13 @@ export type ModalHandle = {
 
 interface ModalProps extends React.PropsWithChildren {
     title?: string;
+    onClose?: () => void;
 }
 
-export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref) => {
+export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref: ForwardedRef<ModalHandle>) => {
     const {
         title,
+        onClose,
         children
     } = props;
     const dialogRef = useRef<HTMLDialogElement>(null!);
@@ -30,6 +32,7 @@ export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref) => {
     }, []);
 
     useImperativeHandle(ref, () => ({
+        test: "hello world",
         open,
         close
     }));
@@ -41,7 +44,11 @@ export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref) => {
             data-testid={"modal"}>
             <button
                 className={styles.button_close}
-                onClick={close}
+                onClick={() => {
+                    if (onClose)
+                        onClose();
+                    close();
+                }}
                 aria-label={"close"}>
                 <FontAwesomeIcon icon={faXmark}/>
             </button>

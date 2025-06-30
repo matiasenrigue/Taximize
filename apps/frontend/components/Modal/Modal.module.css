@@ -3,6 +3,7 @@
     z-index: 300;
     left: 0;
     right: 0;
+    width: 100%;
     top: 50%;
     transform: translateY(calc(-50% - var(--padding-md)));
     margin: var(--padding-md);

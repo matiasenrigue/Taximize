@@ -1,0 +1,20 @@
+.container {
+    background-color: var(--color-surface);
+    border: solid 1px var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--padding-sm);
+    width: fit-content;
+    font-family: var(--font-roboto-mono);
+}
+
+.container:focus-within {
+    border-color: var(--color-primary);
+}
+
+.segment {
+    outline: none;
+}
+
+.text {
+    color: var(--color-on-surface-low-contrast);
+}

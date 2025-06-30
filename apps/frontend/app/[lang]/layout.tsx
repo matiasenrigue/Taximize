@@ -6,6 +6,12 @@ import { Roboto, Roboto_Mono } from "next/font/google";
 import {hasLocale, NextIntlClientProvider} from "next-intl";
 import {routing} from "../../i18n/routing";
 import {notFound} from "next/navigation";
+import {ShiftContextProvider} from "../../contexts/ShiftContext/ShiftContext";
+import clsx from "clsx";
+import {RideContextProvider} from "../../contexts/RideContext/RideContext";
+import React from "react";
+import {BreakModalHandler} from "../../components/modals/BreakModalHandler/BreakModalHandler";
+import {ShiftEndModalHandler} from "../../components/modals/ShiftEndModalHandler/ShiftEndModalHandler";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -54,14 +60,23 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} prefix="og: https://ogp.me/ns#">
-      <body className={`${roboto.variable} ${roboto_mono.variable}`}>
+      <body className={clsx(roboto.variable, roboto_mono.variable)}>
         <NextIntlClientProvider>
-          <div className={styles.container}>
-            <Header/>
-            <main className={styles.main}>
-              {children}
-            </main>
-          </div>
+          <ShiftContextProvider>
+            <RideContextProvider>
+
+              <BreakModalHandler/>
+              <ShiftEndModalHandler/>
+
+              <div className={styles.container}>
+                <Header/>
+                <main className={styles.main}>
+                  {children}
+                </main>
+              </div>
+
+            </RideContextProvider>
+          </ShiftContextProvider>
         </NextIntlClientProvider>
       </body>
     </html>

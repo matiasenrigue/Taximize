@@ -1,5 +1,6 @@
 import styles from "./Button.module.css";
 import clsx from "clsx";
+import React from "react";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
     theme?: 'primary' | 'secondary' | 'danger';

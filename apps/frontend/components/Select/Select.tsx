@@ -2,7 +2,7 @@
 
 import styles from "./Select.module.css";
 import React, {useCallback, useRef, useState, createContext, useContext, useEffect, useId} from "react";
-import {useClickOutside} from "../../hooks/useClickOutside";
+import {useClickOutside} from "../../hooks/useClickOutside/useClickOutside";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
@@ -88,7 +88,7 @@ export const Option = (props: OptionProps) => {
     const context = useContext(SelectContext);
 
     if (!context)
-        throw new Error('<Option> can only be used as a child of <Select>!');
+        throw new Error('Option can only be used as a child of Select!');
 
     useEffect(() => {
         if (selected)

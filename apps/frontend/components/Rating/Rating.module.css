@@ -1,0 +1,20 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: var(--padding-sm);
+}
+
+.star {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: solid 2px var(--color-border);
+    border-radius: 50%;
+}
+
+.star_filled {
+    background-color: var(--color-primary);
+    border: none;
+}

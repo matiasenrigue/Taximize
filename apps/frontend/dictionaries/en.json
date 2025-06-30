@@ -1,6 +1,10 @@
 {
   "map": {
-    "startRide": "Start Ride"
+    "startRide": "Start Ride",
+    "endRide": "End Ride",
+    "pauseShift": "Take a break",
+    "endShift": "End Shift",
+    "locationSearchPlaceholder": "Search Address..."
   },
   "signin": {
     "email": "Email",
@@ -25,5 +29,51 @@
     "emailError": "Please input a valid email address",
     "alreadyHaveAccount": "Already have an account?",
     "signUpError": "Sign up failed"
+  },
+  "start-shift": {
+    "startShift": "Start Shift"
+  },
+  "RideEvaluationModal": {
+    "title": "Evaluate Ride",
+    "text": "This ride is below average. It will be difficult to find a new passenger near the target location.",
+    "confirmButton": "Start Ride",
+    "cancelButton": "Cancel"
+  },
+  "RideSummaryModal": {
+    "title": "End Ride",
+    "confirmButton": "End Ride",
+    "cancelButton": "Cancel"
+  },
+  "BreakReminderModal": {
+    "title": "Take a break!",
+    "text": "You’ve been driving for more than 3 hours without a break! We recommend that you take a short 15 minute break.",
+    "confirmButton": "Take a break",
+    "cancelButton": "Cancel"
+  },
+  "BreakModal": {
+    "title": "Enjoy your break!",
+    "endButton": "End break",
+    "endEarlyButton": "End break early"
+  },
+  "ShiftEndModal": {
+    "title": "Shift Over",
+    "text": "Your shift is over.",
+    "confirmButton": "End Shift",
+    "cancelButton": "Cancel"
+  },
+  "NoRouteFoundModal": {
+    "title": "No Route",
+    "text": "No route was found to your specified destination.",
+    "confirmButton": "Ok"
+  },
+  "UnknownLocationModal": {
+    "title": "Unknown Destination",
+    "text": "The location you specified could not be found. The route cannot be displayed.",
+    "confirmButton": "Ok"
+  },
+  "RouteErrorModal": {
+    "title": "Internal Error",
+    "text": "An unknown error occurred. The route cannot be displayed.",
+    "confirmButton": "Ok"
   }
 }

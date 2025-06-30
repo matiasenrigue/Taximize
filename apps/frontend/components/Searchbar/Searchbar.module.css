@@ -7,11 +7,11 @@
     border: solid 1px var(--color-border);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
+    transition: .2s;
 }
 
 .searchbar:focus-within {
     border: solid 1px var(--color-primary);
-    transition: .2s;
 }
 
 .icon {
@@ -25,6 +25,7 @@
     padding: 12px;
     font-size: 20px;
     color: var(--color-on-surface-low-contrast);
+    cursor: text;
 }
 
 .button_clear {
@@ -43,6 +44,12 @@
 
 .button_clear:hover {
     transform: scale(1.1);
+    color: var(--color-on-surface)
+}
+
+.button_clear:active {
+    transform: scale(.95);
+    transition: .1s;
 }
 
 .input {
