@@ -24,10 +24,11 @@
     border: solid 1px var(--color-border);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
+    visibility: hidden;
 }
 
-.options_container[data-open=false] {
-    visibility: hidden;
+.options_container[data-open=true] {
+    visibility: visible;
 }
 
 .option {

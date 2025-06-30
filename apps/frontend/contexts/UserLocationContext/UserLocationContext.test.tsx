@@ -1,10 +1,10 @@
-import {render} from "@testing-library/react";
+import {render, screen} from "@testing-library/react";
 import {expect} from "@jest/globals";
 import {UserLocationContextProvider, useUserLocationContext} from "./UserLocationContext";
 
 const UserLocationContextConsumerTest = () => {
     const context = useUserLocationContext();
-    return null;
+    return <div data-testid={"child"}/>;
 };
 
 describe("UserLocationContext", () => {

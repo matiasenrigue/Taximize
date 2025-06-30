@@ -6,7 +6,7 @@ import {Button} from "../../Button/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faClock} from "@fortawesome/free-solid-svg-icons";
 import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
-import {formatDuration} from "../../../utility/formatDuration";
+import {formatDuration} from "../../../utility/formatDuration/formatDuration";
 
 export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('BreakModal');

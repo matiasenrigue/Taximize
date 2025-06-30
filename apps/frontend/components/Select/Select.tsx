@@ -2,7 +2,7 @@
 
 import styles from "./Select.module.css";
 import React, {useCallback, useRef, useState, createContext, useContext, useEffect, useId} from "react";
-import {useClickOutside} from "../../hooks/useClickOutside";
+import {useClickOutside} from "../../hooks/useClickOutside/useClickOutside";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";

@@ -2,7 +2,7 @@
 
 import {createContext, PropsWithChildren, useCallback, useContext, useState} from "react";
 import moment from "moment";
-import {formatDuration} from "../../utility/formatDuration";
+import {formatDuration} from "../../utility/formatDuration/formatDuration";
 
 interface Location {
     placeId: string;

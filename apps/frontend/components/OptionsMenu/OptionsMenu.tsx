@@ -3,7 +3,7 @@ import styles from "./OptionsMenu.module.css";
 import {faEllipsis} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {PropsWithChildren, useCallback, useRef, useState} from "react";
-import {useClickOutside} from "../../hooks/useClickOutside";
+import {useClickOutside} from "../../hooks/useClickOutside/useClickOutside";
 import clsx from "clsx";
 
 
@@ -21,13 +21,15 @@ export const OptionsMenu = (props: PropsWithChildren) => {
             className={styles.container}>
             <button
                 className={styles.button}
-                aria-label={"More Options"}
+                aria-label={"Options"}
+                data-testid={"menu-button"}
                 onClick={() => setIsOpen(prev => !prev)}>
                 <FontAwesomeIcon icon={faEllipsis}/>
             </button>
             <div
                 className={styles.options_container}
-                data-open={isOpen}>
+                data-open={isOpen}
+                data-testid={"menu-container"}>
                 {children}
             </div>
         </div>
