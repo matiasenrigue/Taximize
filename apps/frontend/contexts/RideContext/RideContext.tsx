@@ -5,7 +5,7 @@ import moment from "moment";
 import {formatDuration} from "../../utility/formatDuration/formatDuration";
 
 interface Location {
-    placeId: string;
+    placeId: string | null;
     name: string;
 }
 

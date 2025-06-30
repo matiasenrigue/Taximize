@@ -55,6 +55,14 @@ export const LocationSearchbar = (props: SearchbarProps) => {
         updateDestination({name, placeId: place_id});
     };
 
+    const confirmInput = (name: string) => {
+        setSearchResults([]);
+        if (!name)
+            updateDestination(null);
+        else
+            updateDestination({name, placeId: null});
+    }
+
     return (
         <>
             <Searchbar
@@ -68,7 +76,7 @@ export const LocationSearchbar = (props: SearchbarProps) => {
                     updateDestination(null);
                     debounceSearchAddress(e.target.value);
                 }}
-                onConfirm={(name) => selectLocation({name})}/>
+                onConfirm={(name) => confirmInput(name)}/>
             <SearchResults>
                 {searchResults.map((result, i) => (
                     <SearchResult
