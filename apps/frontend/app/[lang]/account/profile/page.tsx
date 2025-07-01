@@ -134,7 +134,12 @@ export default function profile() {
                             </div>
                         </Modal>
                         {/* modal for delete account */}
-                        <Modal ref={deleteModalRef} title={t('deleteAccount')} className={styles.modal}>
+                        <Modal 
+                            ref={deleteModalRef} 
+                            title={t('deleteAccount')} 
+                            className={styles.modal}
+                            titleStyle={{ color: "var(--color-on-surface)" }} 
+                        >
                             <div className={styles.modalContent}>
                                 <p className={styles.warning}>{t('deleteAccountWarning')}</p>
                                 <div className={styles.modalActions}>
