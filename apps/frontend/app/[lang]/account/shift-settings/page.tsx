@@ -3,9 +3,7 @@
 import React from "react";
 import styles from "./page.module.css";
 import { useTranslations } from "next-intl";
-import { Select, Option } from "../../../../components/Select/Select";
-import { Switch } from "../../../../components/Switch/Switch";
-import { useRouter, usePathname } from "next/navigation";
+import { TimeInput } from "../../../../components/TimeInput/TimeInput";
 
 export default function shiftSettings() {
     const t = useTranslations('shiftSettings');
@@ -19,6 +17,11 @@ export default function shiftSettings() {
         "Sunday"
     ]
 
+    const setDurationInMilliseconds = (duration: number) => {
+        // Here you would typically save the duration to a state or context
+        console.log(`Duration set to: ${duration} milliseconds`);
+    };
+
     return (
         <div className={styles.page}>
             <div className={styles.container}>
@@ -30,10 +33,8 @@ export default function shiftSettings() {
                                 <label>{t(label)}</label>
                             </div>
                             <div className={styles.select}>
-                                <Select>
-                                    <Option value="off">{t("off")}</Option>
-                                    <Option value="on">{t("on")}</Option>
-                                </Select>
+                                <TimeInput
+                                    onChange={setDurationInMilliseconds}/>
                             </div>
                         </div>
                     ))}
