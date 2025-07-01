@@ -1,6 +1,7 @@
 import {render, screen} from "@testing-library/react";
 import {Searchbar} from "./Searchbar";
 import {expect} from "@jest/globals";
+import {userEvent} from "@testing-library/user-event";
 
 
 describe("Searchbar",  () => {
@@ -23,5 +24,17 @@ describe("Searchbar",  () => {
 
         clear_button.click();
         expect(input).toHaveValue("");
+    });
+
+    it("calls onConfirm", async () => {
+        const dummyCallback = jest.fn();
+        render(<Searchbar onConfirm={dummyCallback}/>);
+
+        const input = screen.getByRole("textbox", {name: "Address"}) as HTMLInputElement;
+        expect(input).toBeInTheDocument();
+
+        await userEvent.type(input, "Hello World{enter}");
+        expect(dummyCallback).toHaveBeenCalledTimes(1);
+        expect(dummyCallback).toHaveBeenCalledWith("Hello World");
     });
 });

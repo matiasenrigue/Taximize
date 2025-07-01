@@ -7,8 +7,10 @@ import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
-import authRoutes from './routes/authRoutes';
-import { errorHandler } from './middleware/errorMiddleware';
+import authRoutes from './entities/auth/auth.routes';
+import rideRoutes from './entities/rides/ride.routes';
+import shiftRoutes from './entities/shifts/shift.routes';
+import { errorHandler } from './shared/middleware/error.middleware';
 
 const app = express();
 
@@ -43,6 +45,8 @@ app.use(cookieParser());
 
 
 app.use('/api/auth', authRoutes);
+app.use('/api/rides', rideRoutes);
+app.use('/api/shifts', shiftRoutes);
 
 app.use(errorHandler);
 

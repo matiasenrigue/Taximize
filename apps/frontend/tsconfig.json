@@ -22,7 +22,13 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["jest", "node", "@testing-library/jest-dom", "@testing-library/react"]
+    "types": [
+      "jest",
+      "node",
+      "@testing-library/jest-dom",
+      "@testing-library/react",
+      "@types/google.maps"
+    ]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "jest.setup.ts"],
   "exclude": ["node_modules"]

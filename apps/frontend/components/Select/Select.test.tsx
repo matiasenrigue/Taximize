@@ -30,9 +30,9 @@ describe("Select", () => {
         expect(select).toHaveTextContent("Option B");
     });
 
-    it("throws an error when <Option> is used outside of <Select>", () => {
+    it("throws an error when Option is used outside of Select", () => {
         expect(() => render(<Option value={"test"}>Test</Option>))
-            .toThrowError('<Option> can only be used as a child of <Select>!');
+            .toThrowError('Option can only be used as a child of Select!');
     });
 
     it("is only controllable by its children", () => {

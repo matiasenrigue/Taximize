@@ -1,5 +1,5 @@
 import {Switch} from "./Switch";
-import {render, act, screen} from "@testing-library/react";
+import {render, act} from "@testing-library/react";
 import {expect} from "@jest/globals";
 
 

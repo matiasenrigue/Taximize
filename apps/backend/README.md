@@ -66,3 +66,33 @@ CREATE DATABASE "TaxiAPP"
 
 ```
 
+
+
+### **Hot to inspect DB**
+
+#### **In Bash:**
+
+```bash
+psql -d postgres
+```
+
+#### **In Postgress:**
+
+
+```bash
+\l  # see al DBs
+
+\c TaxiAPP  # Change to the Taxi DB
+
+\dt  # Check all the tables in the DB
+
+\d your_table_name  # get table description
+
+# Select rows from table
+SELECT *     
+  FROM your_table_name 
+ LIMIT 10;
+
+# Quit 
+\q 
+```

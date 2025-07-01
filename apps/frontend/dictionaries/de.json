@@ -1,6 +1,10 @@
 {
   "map": {
-    "startRide": "Fahrt starten"
+    "startRide": "Fahrt starten",
+    "endRide": "Fahrt beenden",
+    "pauseShift": "Pause machen",
+    "endShift": "Schicht beenden",
+    "locationSearchPlaceholder": "Adresse suchen..."
   },
   "signin": {
     "email": "E-Mail",
@@ -25,6 +29,52 @@
     "emailError": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
     "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
     "signUpError": "Signup fehlgeschlagen"
+  },
+  "start-shift": {
+    "startShift": "Schicht starten"
+  },
+  "RideEvaluationModal": {
+    "title": "Fahrt starten",
+    "text": "Diese Fahrt ist schlechter als der Durchschnitt. Es wird schwierig sein, am Ziel einen neuen Passagier zu finden.",
+    "confirmButton": "Fahrt starten",
+    "cancelButton": "Abbrechen"
+  },
+  "RideSummaryModal": {
+    "title": "Fahrt beenden",
+    "confirmButton": "Fahrt beenden",
+    "cancelButton": "Abbrechen"
+  },
+  "BreakReminderModal": {
+    "title": "Zeit für eine Pause!",
+    "text": "Du fährst seit über 3 Stunden ohne Pause! Wir empfehlen dir, eine kurze 15-Minuten Pause einzulegen.",
+    "confirmButton": "Pause machen",
+    "cancelButton": "Abbrechen"
+  },
+  "BreakModal": {
+    "title": "Genieß deine Pause!",
+    "endButton": "Pause beenden",
+    "endEarlyButton": "Pause abbrechen"
+  },
+  "ShiftEndModal": {
+    "title": "Schicht vorbei",
+    "text": "Du hast deine für heute geplante Arbeitszeit erreicht!",
+    "confirmButton": "Schicht beenden",
+    "cancelButton": "Abbrechen"
+  },
+  "NoRouteFoundModal": {
+    "title": "Keine Route",
+    "text": "Es wurde keine Route zur angegebenen Adresse gefunden.",
+    "confirmButton": "Ok"
+  },
+  "UnknownLocationModal": {
+    "title": "Unbekanntes Ziel",
+    "text": "Die angegebene Adresse wurde nicht gefunden. Die Route kann daher nicht angezeigt werden.",
+    "confirmButton": "Ok"
+  },
+  "RouteErrorModal": {
+    "title": "Interner Fehler",
+    "text": "Ein unbekannter Fehler ist aufgetreten. Die Route kann nicht angezeigt werden.",
+    "confirmButton": "Ok"
   },
   "account": {
     "account": "Konto",
