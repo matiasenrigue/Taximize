@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getToken, deleteToken } from './token';
+import { getToken, setToken, deleteToken, clearAllTokens } from './token';
 
 /**
  * Create an Axios instance with default settings
@@ -11,6 +11,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+  withCredentials: true, // Important: needed for cookies to be sent with requests
 });
 
 /** 
@@ -30,27 +31,47 @@ api.interceptors.request.use(
 );
 
 /**
- * Add a response interceptor to handle errors globally
+ * Add a response interceptor to handle errors globally and refresh tokens
  */
 api.interceptors.response.use(
-    (response) => {     
-      return response;
-    }
-  ,
-  (error) => { 
+  (response) => {     
+    return response;
+  },
+  async (error) => { 
+    const originalRequest = error.config;
+
     if (error.response) {
       // Handle specific error responses
-      if (error.response.status === 401) {
-        // Handle unauthorized access, redirect to login
-        console.error('Unauthorized access - redirecting to login');
-        // Clear token
-        deleteToken();
-        // Redirect to signin page
-        window.location.href = '/signin';
+      if (error.response.status === 401 && !originalRequest._retry) {
+        // Handle unauthorized access - try to refresh token
+        originalRequest._retry = true;
+        
+        try {
+          // Attempt to refresh the access token
+          const refreshResponse = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/auth'}/refresh`,
+            {},
+            { withCredentials: true }
+          );
+          
+          if (refreshResponse.data.success) {
+            // Store the new access token
+            setToken(refreshResponse.data.data.token);
+            
+            // Retry the original request with new token
+            originalRequest.headers['Authorization'] = `Bearer ${refreshResponse.data.data.token}`;
+            return api(originalRequest);
+          }
+        } catch (refreshError) {
+          // Refresh failed, redirect to login
+          console.error('Token refresh failed - redirecting to login');
+          clearAllTokens();
+          window.location.href = '/signin';
+          return Promise.reject(refreshError);
+        }
       } else if (error.response.status === 403) {
         // Handle forbidden access
         console.error('Forbidden access');
-        // redirect to home 
         window.location.href = '/';
       } else {
         console.error('An error occurred:', error.response.data);
