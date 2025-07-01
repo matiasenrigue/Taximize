@@ -12,14 +12,18 @@ export type ModalHandle = {
 
 interface ModalProps extends React.PropsWithChildren {
     title?: string;
+    className?: string;
+    titleStyle?: React.CSSProperties;
     onClose?: () => void;
 }
 
-export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref: ForwardedRef<ModalHandle>) => {
+export const Modal = forwardRef<ModalHandle, ModalProps>((props: ModalProps, ref: ForwardedRef<ModalHandle>) => {
     const {
         title,
         onClose,
-        children
+        children,
+        className,
+        titleStyle
     } = props;
     const dialogRef = useRef<HTMLDialogElement>(null!);
 
@@ -40,7 +44,7 @@ export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref: ForwardedR
     return (
         <dialog
             ref={dialogRef}
-            className={styles.dialog}
+            className={`${styles.dialog} ${className || ''}`}
             data-testid={"modal"}>
             <button
                 className={styles.button_close}
@@ -52,7 +56,7 @@ export const Modal = forwardRef<ModalHandle>((props: ModalProps, ref: ForwardedR
                 aria-label={"close"}>
                 <FontAwesomeIcon icon={faXmark}/>
             </button>
-            {title && <h4 className={styles.heading}>{title}</h4>}
+            {title && <h4 className={styles.heading} style={titleStyle}>{title}</h4>}
             {children}
         </dialog>
     );

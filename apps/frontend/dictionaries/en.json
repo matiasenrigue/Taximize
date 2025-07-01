@@ -75,5 +75,79 @@
     "title": "Internal Error",
     "text": "An unknown error occurred. The route cannot be displayed.",
     "confirmButton": "Ok"
+  },
+  "account": {
+    "account": "Account",
+    "shiftSettings": "Shift Settings",
+    "preferences": "Preferences",
+    "statistics": "Statistics"
+  },
+  "preferences": {
+    "preferences": "Preferences",
+    "colorScheme": "Color Scheme",
+    "language": "Language",
+    "geolocation": "Geolocation",
+    "breakWarnings": "Break Warnings",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "profile": {
+  "profile": "Profile",
+  "personalInformation": "Personal Information",
+  "username": "Username",
+  "email": "Email",
+  "manageAccount": "Manage Account",
+  "changePassword": "Change Password",
+  "deleteAccount": "Delete Account",
+  "signout": "Sign Out",
+  "signOutWarning": "Are you sure you want to sign out?",
+  "deleteAccountWarning": "Are you sure you want to delete your account?",
+  "cancel": "Cancel",
+  "confirm": "Confirm"
+  },
+  "changeUsername": {
+    "changeUsername": "Change Username",
+    "newUsername": "New Username",
+    "newUsernamePlaceholder": "Enter your new username",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel"
+  },
+  "changeEmail": {
+    "changeEmail": "Change Email",
+    "newEmail": "New Email",
+    "newEmailPlaceholder": "Enter your new email",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel"
+  },
+  "changePassword": {
+    "changePassword": "Change Password",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter your new password",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel"
+  },
+  "shiftSettings": {
+    "shiftSettings": "Shift Settings",
+    "Monday": "Mon",
+    "Tuesday": "Tue",
+    "Wednesday": "Wed",
+    "Thursday": "Thu",
+    "Friday": "Fri",
+    "Saturday": "Sat",
+    "Sunday": "Sun"
+  },
+  "statistics": {
+    "title": "Statistics",
+    "worktimeTitle": "Average Worktime in Hours",
+    "earningsTitle": "Average Earnings in €",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "loadingWorktime": "Loading worktime data...",
+    "errorWorktime": "Error loading worktime data",
+    "loadingEarnings": "Loading earnings data...",
+    "errorEarnings": "Error loading earnings data",
+    "withPassenger": "with passenger",
+    "empty": "empty"
   }
 }

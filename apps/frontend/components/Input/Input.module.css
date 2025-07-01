@@ -28,7 +28,8 @@
     font-size: 16px;
     outline: none;
     margin-bottom: 2px;
-    background: #fafafa;
+    background-color: var(--color-on-input-box);
+    color: var(--color-on-surface);
     transition: border 0.2s;
 }
 
