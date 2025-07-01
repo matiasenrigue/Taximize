@@ -5,7 +5,7 @@ import { getToken, setToken, deleteToken, clearAllTokens } from './token';
  * Create an Axios instance with default settings
  */
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/auth',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ api.interceptors.response.use(
         try {
           // Attempt to refresh the access token
           const refreshResponse = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/auth'}/refresh`,
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/refresh`,
             {},
             { withCredentials: true }
           );

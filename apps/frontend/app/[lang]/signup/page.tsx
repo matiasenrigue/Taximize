@@ -29,7 +29,7 @@ export default function Signup() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        api.post("/signup", {
+        api.post("/auth/signup", {
             email,
             username,
             password
