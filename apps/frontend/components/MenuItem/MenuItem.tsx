@@ -1,4 +1,5 @@
-import { ChevronRight } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import styles from './MenuItem.module.css';
 import Link from 'next/link';
 
@@ -7,7 +8,7 @@ export const MenuItem = ({ href, children, icon }: { href: string; children: Rea
     <Link href={href} className={styles.menuItem}>
       {icon && <span className={styles.icon}>{icon}</span>}
       <span className={styles.menuItemText}>{children}</span>
-      <ChevronRight className={styles.menuIcon}/>
+      <FontAwesomeIcon icon={faChevronRight} className={styles.menuIcon}/>
     </Link>
   );
 };
