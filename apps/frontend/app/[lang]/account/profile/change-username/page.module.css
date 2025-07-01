@@ -75,7 +75,7 @@
 
 
 .warning {
-  color: var(--color-on-surface);
+  color: var(--color-text);
   font-size: 1rem;
   margin-top: 8px;
 }
