@@ -22,6 +22,7 @@
 .select_value {
     flex: 1 1 auto;
     text-align: left;
+    color: var(--color-on-surface);
 }
 
 .placeholder {
@@ -46,6 +47,7 @@
     width: 100%;
     background-color: var(--color-surface);
     border: solid 1px var(--color-border);
+    color: var(--color-on-surface);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     z-index: 1000; /* ensure that the options are displayed above other elements */
@@ -64,6 +66,7 @@
     border-radius: var(--border-radius);
     text-align: left;
     cursor: pointer;
+    color: var(--color-on-surface);
 }
 
 .option:hover {
