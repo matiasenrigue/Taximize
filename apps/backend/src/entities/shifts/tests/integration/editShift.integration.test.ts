@@ -117,7 +117,7 @@ describe('Edit Shift Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot edit active shift');
+      expect(response.body.error).toContain('Cannot edit active shift');
     });
 
     it('Tests-ED-31-Must-end-shift-before-editing', async () => {
@@ -146,15 +146,16 @@ describe('Edit Shift Operations', () => {
       const { user, token } = await createAuthenticatedUser();
       const shift = await createCompletedShift(user.id);
 
+      // Try to set start time 25 hours before the shift's current end time
       const response = await request(app)
         .put(`/api/shifts/${shift.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          shift_start: new Date(Date.now() - 90000000) // 25 hours before end
+          shift_start: new Date(shift.shift_end!.getTime() - (25 * 60 * 60 * 1000)) // 25 hours before end
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Shift cannot exceed 24 hours');
+      expect(response.body.error).toContain('Shift cannot exceed 24 hours');
     });
 
     it('Tests-ED-33-Shift-start-must-be-before-end', async () => {
@@ -170,7 +171,7 @@ describe('Edit Shift Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Shift start must be before shift end');
+      expect(response.body.error).toContain('Shift start must be before shift end');
     });
   });
 
@@ -191,7 +192,7 @@ describe('Edit Shift Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Shift must encompass all rides');
+      expect(response.body.error).toContain('Shift must encompass all rides');
     });
 
     it('Tests-ED-35-Cannot-edit-shift-times-invalidating-rides', async () => {
@@ -211,14 +212,15 @@ describe('Edit Shift Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Shift must encompass all rides');
+      expect(response.body.error).toContain('Shift must encompass all rides');
     });
 
     it('Tests-ED-36-Auto-recalculates-shift-statistics', async () => {
       const { user, token } = await createAuthenticatedUser();
       const shift = await createCompletedShift(user.id);
 
-      const newShiftEnd = new Date(Date.now() - 1800000); // 30 minutes ago
+      // Set end time to 2 hours ago (making duration 2 hours instead of 3)
+      const newShiftEnd = new Date(Date.now() - 7200000); // 2 hours ago
       const response = await request(app)
         .put(`/api/shifts/${shift.id}`)
         .set('Authorization', `Bearer ${token}`)
@@ -227,8 +229,8 @@ describe('Edit Shift Operations', () => {
         });
 
       expect(response.status).toBe(200);
-      expect(response.body.total_duration_ms).toBeLessThan(shift.total_duration_ms);
-      expect(response.body.work_time_ms).toBeLessThan(shift.work_time_ms);
+      expect(response.body.total_duration_ms).toBeLessThan(shift.total_duration_ms || 0);
+      expect(response.body.work_time_ms).toBeLessThan(shift.work_time_ms || 0);
     });
   });
 
@@ -241,7 +243,7 @@ describe('Edit Shift Operations', () => {
       await ShiftSignal.create({
         shift_id: shift.id,
         driver_id: user.id,
-        signal_type: 'pause',
+        signal: 'pause',
         timestamp: new Date(Date.now() - 7200000) // 2 hours ago
       });
 
@@ -254,7 +256,7 @@ describe('Edit Shift Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Break times must be within shift boundaries');
+      expect(response.body.error).toContain('Break times must be within shift boundaries');
     });
   });
 
@@ -297,8 +299,8 @@ describe('Edit Shift Operations', () => {
       const { user, token } = await createAuthenticatedUser();
       const shift = await createCompletedShift(user.id);
 
-      const originalDuration = shift.total_duration_ms;
-      const newEndTime = new Date(shift.shift_end.getTime() + 3600000); // Add 1 hour
+      const originalDuration = shift.total_duration_ms || 0;
+      const newEndTime = new Date(shift.shift_end!.getTime() + 3600000); // Add 1 hour
 
       const response = await request(app)
         .put(`/api/shifts/${shift.id}`)
@@ -319,14 +321,14 @@ describe('Edit Shift Operations', () => {
       await ShiftSignal.create({
         shift_id: shift.id,
         driver_id: user.id,
-        signal_type: 'pause',
+        signal: 'pause',
         timestamp: new Date(shift.shift_start.getTime() + 3600000) // 1 hour after start
       });
 
       await ShiftSignal.create({
         shift_id: shift.id,
         driver_id: user.id,
-        signal_type: 'resume',
+        signal: 'resume',
         timestamp: new Date(shift.shift_start.getTime() + 5400000) // 1.5 hours after start
       });
 
@@ -334,7 +336,7 @@ describe('Edit Shift Operations', () => {
         .put(`/api/shifts/${shift.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          shift_end: new Date(shift.shift_end.getTime() + 3600000) // Extend by 1 hour
+          shift_end: new Date(shift.shift_end!.getTime() + 3600000) // Extend by 1 hour
         });
 
       expect(response.status).toBe(200);
@@ -374,7 +376,7 @@ describe('Edit Shift Operations', () => {
         });
 
       expect(response.status).toBe(403);
-      expect(response.body.message).toContain('Not authorized');
+      expect(response.body.error).toContain('Not authorized');
     });
 
     it('Tests-ED-44-Driver-can-edit-own-shift', async () => {

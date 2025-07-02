@@ -249,4 +249,156 @@ export class ShiftController {
       throw new Error(error.message || 'Failed to get shift status');
     }
   });
+
+  // @desc    Edit shift details
+  // @route   PUT /api/shifts/:shiftId
+  // @access  Protected
+  static editShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { shiftId } = req.params;
+    const driverId = req.user?.id;
+    const updateData = req.body;
+
+    // Validate authentication
+    if (!driverId) {
+      res.status(401);
+      throw new Error('Driver authentication required');
+    }
+
+    try {
+      const updatedShift = await ShiftService.editShift(shiftId, driverId, updateData);
+      res.status(200).json(updatedShift);
+    } catch (error: any) {
+      if (error.message.includes('Not authorized')) {
+        res.status(403);
+      } else {
+        res.status(400);
+      }
+      throw new Error(error.message || 'Failed to edit shift');
+    }
+  });
+
+  // @desc    Delete shift (soft delete)
+  // @route   DELETE /api/shifts/:shiftId
+  // @access  Protected
+  static deleteShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { shiftId } = req.params;
+    const driverId = req.user?.id;
+
+    // Validate authentication
+    if (!driverId) {
+      res.status(401);
+      throw new Error('Driver authentication required');
+    }
+
+    try {
+      await ShiftService.deleteShift(shiftId, driverId);
+      res.status(200).json({ message: 'Shift deleted successfully' });
+    } catch (error: any) {
+      if (error.message.includes('Not authorized')) {
+        res.status(403);
+      } else {
+        res.status(400);
+      }
+      throw new Error(error.message || 'Failed to delete shift');
+    }
+  });
+
+  // @desc    Restore deleted shift
+  // @route   POST /api/shifts/:shiftId/restore
+  // @access  Protected
+  static restoreShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { shiftId } = req.params;
+    const driverId = req.user?.id;
+
+    // Validate authentication
+    if (!driverId) {
+      res.status(401);
+      throw new Error('Driver authentication required');
+    }
+
+    try {
+      await ShiftService.restoreShift(shiftId, driverId);
+      res.status(200).json({ message: 'Shift restored successfully' });
+    } catch (error: any) {
+      if (error.message.includes('Not authorized')) {
+        res.status(403);
+      } else {
+        res.status(400);
+      }
+      throw new Error(error.message || 'Failed to restore shift');
+    }
+  });
+
+  // @desc    Get all shifts for driver
+  // @route   GET /api/shifts
+  // @access  Protected
+  static getShifts = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const driverId = req.user?.id;
+
+    // Validate authentication
+    if (!driverId) {
+      res.status(401);
+      throw new Error('Driver authentication required');
+    }
+
+    try {
+      const shifts = await ShiftService.getShiftsByDriver(driverId);
+      res.status(200).json(shifts);
+    } catch (error: any) {
+      res.status(400);
+      throw new Error(error.message || 'Failed to get shifts');
+    }
+  });
+
+  // @desc    Get single shift
+  // @route   GET /api/shifts/:shiftId
+  // @access  Protected
+  static getShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { shiftId } = req.params;
+    const driverId = req.user?.id;
+
+    // Validate authentication
+    if (!driverId) {
+      res.status(401);
+      throw new Error('Driver authentication required');
+    }
+
+    try {
+      const shift = await ShiftService.getShiftById(shiftId, driverId);
+      res.status(200).json(shift);
+    } catch (error: any) {
+      if (error.message.includes('Not authorized')) {
+        res.status(403);
+      } else {
+        res.status(400);
+      }
+      throw new Error(error.message || 'Failed to get shift');
+    }
+  });
+
+  // @desc    End shift by ID
+  // @route   POST /api/shifts/:shiftId/end
+  // @access  Protected
+  static endShiftById = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { shiftId } = req.params;
+    const driverId = req.user?.id;
+
+    // Validate authentication
+    if (!driverId) {
+      res.status(401);
+      throw new Error('Driver authentication required');
+    }
+
+    try {
+      const result = await ShiftService.endShiftById(shiftId, driverId);
+      res.status(200).json({
+        success: true,
+        message: 'Shift ended successfully',
+        data: result
+      });
+    } catch (error: any) {
+      res.status(400);
+      throw new Error(error.message || 'Failed to end shift');
+    }
+  });
 } 

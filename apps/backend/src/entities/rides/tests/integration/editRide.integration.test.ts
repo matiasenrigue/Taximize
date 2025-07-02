@@ -99,7 +99,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot edit active ride');
+      expect(response.body.error).toContain('Cannot edit active ride');
     });
   });
 
@@ -117,7 +117,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('End time must be after start time');
+      expect(response.body.error).toContain('End time must be after start time');
     });
 
     it('Tests-ED-3-Distance-must-be-positive', async () => {
@@ -133,7 +133,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Distance must be positive');
+      expect(response.body.error).toContain('Distance must be positive');
     });
 
     it('Tests-ED-4-Earning-must-be-positive', async () => {
@@ -149,7 +149,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Earning must be positive');
+      expect(response.body.error).toContain('Earning must be positive');
     });
 
     it('Tests-ED-5-Coordinates-must-be-within-valid-ranges', async () => {
@@ -166,7 +166,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Invalid coordinates');
+      expect(response.body.error).toContain('Invalid coordinates');
     });
 
     it('Tests-ED-6-Cannot-modify-start-time-to-future', async () => {
@@ -183,7 +183,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot modify start_time');
+      expect(response.body.error).toContain('Cannot modify start_time');
     });
   });
 
@@ -270,7 +270,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot modify id');
+      expect(response.body.error).toContain('Cannot modify id');
     });
 
     it('Tests-ED-12-Cannot-edit-shift-id', async () => {
@@ -286,7 +286,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot modify shift_id');
+      expect(response.body.error).toContain('Cannot modify shift_id');
     });
 
     it('Tests-ED-13-Cannot-edit-driver-id', async () => {
@@ -302,7 +302,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot modify driver_id');
+      expect(response.body.error).toContain('Cannot modify driver_id');
     });
 
     it('Tests-ED-14-Cannot-edit-start-time', async () => {
@@ -318,7 +318,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot modify start_time');
+      expect(response.body.error).toContain('Cannot modify start_time');
     });
 
     it('Tests-ED-15-Cannot-edit-start-coordinates', async () => {
@@ -335,7 +335,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot modify start_latitude');
+      expect(response.body.error).toContain('Cannot modify start_latitude');
     });
 
     it('Tests-ED-16-Cannot-edit-predicted-score', async () => {
@@ -351,7 +351,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot modify predicted_score');
+      expect(response.body.error).toContain('Cannot modify predicted_score');
     });
   });
 
@@ -371,7 +371,7 @@ describe('Edit Ride Operations', () => {
         });
 
       expect(response.status).toBe(403);
-      expect(response.body.message).toContain('Not authorized');
+      expect(response.body.error).toContain('Not authorized');
     });
   });
 

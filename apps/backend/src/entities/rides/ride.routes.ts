@@ -11,4 +11,10 @@ router.post('/start-ride', protect, RideController.startRide);
 router.post('/get-ride-status', protect, RideController.getRideStatus);
 router.post('/end-ride', protect, RideController.endRide);
 
+// Edit and Delete routes
+router.put('/:rideId', protect, RideController.editRide);
+router.delete('/:rideId', protect, RideController.deleteRide);
+router.post('/:rideId/restore', protect, RideController.restoreRide);
+router.get('/', protect, RideController.getRides);
+
 export default router; 

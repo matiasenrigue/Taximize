@@ -18,6 +18,10 @@ export class Ride extends Model {
   public distance_km!: number | null;
   public created_at!: Date;
   public updated_at!: Date;
+  public deleted_at!: Date | null;
+
+  // Paranoid model methods
+  public restore!: () => Promise<void>;
 }
 
 Ride.init(
@@ -82,6 +86,7 @@ Ride.init(
     tableName: 'rides',
     timestamps: true,
     underscored: true,
+    paranoid: true,
     indexes: [
       {
         name: 'one_active_ride_per_shift',

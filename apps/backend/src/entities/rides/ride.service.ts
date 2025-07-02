@@ -213,4 +213,143 @@ export class RideService {
       throw new Error('Invalid longitude provided');
     }
   }
+
+  static async editRide(rideId: string, driverId: string, updateData: any): Promise<Ride> {
+    // Find the ride
+    const ride = await Ride.findByPk(rideId);
+    if (!ride) {
+      throw new Error('Ride not found');
+    }
+
+    // Check authorization
+    if (ride.driver_id !== driverId) {
+      throw new Error('Not authorized to edit this ride');
+    }
+
+    // Check if ride is active
+    if (!ride.end_time) {
+      throw new Error('Cannot edit active ride');
+    }
+
+    // Validate forbidden fields
+    const forbiddenFields = ['id', 'shift_id', 'driver_id', 'start_time', 'start_latitude', 'start_longitude', 'predicted_score'];
+    for (const field of forbiddenFields) {
+      if (field in updateData) {
+        throw new Error(`Cannot modify ${field}`);
+      }
+    }
+
+    // Validate coordinates if provided
+    if ('destination_latitude' in updateData || 'destination_longitude' in updateData) {
+      const destLat = updateData.destination_latitude || ride.destination_latitude;
+      const destLng = updateData.destination_longitude || ride.destination_longitude;
+      if (destLat < -90 || destLat > 90 || destLng < -180 || destLng > 180) {
+        throw new Error('Invalid coordinates');
+      }
+    }
+
+    // Validate distance if provided
+    if ('distance_km' in updateData && updateData.distance_km <= 0) {
+      throw new Error('Distance must be positive');
+    }
+
+    // Validate earning if provided
+    if ('earning_cents' in updateData && updateData.earning_cents <= 0) {
+      throw new Error('Earning must be positive');
+    }
+
+    // Validate end_time if provided
+    if ('end_time' in updateData) {
+      const endTime = new Date(updateData.end_time);
+      if (endTime <= ride.start_time) {
+        throw new Error('End time must be after start time');
+      }
+    }
+
+    // Update the ride
+    await ride.update(updateData);
+
+    // Update shift statistics
+    await this.updateShiftStatistics(ride.shift_id);
+
+    return ride;
+  }
+
+  static async deleteRide(rideId: string, driverId: string): Promise<void> {
+    // Find the ride
+    const ride = await Ride.findByPk(rideId);
+    if (!ride) {
+      throw new Error('Ride not found');
+    }
+
+    // Check authorization
+    if (ride.driver_id !== driverId) {
+      throw new Error('Not authorized to delete this ride');
+    }
+
+    // Check if ride is active
+    if (!ride.end_time) {
+      throw new Error('Cannot delete active ride');
+    }
+
+    // Soft delete the ride
+    await ride.destroy();
+
+    // Update shift statistics
+    await this.updateShiftStatistics(ride.shift_id);
+  }
+
+  static async restoreRide(rideId: string, driverId: string): Promise<void> {
+    // Find the deleted ride (paranoid: false to include soft-deleted records)
+    const ride = await Ride.findByPk(rideId, { paranoid: false });
+    if (!ride) {
+      throw new Error('Ride not found');
+    }
+
+    // Check authorization
+    if (ride.driver_id !== driverId) {
+      throw new Error('Not authorized to restore this ride');
+    }
+
+    // Check if ride is deleted (handle both snake_case and camelCase)
+    const deletedAt = ride.deleted_at || (ride as any).deletedAt;
+    if (!deletedAt) {
+      throw new Error('Ride is not deleted');
+    }
+
+    // Restore the ride using Sequelize's restore method
+    await ride.restore();
+
+    // Update shift statistics
+    await this.updateShiftStatistics(ride.shift_id);
+  }
+
+  static async getRidesByDriver(driverId: string): Promise<Ride[]> {
+    return await Ride.findAll({
+      where: { driver_id: driverId },
+      order: [['start_time', 'DESC']]
+    });
+  }
+
+  private static async updateShiftStatistics(shiftId: string): Promise<void> {
+    const shift = await Shift.findByPk(shiftId);
+    if (!shift) return;
+
+    // Get all non-deleted rides for this shift
+    const rides = await Ride.findAll({
+      where: { shift_id: shiftId }
+    });
+
+    // Calculate totals
+    let totalEarnings = 0;
+    let totalDistance = 0;
+
+    for (const ride of rides) {
+      if (ride.earning_cents) totalEarnings += ride.earning_cents;
+      if (ride.distance_km) totalDistance += ride.distance_km;
+    }
+
+    // Update shift with new totals (if needed - depends on your shift model)
+    // This is a placeholder - adjust based on your actual shift model structure
+  }
 } 

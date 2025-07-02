@@ -119,7 +119,7 @@ describe('Delete Shift Operations', () => {
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot delete shift with associated rides');
+      expect(response.body.error).toContain('Cannot delete shift with associated rides');
     });
 
     it('Tests-ED-46-Can-delete-shift-after-deleting-rides', async () => {
@@ -151,7 +151,7 @@ describe('Delete Shift Operations', () => {
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('delete rides first');
+      expect(response.body.error).toContain('delete rides first');
     });
 
     it('Tests-ED-48-Can-delete-shift-with-only-deleted-rides', async () => {
@@ -182,7 +182,9 @@ describe('Delete Shift Operations', () => {
       // Verify shift is soft deleted
       const deletedShift = await Shift.findByPk(shift.id, { paranoid: false });
       expect(deletedShift).toBeTruthy();
-      expect(deletedShift.deleted_at).toBeTruthy();
+      // Check both possible field names
+      const deletedAt = deletedShift!.deleted_at || (deletedShift as any).deletedAt;
+      expect(deletedAt).toBeTruthy();
     });
 
     it('Tests-ED-50-Standard-queries-exclude-deleted-shifts', async () => {
@@ -214,7 +216,7 @@ describe('Delete Shift Operations', () => {
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cannot delete active shift');
+      expect(response.body.error).toContain('Cannot delete active shift');
     });
   });
 
@@ -239,7 +241,9 @@ describe('Delete Shift Operations', () => {
       // Verify shift is restored
       const restoredShift = await Shift.findByPk(shift.id);
       expect(restoredShift).toBeTruthy();
-      expect(restoredShift.deleted_at).toBeNull();
+      // Check both possible field names
+      const deletedAt = restoredShift!.deleted_at || (restoredShift as any).deletedAt;
+      expect(deletedAt).toBeNull();
     });
 
     it('Tests-ED-53-Cannot-restore-non-deleted-shift', async () => {
@@ -251,7 +255,7 @@ describe('Delete Shift Operations', () => {
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Shift is not deleted');
+      expect(response.body.error).toContain('Shift is not deleted');
     });
 
     it('Tests-ED-54-Restores-with-associated-data', async () => {
@@ -262,7 +266,7 @@ describe('Delete Shift Operations', () => {
       await ShiftSignal.create({
         shift_id: shift.id,
         driver_id: user.id,
-        signal_type: 'pause',
+        signal: 'pause',
         timestamp: new Date(Date.now() - 10000000)
       });
 
@@ -295,7 +299,7 @@ describe('Delete Shift Operations', () => {
         .set('Authorization', `Bearer ${token1}`);
 
       expect(response.status).toBe(403);
-      expect(response.body.message).toContain('Not authorized');
+      expect(response.body.error).toContain('Not authorized');
     });
 
     it('Tests-ED-56-Driver-can-delete-own-shift', async () => {
@@ -327,7 +331,7 @@ describe('Delete Shift Operations', () => {
         .set('Authorization', `Bearer ${token1}`);
 
       expect(response.status).toBe(403);
-      expect(response.body.message).toContain('Not authorized');
+      expect(response.body.error).toContain('Not authorized');
     });
   });
 
@@ -350,10 +354,10 @@ describe('Delete Shift Operations', () => {
 
       // Verify data is preserved
       const deletedShift = await Shift.findByPk(shift.id, { paranoid: false });
-      expect(deletedShift.shift_start).toEqual(originalData.shift_start);
-      expect(deletedShift.shift_end).toEqual(originalData.shift_end);
-      expect(deletedShift.total_duration_ms).toBe(originalData.total_duration_ms);
-      expect(deletedShift.work_time_ms).toBe(originalData.work_time_ms);
+      expect(deletedShift!.shift_start).toEqual(originalData.shift_start);
+      expect(deletedShift!.shift_end).toEqual(originalData.shift_end);
+      expect(deletedShift!.total_duration_ms).toBe(originalData.total_duration_ms);
+      expect(deletedShift!.work_time_ms).toBe(originalData.work_time_ms);
     });
 
     it('Tests-ED-59-Maintains-referential-integrity', async () => {
@@ -364,7 +368,7 @@ describe('Delete Shift Operations', () => {
       const signal = await ShiftSignal.create({
         shift_id: shift.id,
         driver_id: user.id,
-        signal_type: 'pause',
+        signal: 'pause',
         timestamp: new Date(Date.now() - 10000000)
       });
 
@@ -376,7 +380,7 @@ describe('Delete Shift Operations', () => {
       // Verify signals still exist
       const existingSignal = await ShiftSignal.findByPk(signal.id);
       expect(existingSignal).toBeTruthy();
-      expect(existingSignal.shift_id).toBe(shift.id);
+      expect(existingSignal!.shift_id).toBe(shift.id);
     });
   });
 });

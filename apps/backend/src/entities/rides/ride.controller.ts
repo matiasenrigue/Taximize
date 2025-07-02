@@ -207,4 +207,104 @@ export class RideController {
       throw new Error(error.message || 'Failed to end ride');
     }
   });
+
+  // @desc    Edit ride details
+  // @route   PUT /api/rides/:rideId
+  // @access  Protected
+  static editRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { rideId } = req.params;
+    const driverId = req.user?.id;
+    const updateData = req.body;
+
+    // Validate authentication
+    if (!driverId) {
+      res.status(401);
+      throw new Error('Driver authentication required');
+    }
+
+    try {
+      const updatedRide = await RideService.editRide(rideId, driverId, updateData);
+      res.status(200).json(updatedRide);
+    } catch (error: any) {
+      if (error.message.includes('Not authorized')) {
+        res.status(403);
+      } else {
+        res.status(400);
+      }
+      throw new Error(error.message || 'Failed to edit ride');
+    }
+  });
+
+  // @desc    Delete ride (soft delete)
+  // @route   DELETE /api/rides/:rideId
+  // @access  Protected
+  static deleteRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { rideId } = req.params;
+    const driverId = req.user?.id;
+
+    // Validate authentication
+    if (!driverId) {
+      res.status(401);
+      throw new Error('Driver authentication required');
+    }
+
+    try {
+      await RideService.deleteRide(rideId, driverId);
+      res.status(200).json({ message: 'Ride deleted successfully' });
+    } catch (error: any) {
+      if (error.message.includes('Not authorized')) {
+        res.status(403);
+      } else {
+        res.status(400);
+      }
+      throw new Error(error.message || 'Failed to delete ride');
+    }
+  });
+
+  // @desc    Restore deleted ride
+  // @route   POST /api/rides/:rideId/restore
+  // @access  Protected
+  static restoreRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { rideId } = req.params;
+    const driverId = req.user?.id;
+
+    // Validate authentication
+    if (!driverId) {
+      res.status(401);
+      throw new Error('Driver authentication required');
+    }
+
+    try {
+      await RideService.restoreRide(rideId, driverId);
+      res.status(200).json({ message: 'Ride restored successfully' });
+    } catch (error: any) {
+      if (error.message.includes('Not authorized')) {
+        res.status(403);
+      } else {
+        res.status(400);
+      }
+      throw new Error(error.message || 'Failed to restore ride');
+    }
+  });
+
+  // @desc    Get all rides for driver
+  // @route   GET /api/rides
+  // @access  Protected
+  static getRides = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const driverId = req.user?.id;
+
+    // Validate authentication
+    if (!driverId) {
+      res.status(401);
+      throw new Error('Driver authentication required');
+    }
+
+    try {
+      const rides = await RideService.getRidesByDriver(driverId);
+      res.status(200).json(rides);
+    } catch (error: any) {
+      res.status(400);
+      throw new Error(error.message || 'Failed to get rides');
+    }
+  });
 } 
