@@ -1,5 +1,8 @@
 .input_box {
     display: flex;
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .button_clear {
