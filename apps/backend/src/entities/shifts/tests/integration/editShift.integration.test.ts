@@ -5,6 +5,7 @@ import User from '../../../users/user.model';
 import Ride from '../../../rides/ride.model';
 import Shift from '../../shift.model';
 import ShiftSignal from '../../shift-signal.model';
+import ShiftPause from '../../shift-pause.model';
 import { generateAccessToken } from '../../../auth/utils/generateTokens';
 
 // Set up environment variables for testing
@@ -95,6 +96,7 @@ beforeAll(async () => {
 afterEach(async () => {
   await User.destroy({ where: {} });
   await Ride.destroy({ where: {} });
+  await ShiftPause.destroy({ where: {} });
   await Shift.destroy({ where: {} });
   await ShiftSignal.destroy({ where: {} });
 });
@@ -317,19 +319,12 @@ describe('Edit Shift Operations', () => {
       const { user, token } = await createAuthenticatedUser();
       const shift = await createCompletedShift(user.id);
 
-      // Add pause/resume signals to affect work time
-      await ShiftSignal.create({
+      // Add pause records to affect work time calculation
+      await ShiftPause.create({
         shift_id: shift.id,
-        driver_id: user.id,
-        signal: 'pause',
-        timestamp: new Date(shift.shift_start.getTime() + 3600000) // 1 hour after start
-      });
-
-      await ShiftSignal.create({
-        shift_id: shift.id,
-        driver_id: user.id,
-        signal: 'resume',
-        timestamp: new Date(shift.shift_start.getTime() + 5400000) // 1.5 hours after start
+        pause_start: new Date(shift.shift_start.getTime() + 3600000), // 1 hour after start
+        pause_end: new Date(shift.shift_start.getTime() + 5400000), // 1.5 hours after start
+        duration_ms: 1800000 // 30 minutes
       });
 
       const response = await request(app)

@@ -31,10 +31,11 @@ beforeAll(async () => {
 
 afterEach(async () => {
   // Clean up in correct order due to foreign key constraints
-  await ShiftSignal.destroy({ where: {}, cascade: true });
-  await ShiftPause.destroy({ where: {}, cascade: true });
-  await Shift.destroy({ where: {}, cascade: true });
-  await User.destroy({ where: {}, cascade: true });
+  // Use force: true to hard delete even with paranoid mode
+  await ShiftSignal.destroy({ where: {}, force: true });
+  await ShiftPause.destroy({ where: {}, force: true });
+  await Shift.destroy({ where: {}, force: true });
+  await User.destroy({ where: {}, force: true });
 });
 
 afterAll(async () => {
