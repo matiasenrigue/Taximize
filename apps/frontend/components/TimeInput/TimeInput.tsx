@@ -1,6 +1,6 @@
 import styles from "./TimeInput.module.css";
 import {ForwardedRef, forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
-import {moveCursorToEnd, removeAllSelections, selectContent} from "../../utility/selectContent";
+import {moveCursorToEnd, removeAllSelections, selectContent} from "../../lib/selectContent";
 
 interface TimeInputProps {
     onChange?: (value: number) => void; // in milliseconds

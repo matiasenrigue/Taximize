@@ -2,7 +2,7 @@
 
 import React, {createContext, PropsWithChildren, useCallback, useContext, useRef, useState} from "react";
 import moment from "moment";
-import {formatDuration} from "../../utility/formatDuration/formatDuration";
+import {formatDuration} from "../../lib/formatDuration/formatDuration";
 import {BREAK_MODAL_TIMEOUT, DEFAULT_BREAK_DURATION} from "../../constants/constants";
 import {ModalHandle} from "../../components/Modal/Modal";
 import {BreakModal} from "../../components/modals/BreakModalHandler/BreakModal";
