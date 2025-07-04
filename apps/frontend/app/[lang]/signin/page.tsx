@@ -26,7 +26,7 @@ export default function Signin() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        api.post("/signin", {
+        api.post("/auth/signin", {
                 email,
                 password
             }).then((response) => {

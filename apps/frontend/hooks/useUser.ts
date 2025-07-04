@@ -18,7 +18,7 @@ export const useUser = () => {
 
     // get the user data
     useEffect(() => {
-        api.get('/user').then((res: { data: User }) => {
+        api.get('/auth/user').then((res: { data: User }) => {
             setUser(res.data);
         }).catch((err: any) => {
             console.error(err);

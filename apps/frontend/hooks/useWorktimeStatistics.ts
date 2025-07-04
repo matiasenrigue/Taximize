@@ -41,7 +41,7 @@ export const useWorktimeStatistics = () => {
         setWorktimeError(null);
         try {
             // e.g. /statistics/worktime?view=weekly&startDate=2025-01-01&endDate=2025-01-31
-            const response = await api.get('/statistics/worktime', { 
+            const response = await api.get('/auth/statistics/worktime', {
                 params: {
                     view: params.view,
                     startDate: params.startDate,
