@@ -12,27 +12,28 @@ import {Map} from "../../../components/Map/Map";
 import {UserLocationContextProvider} from "../../../contexts/UserLocationContext/UserLocationContext";
 import {APIProvider} from "@vis.gl/react-google-maps";
 import {LocationSearchbar} from "../../../components/LocationSearchbar";
-import {useRouter} from "next/navigation";
 import {TaxiMeter} from "../../../components/TaxiMeter/TaxiMeter";
 import {FlexGroup} from "../../../components/FlexGroup/FlexGroup";
 import {useRide} from "../../../contexts/RideContext/RideContext";
 import {MenuOption, OptionsMenu} from "../../../components/OptionsMenu/OptionsMenu";
+import {useRouter} from "next/navigation";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export default function MapPage() {
-    const router = useRouter();
     const startModalRef = useRef<ModalHandle>(null!);
     const endModalRef = useRef<ModalHandle>(null!);
-    const {isShift, pauseShift, endShift} = useShift();
+    const {isLoaded, isShift, pauseShift, endShift} = useShift();
     const {isOnRide, destination} = useRide();
     const t = useTranslations('map');
+    const router = useRouter();
 
     // if not on shift, reroute to /start-shift
     useEffect(() => {
-        if (isShift) return;
+        if (!isLoaded || isShift)
+            return;
         router.push("/start-shift");
-    }, [isShift]);
+    }, [isLoaded, isShift]);
 
     return (
         <UserLocationContextProvider>

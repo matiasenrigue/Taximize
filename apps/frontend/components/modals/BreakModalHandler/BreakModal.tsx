@@ -1,4 +1,4 @@
-import {ForwardedRef, forwardRef, useEffect, useState} from "react";
+import {ForwardedRef, forwardRef, useCallback, useEffect, useState} from "react";
 import {Modal, ModalHandle} from "../../Modal/Modal";
 import {useTranslations} from "next-intl";
 import {FlexGroup} from "../../FlexGroup/FlexGroup";
@@ -13,16 +13,29 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
     const {isPaused, continueShift, getRemainingBreakDuration} = useShift();
     const [remainingDuration, setRemainingDuration] = useState(() => getRemainingBreakDuration());
 
-    function endBreak() {
+    const safeOpenModal = useCallback(() => {
+        if (!ref || typeof ref === "function")
+            return;
+        ref.current.open();
+    }, []);
+
+    const safeCloseModal = useCallback(() => {
         if (!ref || typeof ref === "function")
             return;
         ref.current.close();
+    }, []);
+
+    function endBreak() {
+        safeCloseModal();
         continueShift();
     }
 
     useEffect(() => {
-        if (!isPaused)
+        if (!isPaused) {
+            safeCloseModal();
             return;
+        }
+        safeOpenModal();
         setRemainingDuration(getRemainingBreakDuration());
         const delay = 1000 * 10;
         const intervalId = setInterval(() => {
@@ -30,7 +43,7 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
         }, delay);
 
         return () => clearInterval(intervalId);
-    }, [isPaused, getRemainingBreakDuration]);
+    }, [isPaused, getRemainingBreakDuration, safeCloseModal, safeOpenModal]);
 
     return (
         <Modal
