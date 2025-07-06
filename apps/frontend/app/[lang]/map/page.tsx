@@ -95,14 +95,14 @@ export default function MapPage() {
                                 onClick={() => startModalRef.current?.open()}>
                                 {t("startRide")}
                             </Button>)}
-                        <OptionsMenu>
+                        {!isOnRide && <OptionsMenu>
                             <MenuOption onClick={openPauseModal}>
                                 {t("pauseShift")}
                             </MenuOption>
-                            {!isOnRide && <MenuOption onClick={endShift}>
+                            <MenuOption onClick={endShift}>
                                 {t("endShift")}
-                            </MenuOption>}
-                        </OptionsMenu>
+                            </MenuOption>
+                        </OptionsMenu>}
                     </FlexGroup>
                 </div>
             </div>
