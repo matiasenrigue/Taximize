@@ -35,7 +35,11 @@
   },
   "RideEvaluationModal": {
     "title": "Fahrt starten",
-    "text": "Diese Fahrt ist schlechter als der Durchschnitt. Es wird schwierig sein, am Ziel einen neuen Passagier zu finden.",
+    "text-rating-1": "Diese Fahrt ist nicht empfohlen. Es wird sehr schwierig sein, am Ziel einen neuen Passagier zu finden.",
+    "text-rating-2": "Diese Fahrt ist schlechter als der Durchschnitt. Es wird schwierig sein, am Ziel einen neuen Passagier zu finden.",
+    "text-rating-3": "Diese Fahrt ist durchschnittlich gut. Es wird einen Moment dauern, am Ziel einen neuen Passagier zu finden.",
+    "text-rating-4": "Diese Fahrt ist besser als der Durchschnitt. Es wird leicht sein, am Ziel einen neuen Passagier zu finden.",
+    "text-rating-5": "Diese Fahrt ist ideal! Es wird sehr leicht sein, am Ziel einen neuen Passagier zu finden.",
     "confirmButton": "Fahrt starten",
     "cancelButton": "Abbrechen"
   },

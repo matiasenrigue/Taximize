@@ -35,7 +35,11 @@
   },
   "RideEvaluationModal": {
     "title": "Evaluate Ride",
-    "text": "This ride is below average. It will be difficult to find a new passenger near the target location.",
+    "text-rating-1": "This ride is not recommended. It will be very difficult to find a new passenger near the destination.",
+    "text-rating-2": "This ride is below average. It will be difficult to find a new passenger near the destination.",
+    "text-rating-3": "This ride is average. It will take a bit of time to find a new passenger near the destination.",
+    "text-rating-4": "This ride is above average. It will be easy to find a new passenger near the destination.",
+    "text-rating-5": "This ride is ideal! It will be very easy to find a new passenger near the destination.",
     "confirmButton": "Start Ride",
     "cancelButton": "Cancel"
   },

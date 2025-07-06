@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import styles from "./page.module.css";
 import {Button} from "../../../components/Button/Button";
@@ -24,7 +24,7 @@ export default function MapPage() {
     const startModalRef = useRef<ModalHandle>(null!);
     const endModalRef = useRef<ModalHandle>(null!);
     const {isLoaded, isShift, pauseShift, endShift} = useShift();
-    const {isOnRide, destination} = useRide();
+    const {isOnRide, destination, isRouteAvailable} = useRide();
     const t = useTranslations('map');
     const router = useRouter();
 
@@ -36,55 +36,53 @@ export default function MapPage() {
     }, [isLoaded, isShift]);
 
     return (
-        <UserLocationContextProvider>
-            <APIProvider apiKey={API_KEY}>
-                <RideEvaluationModal
-                    ref={startModalRef}/>
-                <RideSummaryModal
-                    ref={endModalRef}/>
+        <APIProvider apiKey={API_KEY}>
+            <RideEvaluationModal
+                ref={startModalRef}/>
+            <RideSummaryModal
+                ref={endModalRef}/>
 
-                <div className={styles.page}>
-                    <Map className={styles.map}/>
+            <div className={styles.page}>
+                <Map className={styles.map}/>
 
-                    <div className={styles.search_container}>
-                        <LocationSearchbar
-                            placeholder={t("locationSearchPlaceholder")}/>
-                    </div>
-
-                    <div className={styles.button_container}>
-                        {isOnRide && <TaxiMeter/>}
-                        <FlexGroup
-                            direction={"row"}
-                            align={"center"}
-                            justify={"end"}>
-                            {isOnRide
-                                ? <FlexGroup
-                                    direction={"column"}
-                                    align={"start"}>
-                                    <Button
-                                        elevated={true}
-                                        onClick={() => endModalRef.current?.open()}>
-                                        {t("endRide")}
-                                    </Button>
-                                </FlexGroup>
-                                : (destination && <Button
-                                    elevated={true}
-                                    onClick={() => startModalRef.current?.open()}>
-                                    {t("startRide")}
-                                </Button>)}
-                            <OptionsMenu>
-                                <MenuOption onClick={pauseShift}>
-                                    {t("pauseShift")}
-                                </MenuOption>
-                                <MenuOption onClick={endShift}>
-                                    {t("endShift")}
-                                </MenuOption>
-                            </OptionsMenu>
-                        </FlexGroup>
-                    </div>
+                <div className={styles.search_container}>
+                    <LocationSearchbar
+                        placeholder={t("locationSearchPlaceholder")}/>
                 </div>
-            </APIProvider>
-        </UserLocationContextProvider>
+
+                <div className={styles.button_container}>
+                    {isOnRide && <TaxiMeter/>}
+                    <FlexGroup
+                        direction={"row"}
+                        align={"center"}
+                        justify={"end"}>
+                        {isOnRide
+                            ? <FlexGroup
+                                direction={"column"}
+                                align={"start"}>
+                                <Button
+                                    elevated={true}
+                                    onClick={() => endModalRef.current?.open()}>
+                                    {t("endRide")}
+                                </Button>
+                            </FlexGroup>
+                            : (destination && isRouteAvailable && <Button
+                                elevated={true}
+                                onClick={() => startModalRef.current?.open()}>
+                                {t("startRide")}
+                            </Button>)}
+                        <OptionsMenu>
+                            <MenuOption onClick={pauseShift}>
+                                {t("pauseShift")}
+                            </MenuOption>
+                            <MenuOption onClick={endShift}>
+                                {t("endShift")}
+                            </MenuOption>
+                        </OptionsMenu>
+                    </FlexGroup>
+                </div>
+            </div>
+        </APIProvider>
     );
 }
 

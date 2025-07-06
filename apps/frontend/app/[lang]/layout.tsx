@@ -13,6 +13,7 @@ import {RideContextProvider} from "../../contexts/RideContext/RideContext";
 import React from "react";
 import {BreakModalHandler} from "../../components/modals/BreakModalHandler/BreakModalHandler";
 import {ShiftEndModalHandler} from "../../components/modals/ShiftEndModalHandler/ShiftEndModalHandler";
+import {UserLocationContextProvider} from "../../contexts/UserLocationContext/UserLocationContext";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -68,21 +69,23 @@ export default async function RootLayout({
             <body className={clsx(roboto.variable, roboto_mono.variable)}>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
                     <NextIntlClientProvider>
-                        <ShiftContextProvider>
-                            <RideContextProvider>
+                        <UserLocationContextProvider>
+                            <ShiftContextProvider>
+                                <RideContextProvider>
 
-                                <BreakModalHandler/>
-                                <ShiftEndModalHandler/>
+                                    <BreakModalHandler/>
+                                    <ShiftEndModalHandler/>
 
-                                <div className={styles.container}>
-                                    <Header/>
-                                    <main className={styles.main}>
-                                        {children}
-                                    </main>
-                                </div>
+                                    <div className={styles.container}>
+                                        <Header/>
+                                        <main className={styles.main}>
+                                            {children}
+                                        </main>
+                                    </div>
 
-                            </RideContextProvider>
-                        </ShiftContextProvider>
+                                </RideContextProvider>
+                            </ShiftContextProvider>
+                        </UserLocationContextProvider>
                     </NextIntlClientProvider>
                 </ThemeProvider>
             </body>
