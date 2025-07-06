@@ -57,6 +57,12 @@
     "confirmButton": "Pause machen",
     "cancelButton": "Abbrechen"
   },
+  "StartBreakModal": {
+    "title": "Pause machen",
+    "text": "Bist du sicher, dass du eine 15-Minuten Pause einlegen möchtest?",
+    "confirmButton": "Pause machen",
+    "cancelButton": "Abbrechen"
+  },
   "BreakModal": {
     "title": "Genieß deine Pause!",
     "endButton": "Pause beenden",

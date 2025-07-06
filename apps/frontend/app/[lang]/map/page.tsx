@@ -20,18 +20,27 @@ import {FlexGroup} from "../../../components/FlexGroup/FlexGroup";
 import {useRide} from "../../../contexts/RideContext/RideContext";
 import {MenuOption, OptionsMenu} from "../../../components/OptionsMenu/OptionsMenu";
 import {useRouter} from "next/navigation";
+import {StartBreakModal} from "../../../components/modals/BreakModalHandler/StartBreakModal";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export default function MapPage() {
     const startModalRef = useRef<ModalHandle>(null!);
     const endModalRef = useRef<ModalHandle>(null!);
+    const startBreakModalRef = useRef<ModalHandle>(null!);
+
     const {pauseShift, endShift} = useShift();
     const {isOnRide, destination, isRouteAvailable} = useRide();
     const t = useTranslations('map');
 
     const {location, isAvailable, setIsWatching} = useUserLocationContext();
     useEffect(() => setIsWatching(true), []);
+
+    function openPauseModal() {
+        if (!startBreakModalRef || typeof startBreakModalRef === "function")
+            return;
+        startBreakModalRef.current.open();
+    }
 
     if (!isAvailable) return (
         <div>
@@ -54,6 +63,8 @@ export default function MapPage() {
                 ref={startModalRef}/>
             <RideSummaryModal
                 ref={endModalRef}/>
+            <StartBreakModal
+                ref={startBreakModalRef}/>
 
             <div className={styles.page}>
                 <Map className={styles.map}/>
@@ -85,7 +96,7 @@ export default function MapPage() {
                                 {t("startRide")}
                             </Button>)}
                         <OptionsMenu>
-                            <MenuOption onClick={pauseShift}>
+                            <MenuOption onClick={openPauseModal}>
                                 {t("pauseShift")}
                             </MenuOption>
                             {!isOnRide && <MenuOption onClick={endShift}>

@@ -1,14 +1,14 @@
-
-import {useTranslations} from "next-intl";
-import {ForwardedRef, forwardRef, Ref} from "react";
+import {ForwardedRef, forwardRef} from "react";
 import {Modal, ModalHandle} from "../../Modal/Modal";
 import {FlexGroup} from "../../FlexGroup/FlexGroup";
 import {Button} from "../../Button/Button";
+import {useTranslations} from "next-intl";
 import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
 
-export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
-    const {pauseShift, skipBreak} = useShift();
-    const t = useTranslations('BreakReminderModal');
+
+export const StartBreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
+    const {pauseShift} = useShift();
+    const t = useTranslations('StartBreakModal');
 
     function closeModal() {
         if (!ref || typeof ref === "function")
@@ -16,21 +16,16 @@ export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHand
         ref.current.close();
     }
 
-    function takeBreak() {
+    function takeBreakAndCloseModal() {
         pauseShift();
         closeModal();
     }
 
-    function skipBreakAndCloseModal() {
-        skipBreak();
-        closeModal();
-    }
 
     return (
         <Modal
             ref={ref}
-            title={t("title")}
-            onClose={skipBreak}>
+            title={t("title")}>
             <FlexGroup
                 direction={"column"}
                 align={"stretch"}>
@@ -40,11 +35,11 @@ export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHand
                     align={"stretch"}>
                     <Button
                         theme={"secondary"}
-                        onClick={skipBreakAndCloseModal}>
+                        onClick={closeModal}>
                         {t("cancelButton")}
                     </Button>
                     <Button
-                        onClick={takeBreak}>
+                        onClick={takeBreakAndCloseModal}>
                         {t("confirmButton")}
                     </Button>
                 </FlexGroup>

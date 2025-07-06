@@ -57,6 +57,12 @@
     "confirmButton": "Take a break",
     "cancelButton": "Cancel"
   },
+  "StartBreakModal": {
+    "title": "Take a break!",
+    "text": "Are you sure you want to do a 15 minute break?",
+    "confirmButton": "Take a break",
+    "cancelButton": "Cancel"
+  },
   "BreakModal": {
     "title": "Enjoy your break!",
     "endButton": "End break",
