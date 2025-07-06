@@ -14,6 +14,7 @@ import {LatLng} from "../../constants/types";
 interface UserLocationContextType {
     location: LatLng | null;
     isWatching: boolean;
+    isAvailable: boolean;
     setIsWatching: Dispatch<SetStateAction<boolean>>
 }
 
@@ -54,25 +55,12 @@ export const UserLocationContextProvider = (props: PropsWithChildren) => {
         <UserLocationContext.Provider value={{
             location,
             isWatching,
+            isAvailable,
             setIsWatching,
         }}>
-            {isAvailable
-                ? children
-                : <LocationWarning/>
-            }
+            {children}
         </UserLocationContext.Provider>
     )
-};
-
-export const LocationWarning = () => {
-    return (
-        <div>
-            <h4>Enable your Location</h4>
-            <p>
-                The app requires access to your location to recommend routes and calculate fares.
-            </p>
-        </div>
-    );
 };
 
 export const useUserLocationContext = () => {

@@ -3,13 +3,16 @@
 import styles from "./page.module.css";
 import {Button} from "../../../components/Button/Button";
 import {ModalHandle} from "../../../components/Modal/Modal";
-import {useEffect, useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {useTranslations} from "next-intl";
 import {RideEvaluationModal} from "../../../components/modals/RideEvaluationModal";
 import {RideSummaryModal} from "../../../components/modals/RideSummaryModal";
 import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
 import {Map} from "../../../components/Map/Map";
-import {UserLocationContextProvider} from "../../../contexts/UserLocationContext/UserLocationContext";
+import {
+    UserLocationContextProvider,
+    useUserLocationContext
+} from "../../../contexts/UserLocationContext/UserLocationContext";
 import {APIProvider} from "@vis.gl/react-google-maps";
 import {LocationSearchbar} from "../../../components/LocationSearchbar";
 import {TaxiMeter} from "../../../components/TaxiMeter/TaxiMeter";
@@ -26,6 +29,24 @@ export default function MapPage() {
     const {pauseShift, endShift} = useShift();
     const {isOnRide, destination, isRouteAvailable} = useRide();
     const t = useTranslations('map');
+
+    const {location, isAvailable, setIsWatching} = useUserLocationContext();
+    useEffect(() => setIsWatching(true), []);
+
+    if (!isAvailable) return (
+        <div>
+            <h4>Enable your Location</h4>
+            <p>
+                The app requires access to your location to recommend routes and calculate fares.
+            </p>
+        </div>
+    );
+
+    if (!location) return (
+        <div>
+            <h4>Loading Location...</h4>
+        </div>
+    );
 
     return (
         <APIProvider apiKey={API_KEY}>
@@ -67,9 +88,9 @@ export default function MapPage() {
                             <MenuOption onClick={pauseShift}>
                                 {t("pauseShift")}
                             </MenuOption>
-                            <MenuOption onClick={endShift}>
+                            {!isOnRide && <MenuOption onClick={endShift}>
                                 {t("endShift")}
-                            </MenuOption>
+                            </MenuOption>}
                         </OptionsMenu>
                     </FlexGroup>
                 </div>
