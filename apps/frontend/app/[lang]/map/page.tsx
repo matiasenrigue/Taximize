@@ -23,17 +23,9 @@ const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 export default function MapPage() {
     const startModalRef = useRef<ModalHandle>(null!);
     const endModalRef = useRef<ModalHandle>(null!);
-    const {isLoaded, isShift, pauseShift, endShift} = useShift();
+    const {pauseShift, endShift} = useShift();
     const {isOnRide, destination, isRouteAvailable} = useRide();
     const t = useTranslations('map');
-    const router = useRouter();
-
-    // if not on shift, reroute to /start-shift
-    useEffect(() => {
-        if (!isLoaded || isShift)
-            return;
-        router.push("/start-shift");
-    }, [isLoaded, isShift]);
 
     return (
         <APIProvider apiKey={API_KEY}>

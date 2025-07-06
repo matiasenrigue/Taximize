@@ -33,6 +33,9 @@
   "start-shift": {
     "startShift": "Start Shift"
   },
+  "end-shift": {
+    "confirmButton": "Ok"
+  },
   "RideEvaluationModal": {
     "title": "Evaluate Ride",
     "text-rating-1": "This ride is not recommended. It will be very difficult to find a new passenger near the destination.",

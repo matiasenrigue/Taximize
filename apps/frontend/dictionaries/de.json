@@ -33,6 +33,9 @@
   "start-shift": {
     "startShift": "Schicht starten"
   },
+  "end-shift": {
+    "confirmButton": "Ok"
+  },
   "RideEvaluationModal": {
     "title": "Fahrt starten",
     "text-rating-1": "Diese Fahrt ist nicht empfohlen. Es wird sehr schwierig sein, am Ziel einen neuen Passagier zu finden.",

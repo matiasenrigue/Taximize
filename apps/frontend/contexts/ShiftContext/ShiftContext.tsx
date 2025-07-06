@@ -62,14 +62,17 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
                 setIsLoaded(true);
 
-                if (!isOnShift)
+                if (!isOnShift) {
+                    router.push("/start-shift");
                     return;
+                }
 
                 setIsShift(isOnShift);
                 setDuration(60 * 60 * 60 * 1000);
                 setStartTime(shiftStart);
                 setIsPaused(isPaused);
                 setLastBreakTime(isPaused ? pauseStart : (lastPauseEnd ?? shiftStart));
+                router.push("/map");
             })
             .catch((error) => console.warn(error));
     }, []);
@@ -90,6 +93,8 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     const endShift = useCallback(() => {
         setIsShift(false);
+        console.log("end")
+        router.push('/end-shift');
         api.post("/shifts/end-shift", {})
             .then((response) => console.log(response))
             .catch((error) => console.warn(error));
