@@ -24,6 +24,8 @@ interface ShiftContextType {
     skipBreak: () => void;
     startOvertime: () => void;
     getRemainingBreakDuration: () => number;
+    totalDuration: number;
+    totalEarnings: number;
 }
 
 const ShiftContext = createContext<ShiftContextType|null>(null);
@@ -42,6 +44,10 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const [lastBreakTime, setLastBreakTime] = useState<number|null>(null);
     const [totalBreakDuration, setTotalBreakDuration] = useState<number>(0);
     const [isOvertime, setIsOvertime] = useState<boolean>(false);
+
+    // shift statistics
+    const [totalDuration, setTotalDuration] = useState<number>(0);
+    const [totalEarnings, setTotalEarnings] = useState<number>(0);
 
     // initialize shift
     useEffect(() => {
@@ -93,11 +99,31 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     const endShift = useCallback(() => {
         setIsShift(false);
-        console.log("end")
-        router.push('/end-shift');
         api.post("/shifts/end-shift", {})
-            .then((response) => console.log(response))
+            .then((response) => {
+                const {
+                    success,
+                    data
+                } = response.data;
+
+                if (!success)
+                    return;
+
+                const {
+                    totalDuration,
+                    workTime,
+                    breakTime,
+                    numBreaks,
+                    averageBreak,
+                    totalEarnings
+                } = data;
+
+                setTotalDuration(totalDuration);
+                setTotalEarnings(totalEarnings);
+
+            })
             .catch((error) => console.warn(error));
+        router.push('/end-shift');
     }, []);
 
     const pauseShift = useCallback(() => {
@@ -179,6 +205,8 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             skipBreak,
             startOvertime,
             getRemainingBreakDuration,
+            totalDuration,
+            totalEarnings,
         }}>
             <BreakModal ref={breakModalRef}/>
             {children}
