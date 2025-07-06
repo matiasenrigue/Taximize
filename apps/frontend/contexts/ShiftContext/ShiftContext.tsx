@@ -7,6 +7,7 @@ import {BREAK_MODAL_TIMEOUT, DEFAULT_BREAK_DURATION} from "../../constants/const
 import {ModalHandle} from "../../components/Modal/Modal";
 import {BreakModal} from "../../components/modals/BreakModalHandler/BreakModal";
 import api from "../../lib/axios";
+import {useRouter} from "next/navigation";
 
 interface ShiftContextType {
     isLoaded: boolean;
@@ -31,6 +32,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const {children} = props;
 
     const breakModalRef = useRef<ModalHandle>(null!);
+    const router = useRouter();
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [isShift, setIsShift] = useState<boolean>(false);
@@ -73,6 +75,8 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     }, []);
 
     const startShift = useCallback((duration: number) => {
+        if (duration === 0)
+            return;
         setDuration(duration);
         setStartTime(moment.now());
         setLastBreakTime(moment.now());
@@ -81,6 +85,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         api.post("/shifts/start-shift", {})
             .then((response) => console.log(response))
             .catch((error) => console.warn(error));
+        router.push('/map');
     }, []);
 
     const endShift = useCallback(() => {

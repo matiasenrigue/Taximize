@@ -12,6 +12,11 @@
     box-sizing: border-box;
 }
 
+.button:disabled {
+    opacity: .5;
+    cursor: unset;
+}
+
 .button_elevated {
     box-shadow: var(--box-shadow);
 }

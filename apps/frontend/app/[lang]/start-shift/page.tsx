@@ -8,11 +8,12 @@ import {useEffect, useState} from "react";
 import {TimeInput} from "../../../components/TimeInput/TimeInput";
 import {FlexGroup} from "../../../components/FlexGroup/FlexGroup";
 import {useTranslations} from "next-intl";
+import {DEFAULT_SHIFT_DURATION} from "../../../constants/constants";
 
 export default function StartShift() {
     const router = useRouter();
     const {isLoaded, isShift, startShift} = useShift();
-    const [durationInMilliseconds, setDurationInMilliseconds] = useState<number>(0);
+    const [duration, setDuration] = useState<number>(DEFAULT_SHIFT_DURATION);
     const t = useTranslations("start-shift");
 
     // if on shift, reroute to /map
@@ -28,12 +29,12 @@ export default function StartShift() {
                 direction={"column"}
                 align={"start"}>
                 <TimeInput
-                    onChange={setDurationInMilliseconds}/>
+                    defaultValue={DEFAULT_SHIFT_DURATION}
+                    invalid={duration === 0}
+                    onChange={setDuration}/>
                 <Button
-                    onClick={() => {
-                        startShift(durationInMilliseconds)
-                        router.push('/map');
-                    }}>
+                    disabled={duration === 0}
+                    onClick={() => startShift(duration)}>
                     {t("startShift")}
                 </Button>
             </FlexGroup>
