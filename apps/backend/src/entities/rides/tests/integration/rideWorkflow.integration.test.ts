@@ -267,7 +267,7 @@ describe('Ride Workflow Integration Tests', () => {
         });
 
       expect(ride2Res.status).toBe(400);
-      expect(ride2Res.body.error).toContain('Cannot start ride');
+      expect(ride2Res.body.error).toContain('Another ride is already in progress. Please end the current ride first.');
     });
 
     it('should handle ride start immediately after ending previous ride', async () => {

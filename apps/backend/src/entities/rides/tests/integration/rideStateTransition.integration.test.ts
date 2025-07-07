@@ -74,7 +74,7 @@ describe('Ride State Transition Tests', () => {
         });
 
       expect(rideRes.status).toBe(400);
-      expect(rideRes.body.error).toContain('Cannot start ride');
+      expect(rideRes.body.error).toContain('No active shift found');
     });
 
     it('should handle ride status check after shift termination', async () => {
@@ -104,7 +104,7 @@ describe('Ride State Transition Tests', () => {
         .send({});
 
       expect(statusRes.status).toBe(400);
-      expect(statusRes.body.error).toContain('No active ride');
+      expect(statusRes.body.error).toContain('No active shift found');
     });
 
     it('should handle ride end after shift termination', async () => {
@@ -137,7 +137,7 @@ describe('Ride State Transition Tests', () => {
         });
 
       expect(endRes.status).toBe(400);
-      expect(endRes.body.error).toContain('No active ride');
+      expect(endRes.body.error).toContain('No active shift found');
     });
   });
 
@@ -165,7 +165,7 @@ describe('Ride State Transition Tests', () => {
         });
 
       expect(rideRes.status).toBe(400);
-      expect(rideRes.body.error).toContain('Cannot start ride');
+      expect(rideRes.body.error).toContain('Cannot start ride while on break. Please continue your shift first.');
     });
 
     it('should allow ride start after driver becomes available again', async () => {
@@ -230,8 +230,8 @@ describe('Ride State Transition Tests', () => {
       expect(failedResponses).toHaveLength(2);
       
       failedResponses.forEach(res => {
-        // Error could be either "Cannot start ride" or "Validation error" due to unique constraint
-        expect(res.body.error).toMatch(/Cannot start ride|Validation error/);
+        // Error could be either "Already has active ride" or "Validation error" due to unique constraint
+        expect(res.body.error).toMatch(/Already has active ride|Validation error/);
       });
     });
 

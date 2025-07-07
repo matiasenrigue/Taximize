@@ -1,5 +1,6 @@
 import { Ride } from './ride.model';
 import { Shift } from '../shifts/shift.model';
+import { ShiftSignal } from '../shifts/shift-signal.model';
 import { ShiftService } from '../shifts/shift.service';
 import { MlStub } from './utils/mlStub';
 import { RideCalculator } from './utils/rideCalculator';
@@ -40,16 +41,36 @@ export class RideService {
     return !!activeRide;
   }
 
-  static async canStartRide(driverId: string): Promise<boolean> {
-    // Check if driver is available (has active shift and not paused)
-    const isAvailable = await ShiftService.driverIsAvailable(driverId);
-    if (!isAvailable) {
-      return false;
+  static async canStartRide(driverId: string): Promise<{ canStart: boolean; reason?: string }> {
+    // Check if driver has active shift
+    const activeShift = await Shift.findOne({
+      where: { 
+        driver_id: driverId,
+        shift_end: null
+      }
+    });
+
+    if (!activeShift) {
+      return { canStart: false, reason: 'No active shift found. Please start a shift before starting a ride.' };
+    }
+
+    // Check if driver is paused
+    const lastSignal = await ShiftSignal.findOne({
+      where: { shift_id: activeShift.id },
+      order: [['timestamp', 'DESC']]
+    });
+
+    if (lastSignal && lastSignal.signal === 'pause') {
+      return { canStart: false, reason: 'Cannot start ride while on break. Please continue your shift first.' };
     }
 
     // Check if driver already has an active ride
     const hasActive = await this.hasActiveRide(driverId);
-    return !hasActive;
+    if (hasActive) {
+      return { canStart: false, reason: 'Another ride is already in progress. Please end the current ride first.' };
+    }
+
+    return { canStart: true };
   }
 
   static async evaluateRide(startLat: number, startLng: number, destLat: number, destLng: number): Promise<number> {
@@ -65,9 +86,9 @@ export class RideService {
     this.validateCoordinates(coords.startLat, coords.startLng, coords.destLat, coords.destLng);
 
     // Check if driver can start ride
-    const canStart = await this.canStartRide(driverId);
-    if (!canStart) {
-      throw new Error('Cannot start ride—either no active shift or another ride in progress');
+    const canStartResult = await this.canStartRide(driverId);
+    if (!canStartResult.canStart) {
+      throw new Error(canStartResult.reason || 'Cannot start ride');
     }
 
     // Get predicted score
@@ -138,7 +159,9 @@ export class RideService {
       }
     });
 
-    if (!activeShift) return null;
+    if (!activeShift) {
+      throw new Error('No active shift found. Please start a shift before checking ride status.');
+    }
 
     // Find active ride for driver
     const activeRide = await Ride.findOne({
@@ -150,7 +173,7 @@ export class RideService {
     });
 
     if (!activeRide) {
-      return null;
+      throw new Error('No active ride found. Please start a ride first.');
     }
 
     const currentTime = new Date();

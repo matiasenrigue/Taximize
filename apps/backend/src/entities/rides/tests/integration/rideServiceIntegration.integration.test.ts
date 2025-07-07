@@ -49,8 +49,8 @@ describe('Ride Service Integration Tests', () => {
       expect(isAvailable).toBe(true);
 
       // Test canStartRide through RideService
-      const canStart = await RideService.canStartRide(user.id);
-      expect(canStart).toBe(true);
+      const canStartResult = await RideService.canStartRide(user.id);
+      expect(canStartResult.canStart).toBe(true);
 
       // Test hasActiveRide through RideService
       const hasActive = await RideService.hasActiveRide(user.id);
@@ -73,8 +73,8 @@ describe('Ride Service Integration Tests', () => {
       });
 
       // Initially should be able to start ride
-      let canStart = await RideService.canStartRide(user.id);
-      expect(canStart).toBe(true);
+      let canStartResult = await RideService.canStartRide(user.id);
+      expect(canStartResult.canStart).toBe(true);
 
       // Start a ride
       const coords = {
@@ -88,8 +88,8 @@ describe('Ride Service Integration Tests', () => {
       expect(rideResult.rideId).toBeDefined();
 
       // Now should not be able to start another ride
-      canStart = await RideService.canStartRide(user.id);
-      expect(canStart).toBe(false);
+      canStartResult = await RideService.canStartRide(user.id);
+      expect(canStartResult.canStart).toBe(false);
 
       // Should have an active ride
       const hasActive = await RideService.hasActiveRide(user.id);
@@ -104,8 +104,8 @@ describe('Ride Service Integration Tests', () => {
       });
 
       // No active shift scenario
-      const canStart = await RideService.canStartRide(user.id);
-      expect(canStart).toBe(false);
+      const canStartResult = await RideService.canStartRide(user.id);
+      expect(canStartResult.canStart).toBe(false);
 
       // Attempt to start ride without shift should fail
       const coords = {
@@ -116,7 +116,7 @@ describe('Ride Service Integration Tests', () => {
       };
 
       await expect(RideService.startRide(user.id, 'fake-shift-id', coords))
-        .rejects.toThrow('Cannot start ride—either no active shift or another ride in progress');
+        .rejects.toThrow('No active shift found');
     });
   });
 
@@ -195,9 +195,9 @@ describe('Ride Service Integration Tests', () => {
       // End shift
       await shift.update({ shift_end: new Date() });
 
-      // Ride status should return null (no active shift)
-      rideStatus = await RideService.getRideStatus(user.id);
-      expect(rideStatus).toBeNull();
+      // Ride status should throw error (no active shift)
+      await expect(RideService.getRideStatus(user.id))
+        .rejects.toThrow('No active shift found. Please start a shift before checking ride status.');
 
       // But ride should still exist in database
       const dbRide = await Ride.findByPk(rideResult.rideId);
@@ -311,8 +311,8 @@ describe('Ride Service Integration Tests', () => {
         .rejects.toThrow();
 
       // Test with malformed driver ID for status
-      const status = await RideService.getRideStatus('invalid-uuid');
-      expect(status).toBeNull();
+      await expect(RideService.getRideStatus('invalid-uuid'))
+        .rejects.toThrow('No active shift found. Please start a shift before checking ride status.');
     });
 
     it('should handle coordinate validation through service layer', async () => {

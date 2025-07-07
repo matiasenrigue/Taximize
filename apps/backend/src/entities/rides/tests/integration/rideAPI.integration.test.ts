@@ -162,7 +162,7 @@ describe('Ride API Integration Tests', () => {
         
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
-      expect(res.body.error).toContain('Cannot start ride');
+      expect(res.body.error).toContain('No active shift found');
     });
 
     it('should return 400 when authenticated but invalid coordinates provided', async () => {
@@ -209,7 +209,7 @@ describe('Ride API Integration Tests', () => {
         
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
-      expect(res.body.error).toContain('No active ride');
+      expect(res.body.error).toContain('No active shift found. Please start a shift before checking ride status.');
     });
 
     it('should return 400 when authenticated but invalid override destination provided', async () => {
@@ -264,7 +264,7 @@ describe('Ride API Integration Tests', () => {
         
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
-      expect(res.body.error).toContain('No active ride');
+      expect(res.body.error).toContain('No active shift found. Please start a shift before checking ride status.');
     });
 
     it('should return 400 when authenticated but missing required fields', async () => {

@@ -76,7 +76,7 @@ export class RideController {
       const activeShift = await ShiftService.getActiveShiftForDriver(driverId);
       if (!activeShift) {
         res.status(400);
-        throw new Error('Cannot start ride—either no active shift or another ride in progress');
+        throw new Error('No active shift found');
       }
 
       const result = await RideService.startRide(driverId, activeShift.id, coords);
@@ -95,9 +95,12 @@ export class RideController {
         res.status(400);
         throw new Error('Invalid coordinates provided');
       }
-      if (error.message.includes('Cannot start ride')) {
+      // Pass through specific error messages from the service
+      if (error.message.includes('No active shift found') || 
+          error.message.includes('Driver is on pause') || 
+          error.message.includes('Another ride is already in progress')) {
         res.status(400);
-        throw new Error('Cannot start ride—either no active shift or another ride in progress');
+        throw new Error(error.message);
       }
       res.status(400);
       throw new Error(error.message || 'Failed to start ride');
@@ -130,11 +133,6 @@ export class RideController {
       }
 
       const rideStatus = await RideService.getRideStatus(driverId, overrideDest);
-      
-      if (!rideStatus) {
-        res.status(400);
-        throw new Error('No active ride or invalid coordinates');
-      }
 
       res.status(200).json({
         success: true,
@@ -183,11 +181,6 @@ export class RideController {
     try {
       // First get the active ride to get the rideId
       const rideStatus = await RideService.getRideStatus(driverId);
-      
-      if (!rideStatus) {
-        res.status(400);
-        throw new Error('No active ride to end');
-      }
 
       const result = await RideService.endRide(rideStatus.rideId, fare_cents, actual_distance_km);
       

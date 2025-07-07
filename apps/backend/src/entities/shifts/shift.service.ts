@@ -115,6 +115,18 @@ export class ShiftService {
       throw new Error('No active shift to save');
     }
 
+    // Check if there are any active rides for this shift
+    const activeRide = await Ride.findOne({
+      where: { 
+        shift_id: activeShift.id,
+        end_time: null 
+      }
+    });
+
+    if (activeRide) {
+      throw new Error('Cannot end shift while ride is in progress. Please end the active ride first.');
+    }
+
     const shiftEnd = new Date();
     const totalDurationMs = shiftEnd.getTime() - activeShift.shift_start.getTime();
 
@@ -621,6 +633,18 @@ export class ShiftService {
 
     if (shift.shift_end) {
       throw new Error('Shift already ended');
+    }
+
+    // Check if there are any active rides for this shift
+    const activeRide = await Ride.findOne({
+      where: { 
+        shift_id: shiftId,
+        end_time: null 
+      }
+    });
+
+    if (activeRide) {
+      throw new Error('Cannot end shift while ride is in progress. Please end the active ride first.');
     }
 
     await this.saveShiftByShiftId(shiftId);
