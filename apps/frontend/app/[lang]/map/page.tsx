@@ -21,6 +21,8 @@ import {useRide} from "../../../contexts/RideContext/RideContext";
 import {MenuOption, OptionsMenu} from "../../../components/OptionsMenu/OptionsMenu";
 import {useRouter} from "next/navigation";
 import {StartBreakModal} from "../../../components/modals/BreakModalHandler/StartBreakModal";
+import {LocationUnavailable} from "./LocationUnavailable";
+import {LocationLoading} from "./LocationLoading";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -42,20 +44,10 @@ export default function MapPage() {
         startBreakModalRef.current.open();
     }
 
-    if (!isAvailable) return (
-        <div>
-            <h4>Enable your Location</h4>
-            <p>
-                The app requires access to your location to recommend routes and calculate fares.
-            </p>
-        </div>
-    );
-
-    if (!location) return (
-        <div>
-            <h4>Loading Location...</h4>
-        </div>
-    );
+    if (!isAvailable)
+        return <LocationUnavailable/>;
+    if (!location)
+        return <LocationLoading/>;
 
     return (
         <APIProvider apiKey={API_KEY}>

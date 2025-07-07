@@ -30,3 +30,14 @@
     left: 16px;
     right: 16px;
 }
+
+.message {
+    width: 100%;
+    max-width: 360px;
+    margin: 80px 0;
+    text-align: center;
+}
+
+.message_heading {
+    margin: 8px 0;
+}

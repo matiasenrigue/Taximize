@@ -6,6 +6,14 @@
     "endShift": "Schicht beenden",
     "locationSearchPlaceholder": "Adresse suchen..."
   },
+  "LocationUnavailable": {
+    "title": "Aktiviere deinen Standort",
+    "text": "Die App braucht Zugriff auf deinen Standort, um Routen anzuzeigen und Fahrpreise zu berechnen."
+  },
+  "LocationLoading": {
+    "title": "Standort wird geladen...",
+    "text": "Die App lädt deinen Standort. Das kann einen Moment dauern."
+  },
   "signin": {
     "email": "E-Mail",
     "password": "Passwort",

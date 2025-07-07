@@ -6,6 +6,14 @@
     "endShift": "End Shift",
     "locationSearchPlaceholder": "Search Address..."
   },
+  "LocationUnavailable": {
+    "title": "Enable your Location",
+    "text": "The app requires access to your location to recommend routes and calculate fares."
+  },
+  "LocationLoading": {
+    "title": "Location loading...",
+    "text": "The app is retrieving your location from the browser. This might take a moment."
+  },
   "signin": {
     "email": "Email",
     "password": "Password",
