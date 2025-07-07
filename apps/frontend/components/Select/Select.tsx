@@ -8,7 +8,7 @@ import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
 
 interface SelectContextValue {
-    onClick?: (value, label) => void;
+    onClick?: (value: string, label: React.ReactNode) => void;
 }
 
 const SelectContext = createContext<SelectContextValue|null>(null);
@@ -16,6 +16,7 @@ const SelectContext = createContext<SelectContextValue|null>(null);
 interface SelectProps extends React.PropsWithChildren {
     elevated?: boolean;
     placeholder?: string;
+    onChange?: (value: string) => void;
 }
 
 export const Select = (props: SelectProps) => {
@@ -23,6 +24,7 @@ export const Select = (props: SelectProps) => {
         elevated = false,
         placeholder = "Select an option...",
         children,
+        onChange,
     } = props;
     const [value, setValue] = useState<string|null>(null);
     const [label, setLabel] = useState<string|null>(null);
@@ -33,10 +35,13 @@ export const Select = (props: SelectProps) => {
     const handleClickOutside = useCallback(() => setIsOpen(false), []);
     useClickOutside(ref, handleClickOutside);
 
-    const selectOption = (value: string, label: string) => {
+    const selectOption = (value: string, label: React.ReactNode) => {
         setValue(value);
-        setLabel(label);
+        setLabel(label as string);
         setIsOpen(false);
+        if (onChange) {
+            onChange(value);
+        }
     };
 
     return (

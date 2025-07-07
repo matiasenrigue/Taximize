@@ -1,29 +1,54 @@
 import { getCookie, setCookie, deleteCookie } from 'cookies-next';
+
 /**
- * Get the token from cookies
- * @returns the token from cookies
+ * Get the access token from cookies
+ * @returns the access token from cookies
  */
 export const getToken = () => {
-  return getCookie('token');
+  return getCookie('accessToken');
 };
 
 /**
- * Set the token in cookies
- * @param token - the token to set in cookies
+ * Set the access token in cookies
+ * @param token - the access token to set in cookies
  */
 export const setToken = (token: string) => {
-  setCookie('token', token, {
-    httpOnly: true,
-    // secure: process.env.NODE_ENV === 'production', only if we are using https
+  setCookie('accessToken', token, {
+    httpOnly: false, // Access token needs to be accessible by JavaScript for axios
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    path: '/'
+    path: '/',
+    maxAge: 15 * 60 // 15 minutes in seconds
   });
 };
 
 /**
- * Delete the token from cookies
+ * Delete the access token from cookies
  */
 export const deleteToken = () => {
-  deleteCookie('token');
+  deleteCookie('accessToken');
+};
+
+/**
+ * Get the refresh token from cookies (should be HTTP-only, set by backend)
+ * Note: This is read-only as refresh tokens are managed by the backend
+ */
+export const getRefreshToken = () => {
+  return getCookie('refreshToken');
+};
+
+/**
+ * Delete the refresh token from cookies
+ */
+export const deleteRefreshToken = () => {
+  deleteCookie('refreshToken');
+};
+
+/**
+ * Clear all authentication tokens
+ */
+export const clearAllTokens = () => {
+  deleteToken();
+  deleteRefreshToken();
 };
 
