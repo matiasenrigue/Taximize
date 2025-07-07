@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  backend:
+    build: 
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:password@db:5432/taxiapp
+      - ML_SERVICE_URL=http://ml-service:5001
+      - ML_SERVICE_TIMEOUT=5000
+      - ML_SERVICE_FALLBACK_TO_STUB=true
+      - ML_SERVICE_CACHE_ENABLED=true
+      - ML_SERVICE_CACHE_TTL=300
+      - ACCESS_TOKEN_SECRET=your-access-token-secret
+      - REFRESH_TOKEN_SECRET=your-refresh-token-secret
+    depends_on:
+      - db
+      - ml-service
+    networks:
+      - taxiapp-network
+
+  ml-service:
+    build: 
+      context: ./ml_service
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - DEBUG=false
+    networks:
+      - taxiapp-network
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=taxiapp
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - taxiapp-network
+
+volumes:
+  postgres_data:
+
+networks:
+  taxiapp-network:
+    driver: bridge

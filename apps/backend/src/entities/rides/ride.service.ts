@@ -1,7 +1,7 @@
 import { Ride } from './ride.model';
 import { Shift } from '../shifts/shift.model';
 import { ShiftService } from '../shifts/shift.service';
-import { MlStub } from './utils/mlStub';
+import { mlService } from './utils/mlService';
 import { RideCalculator } from './utils/rideCalculator';
 import { Op } from 'sequelize';
 
@@ -53,25 +53,19 @@ export class RideService {
   }
 
   static async evaluateRide(startLat: number, startLng: number, destLat: number, destLng: number): Promise<number> {
-    // Validate coordinates
-    this.validateCoordinates(startLat, startLng, destLat, destLng);
-    
-    // Use ML stub to get random score
-    return MlStub.getRandomScore();
+    // Use the new ML service instead of stub
+    return await mlService.evaluateRide(startLat, startLng, destLat, destLng);
   }
 
   static async startRide(driverId: string, shiftId: string, coords: RideCoordinates): Promise<any> {
-    // Validate coordinates
-    this.validateCoordinates(coords.startLat, coords.startLng, coords.destLat, coords.destLng);
-
     // Check if driver can start ride
     const canStart = await this.canStartRide(driverId);
     if (!canStart) {
       throw new Error('Cannot start ride—either no active shift or another ride in progress');
     }
 
-    // Get predicted score
-    const predictedScore = await this.evaluateRide(coords.startLat, coords.startLng, coords.destLat, coords.destLng);
+    // Get predicted score using ML service
+    const predictedScore = await mlService.evaluateRide(coords.startLat, coords.startLng, coords.destLat, coords.destLng);
 
     // Create new ride
     const ride = await Ride.create({
@@ -201,16 +195,6 @@ export class RideService {
         earning_per_min: 0,
         distance_km: 0
       });
-    }
-  }
-
-  private static validateCoordinates(startLat: number, startLng: number, destLat: number, destLng: number): void {
-    if (startLat < -90 || startLat > 90 || destLat < -90 || destLat > 90) {
-      throw new Error('Invalid latitude provided');
-    }
-    
-    if (startLng < -180 || startLng > 180 || destLng < -180 || destLng > 180) {
-      throw new Error('Invalid longitude provided');
     }
   }
 } 
