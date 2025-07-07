@@ -11,10 +11,8 @@ import {
     useState
 } from "react";
 import moment from "moment";
-import {formatDuration} from "../../lib/formatDuration/formatDuration";
 import api from "../../lib/axios";
 import {useUserLocationContext} from "../UserLocationContext/UserLocationContext";
-import {BASE_FARE} from "../../constants/constants";
 import {useTaximeter} from "../../hooks/useTaximeter";
 
 interface Place {
@@ -57,13 +55,11 @@ export const RideContextProvider = (props: PropsWithChildren) => {
     const [rating, setRating] = useState<number>(3);
     const [duration, setDuration] = useState<number>(0);
 
-    // todo: handle missing user location
-
     // set a new destination to navigate to (may not be a ride)
     const updateDestination = useCallback((place: Place | null) => {
         setDestination(place);
         setIsRouteAvailable(false);
-        if (!place)
+        if (!place || !userLocation)
             return;
         api.post("/rides/evaluate-ride", {
             "start_latitude": userLocation.lat,
@@ -87,6 +83,8 @@ export const RideContextProvider = (props: PropsWithChildren) => {
 
     // start a ride to the current destination
     const startRide = useCallback(() => {
+        if (isOnRide || !destination || !userLocation)
+            return;
         setIsOnRide(true);
         setRideStartTime(moment.now());
         startTaximeter();
