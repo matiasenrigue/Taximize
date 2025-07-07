@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { RideService } from './ride.service';
+import { Shift } from '../shifts/shift.model';
 
 export class RideController {
   // @desc    Evaluate ride coordinates and get ML prediction score
@@ -63,7 +64,19 @@ export class RideController {
     }
 
     try {
-      // Get active shift for driver (simplified approach - in real app would get from request or service)
+      // Get active shift for driver
+      const activeShift = await Shift.findOne({
+        where: { 
+          driver_id: driverId,
+          shift_end: null
+        }
+      });
+
+      if (!activeShift) {
+        res.status(400);
+        throw new Error('No active shift found for driver');
+      }
+
       const coords = {
         startLat: start_latitude,
         startLng: start_longitude,
@@ -71,11 +84,7 @@ export class RideController {
         destLng: destination_longitude
       };
 
-      // For this implementation, we'll use a placeholder shiftId
-      // In a real implementation, this would come from the driver's current active shift
-      const shiftId = 'current-shift-id'; // This should be retrieved from the driver's active shift
-
-      const result = await RideService.startRide(driverId, shiftId, coords);
+      const result = await RideService.startRide(driverId, activeShift.id, coords);
       
       res.status(200).json({
         success: true,
