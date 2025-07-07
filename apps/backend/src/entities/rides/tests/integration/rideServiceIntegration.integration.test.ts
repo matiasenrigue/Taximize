@@ -1,4 +1,5 @@
 import { sequelize } from '../../../../shared/config/db';
+import { initializeAssociations } from '../../../../shared/config/associations';
 import { RideService } from '../../ride.service';
 import { ShiftService } from '../../../shifts/shift.service';
 import User from '../../../users/user.model';
@@ -8,14 +9,17 @@ import ShiftSignal from '../../../shifts/shift-signal.model';
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'test';
+  initializeAssociations();
   await sequelize.sync({ force: true });
 });
 
 afterEach(async () => {
-  await User.destroy({ where: {} });
-  await Ride.destroy({ where: {} });
-  await Shift.destroy({ where: {} });
-  await ShiftSignal.destroy({ where: {} });
+  // Clean up in correct order due to foreign key constraints
+  // Use force: true to hard delete even with paranoid mode
+  await Ride.destroy({ where: {}, force: true });
+  await ShiftSignal.destroy({ where: {}, force: true });
+  await Shift.destroy({ where: {}, force: true });
+  await User.destroy({ where: {}, force: true });
 });
 
 afterAll(async () => {

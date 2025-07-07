@@ -91,7 +91,21 @@ export class ShiftService {
   }
 
   static async driverIsAvailable(driverId: string): Promise<boolean> {
+    // First check if driver has an active shift
+    const activeShift = await this.getActiveShift(driverId);
+    if (!activeShift) {
+      return false;
+    }
+
+    // Then check the last signal - if it's 'pause', driver is not available
     const lastSignal = await this.getLastSignal(driverId);
+    
+    // If no signal exists (shift created directly), consider driver available
+    if (!lastSignal) {
+      return true;
+    }
+    
+    // Driver is available if last signal is 'start' or 'continue'
     return lastSignal === 'start' || lastSignal === 'continue';
   }
 
@@ -290,6 +304,10 @@ export class ShiftService {
         shift_end: null
       }
     });
+  }
+
+  static async getActiveShiftForDriver(driverId: string): Promise<Shift | null> {
+    return await this.getActiveShift(driverId);
   }
 
   private static async getShiftStartSignal(driverId: string): Promise<ShiftSignal | null> {
@@ -606,7 +624,21 @@ export class ShiftService {
     }
 
     await this.saveShiftByShiftId(shiftId);
-    return shift;
+    
+    // Reload shift to get updated data
+    await shift.reload();
+    
+    // Calculate total earnings
+    const totalEarnings = await this.calculateShiftEarnings(shiftId);
+    
+    return {
+      totalDuration: shift.total_duration_ms,
+      workTime: shift.work_time_ms,
+      breakTime: shift.break_time_ms,
+      numBreaks: shift.num_breaks,
+      averageBreak: shift.avg_break_ms,
+      totalEarnings: totalEarnings
+    };
   }
 
   private static async recalculateShiftStatistics(shiftId: string): Promise<void> {
@@ -630,5 +662,23 @@ export class ShiftService {
       num_breaks: pauses.length,
       avg_break_ms: pauses.length > 0 ? totalBreakTimeMs / pauses.length : 0
     });
+  }
+
+  static async calculateShiftEarnings(shiftId: string): Promise<number> {
+    // Get all rides for this shift that are not deleted
+    const rides = await Ride.findAll({
+      where: { 
+        shift_id: shiftId,
+        deleted_at: null
+      }
+    });
+
+    // Sum up all earnings from rides (earnings are stored in cents)
+    const totalEarningsCents = rides.reduce((total, ride) => {
+      return total + (ride.earning_cents || 0);
+    }, 0);
+
+    // Convert cents to currency units (e.g., dollars)
+    return totalEarningsCents / 100;
   }
 } 

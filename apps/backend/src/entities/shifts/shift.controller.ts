@@ -172,6 +172,9 @@ export class ShiftController {
     try {
       const savedShift = await ShiftService.handleSignal(driverId, signalTimestamp, 'stop');
       
+      // Calculate total earnings from rides
+      const totalEarnings = await ShiftService.calculateShiftEarnings(savedShift.id);
+      
       // Return actual shift summary from saved shift data
       res.status(200).json({
         success: true,
@@ -182,7 +185,7 @@ export class ShiftController {
           breakTime: savedShift.break_time_ms,
           numBreaks: savedShift.num_breaks,
           averageBreak: savedShift.avg_break_ms,
-          totalEarnings: 0 // TODO: Calculate from rides when ride integration is complete
+          totalEarnings: totalEarnings
         }
       });
     } catch (error: any) {
