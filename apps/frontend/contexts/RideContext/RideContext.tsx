@@ -14,6 +14,7 @@ import moment from "moment";
 import api from "../../lib/axios";
 import {useUserLocationContext} from "../UserLocationContext/UserLocationContext";
 import {useTaximeter} from "../../hooks/useTaximeter";
+import {useShift} from "../ShiftContext/ShiftContext";
 
 interface Place {
     placeId: string | null;
@@ -48,12 +49,35 @@ export const RideContextProvider = (props: PropsWithChildren) => {
         stop: stopTaximeter
     } = useTaximeter(userLocation);
 
+    const {loadRide} = useShift();
+
     const [isOnRide, setIsOnRide] = useState(false);
     const [destination, setDestination] = useState<Place|null>(null);
     const [rideStartTime, setRideStartTime] = useState<number|null>(null);
     const [isRouteAvailable, setIsRouteAvailable] = useState<boolean>(false);
     const [rating, setRating] = useState<number>(3);
     const [duration, setDuration] = useState<number>(0);
+
+    // initialize shift
+    useEffect(() => {
+        if (!loadRide)
+            return;
+        api.get("/rides/current")
+            .then((response) => {
+                const {
+                    current_destination_latitude,
+                    current_destination_longitude,
+                } = response.data.data;
+
+                setDestination({
+                    placeId: null,
+                    name: "Unknown",
+                    lat: current_destination_latitude,
+                    lng: current_destination_longitude
+                });
+            })
+            .catch((error) => console.warn(error));
+    }, [loadRide]);
 
     // set a new destination to navigate to (may not be a ride)
     const updateDestination = useCallback((place: Place | null) => {

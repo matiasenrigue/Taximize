@@ -26,6 +26,7 @@ interface ShiftContextType {
     getRemainingBreakDuration: () => number;
     totalDuration: number;
     totalEarnings: number;
+    loadRide: boolean;
 }
 
 const ShiftContext = createContext<ShiftContextType|null>(null);
@@ -36,8 +37,10 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const breakModalRef = useRef<ModalHandle>(null!);
     const router = useRouter();
 
-    const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [isShift, setIsShift] = useState<boolean>(false);
+    const [loadRide, setLoadRide] = useState<boolean>(false);
+
+    const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [isPaused, setIsPaused] = useState<boolean>(false);
     const [duration, setDuration] = useState<number>(0);
     const [startTime, setStartTime] = useState<number|null>(null);
@@ -53,7 +56,6 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     useEffect(() => {
         api.get("/shifts/current")
             .then((response) => {
-                console.log(response);
                 const {
                     isOnShift,
                     shiftStart,
@@ -74,6 +76,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
                 }
 
                 setIsShift(isOnShift);
+                setLoadRide(isOnRide);
                 setDuration(60 * 60 * 60 * 1000);
                 setStartTime(shiftStart);
                 setIsPaused(isPaused);
@@ -207,6 +210,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             getRemainingBreakDuration,
             totalDuration,
             totalEarnings,
+            loadRide,
         }}>
             <BreakModal ref={breakModalRef}/>
             {children}
