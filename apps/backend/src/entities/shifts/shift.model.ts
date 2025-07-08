@@ -7,13 +7,22 @@ export class Shift extends Model {
   public driver_id!: string;
   public shift_start!: Date;
   public shift_end!: Date | null;
+  public shift_start_location_latitude!: number | null;
+  public shift_start_location_longitude!: number | null;
+  public shift_end_location_latitude!: number | null;
+  public shift_end_location_longitude!: number | null;
   public total_duration_ms!: number | null;
   public work_time_ms!: number | null;
   public break_time_ms!: number | null;
   public num_breaks!: number | null;
   public avg_break_ms!: number | null;
+  public planned_duration_ms!: number | null;
   public created_at!: Date;
   public updated_at!: Date;
+  public deleted_at!: Date | null;
+
+  // Paranoid model methods
+  public restore!: () => Promise<void>;
 }
 
 Shift.init(
@@ -55,12 +64,43 @@ Shift.init(
       type: DataTypes.BIGINT,
       allowNull: true,
     },
+    planned_duration_ms: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+    },
+    shift_start_location_latitude: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    shift_start_location_longitude: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    shift_end_location_latitude: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    shift_end_location_longitude: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
   },
   {
     sequelize,
     tableName: 'shifts',
     timestamps: true,
     underscored: true,
+    paranoid: true,
+    indexes: [
+      {
+        name: 'one_active_shift_per_driver',
+        unique: true,
+        fields: ['driver_id'],
+        where: {
+          shift_end: null
+        }
+      }
+    ]
   }
 );
 

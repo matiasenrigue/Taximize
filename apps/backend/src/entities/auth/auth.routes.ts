@@ -7,11 +7,6 @@ const router = Router();
 
 router.post('/signup', signup);
 router.post('/signin', signin);
-router.post('/refresh', refresh); 
-
-// router.get('/profile', protect, getProfile);
-// router.delete('/:id', protect, authorize('admin'), deleteUser);
-
-
+router.post('/refresh', refresh);
 
 export default router;

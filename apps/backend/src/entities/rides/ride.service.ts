@@ -1,5 +1,6 @@
 import { Ride } from './ride.model';
 import { Shift } from '../shifts/shift.model';
+import { ShiftSignal } from '../shifts/shift-signal.model';
 import { ShiftService } from '../shifts/shift.service';
 import { MlStub } from './utils/mlStub';
 import { RideCalculator } from './utils/rideCalculator';
@@ -40,16 +41,36 @@ export class RideService {
     return !!activeRide;
   }
 
-  static async canStartRide(driverId: string): Promise<boolean> {
-    // Check if driver is available (has active shift and not paused)
-    const isAvailable = await ShiftService.driverIsAvailable(driverId);
-    if (!isAvailable) {
-      return false;
+  static async canStartRide(driverId: string): Promise<{ canStart: boolean; reason?: string }> {
+    // Check if driver has active shift
+    const activeShift = await Shift.findOne({
+      where: { 
+        driver_id: driverId,
+        shift_end: null
+      }
+    });
+
+    if (!activeShift) {
+      return { canStart: false, reason: 'No active shift found. Please start a shift before starting a ride.' };
+    }
+
+    // Check if driver is paused
+    const lastSignal = await ShiftSignal.findOne({
+      where: { shift_id: activeShift.id },
+      order: [['timestamp', 'DESC']]
+    });
+
+    if (lastSignal && lastSignal.signal === 'pause') {
+      return { canStart: false, reason: 'Cannot start ride while on break. Please continue your shift first.' };
     }
 
     // Check if driver already has an active ride
     const hasActive = await this.hasActiveRide(driverId);
-    return !hasActive;
+    if (hasActive) {
+      return { canStart: false, reason: 'Another ride is already in progress. Please end the current ride first.' };
+    }
+
+    return { canStart: true };
   }
 
   static async evaluateRide(startLat: number, startLng: number, destLat: number, destLng: number): Promise<number> {
@@ -65,9 +86,9 @@ export class RideService {
     this.validateCoordinates(coords.startLat, coords.startLng, coords.destLat, coords.destLng);
 
     // Check if driver can start ride
-    const canStart = await this.canStartRide(driverId);
-    if (!canStart) {
-      throw new Error('Cannot start ride—either no active shift or another ride in progress');
+    const canStartResult = await this.canStartRide(driverId);
+    if (!canStartResult.canStart) {
+      throw new Error(canStartResult.reason || 'Cannot start ride');
     }
 
     // Get predicted score
@@ -138,7 +159,9 @@ export class RideService {
       }
     });
 
-    if (!activeShift) return null;
+    if (!activeShift) {
+      throw new Error('No active shift found. Please start a shift before checking ride status.');
+    }
 
     // Find active ride for driver
     const activeRide = await Ride.findOne({
@@ -150,7 +173,7 @@ export class RideService {
     });
 
     if (!activeRide) {
-      return null;
+      throw new Error('No active ride found. Please start a ride first.');
     }
 
     const currentTime = new Date();
@@ -212,5 +235,144 @@ export class RideService {
     if (startLng < -180 || startLng > 180 || destLng < -180 || destLng > 180) {
       throw new Error('Invalid longitude provided');
     }
+  }
+
+  static async editRide(rideId: string, driverId: string, updateData: any): Promise<Ride> {
+    // Find the ride
+    const ride = await Ride.findByPk(rideId);
+    if (!ride) {
+      throw new Error('Ride not found');
+    }
+
+    // Check authorization
+    if (ride.driver_id !== driverId) {
+      throw new Error('Not authorized to edit this ride');
+    }
+
+    // Check if ride is active
+    if (!ride.end_time) {
+      throw new Error('Cannot edit active ride');
+    }
+
+    // Validate forbidden fields
+    const forbiddenFields = ['id', 'shift_id', 'driver_id', 'start_time', 'start_latitude', 'start_longitude', 'predicted_score'];
+    for (const field of forbiddenFields) {
+      if (field in updateData) {
+        throw new Error(`Cannot modify ${field}`);
+      }
+    }
+
+    // Validate coordinates if provided
+    if ('destination_latitude' in updateData || 'destination_longitude' in updateData) {
+      const destLat = updateData.destination_latitude || ride.destination_latitude;
+      const destLng = updateData.destination_longitude || ride.destination_longitude;
+      if (destLat < -90 || destLat > 90 || destLng < -180 || destLng > 180) {
+        throw new Error('Invalid coordinates');
+      }
+    }
+
+    // Validate distance if provided
+    if ('distance_km' in updateData && updateData.distance_km <= 0) {
+      throw new Error('Distance must be positive');
+    }
+
+    // Validate earning if provided
+    if ('earning_cents' in updateData && updateData.earning_cents <= 0) {
+      throw new Error('Earning must be positive');
+    }
+
+    // Validate end_time if provided
+    if ('end_time' in updateData) {
+      const endTime = new Date(updateData.end_time);
+      if (endTime <= ride.start_time) {
+        throw new Error('End time must be after start time');
+      }
+    }
+
+    // Update the ride
+    await ride.update(updateData);
+
+    // Update shift statistics
+    await this.updateShiftStatistics(ride.shift_id);
+
+    return ride;
+  }
+
+  static async deleteRide(rideId: string, driverId: string): Promise<void> {
+    // Find the ride
+    const ride = await Ride.findByPk(rideId);
+    if (!ride) {
+      throw new Error('Ride not found');
+    }
+
+    // Check authorization
+    if (ride.driver_id !== driverId) {
+      throw new Error('Not authorized to delete this ride');
+    }
+
+    // Check if ride is active
+    if (!ride.end_time) {
+      throw new Error('Cannot delete active ride');
+    }
+
+    // Soft delete the ride
+    await ride.destroy();
+
+    // Update shift statistics
+    await this.updateShiftStatistics(ride.shift_id);
+  }
+
+  static async restoreRide(rideId: string, driverId: string): Promise<void> {
+    // Find the deleted ride (paranoid: false to include soft-deleted records)
+    const ride = await Ride.findByPk(rideId, { paranoid: false });
+    if (!ride) {
+      throw new Error('Ride not found');
+    }
+
+    // Check authorization
+    if (ride.driver_id !== driverId) {
+      throw new Error('Not authorized to restore this ride');
+    }
+
+    // Check if ride is deleted (handle both snake_case and camelCase)
+    const deletedAt = ride.deleted_at || (ride as any).deletedAt;
+    if (!deletedAt) {
+      throw new Error('Ride is not deleted');
+    }
+
+    // Restore the ride using Sequelize's restore method
+    await ride.restore();
+
+    // Update shift statistics
+    await this.updateShiftStatistics(ride.shift_id);
+  }
+
+  static async getRidesByDriver(driverId: string): Promise<Ride[]> {
+    return await Ride.findAll({
+      where: { driver_id: driverId },
+      order: [['start_time', 'DESC']]
+    });
+  }
+
+  private static async updateShiftStatistics(shiftId: string): Promise<void> {
+    const shift = await Shift.findByPk(shiftId);
+    if (!shift) return;
+
+    // Get all non-deleted rides for this shift
+    const rides = await Ride.findAll({
+      where: { shift_id: shiftId }
+    });
+
+    // Calculate totals
+    let totalEarnings = 0;
+    let totalDistance = 0;
+
+    for (const ride of rides) {
+      if (ride.earning_cents) totalEarnings += ride.earning_cents;
+      if (ride.distance_km) totalDistance += ride.distance_km;
+    }
+
+    // Update shift with new totals (if needed - depends on your shift model)
+    // This is a placeholder - adjust based on your actual shift model structure
   }
 } 
