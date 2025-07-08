@@ -9,12 +9,15 @@ import {TimeInput} from "../../../components/TimeInput/TimeInput";
 import {FlexGroup} from "../../../components/FlexGroup/FlexGroup";
 import {useTranslations} from "next-intl";
 import {DEFAULT_SHIFT_DURATION} from "../../../constants/constants";
+import {ErrorMessage} from "../../../components/ErrorMessage/ErrorMessage";
+import {Label} from "../../../components/Label/Label";
 
 export default function StartShift() {
     const router = useRouter();
     const {isLoaded, isShift, startShift} = useShift();
     const [duration, setDuration] = useState<number>(DEFAULT_SHIFT_DURATION);
     const t = useTranslations("start-shift");
+    const isValid = duration > 0;
 
     // if on shift, reroute to /map
     useEffect(() => {
@@ -28,15 +31,22 @@ export default function StartShift() {
             <FlexGroup
                 direction={"column"}
                 align={"start"}>
-                <TimeInput
-                    defaultValue={DEFAULT_SHIFT_DURATION}
-                    invalid={duration === 0}
-                    onChange={setDuration}/>
+                <div>
+                    <Label>Duration</Label>
+                    <TimeInput
+                        defaultValue={DEFAULT_SHIFT_DURATION}
+                        invalid={!isValid}
+                        onChange={setDuration}/>
+                    {!isValid && <ErrorMessage>
+                        {t("invalidDuration")}
+                    </ErrorMessage>}
+                </div>
                 <Button
-                    disabled={duration === 0}
+                    disabled={!isValid}
                     onClick={() => startShift(duration)}>
                     {t("startShift")}
                 </Button>
+
             </FlexGroup>
         </div>
     );

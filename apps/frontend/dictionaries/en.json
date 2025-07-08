@@ -39,7 +39,8 @@
     "signUpError": "Sign up failed"
   },
   "start-shift": {
-    "startShift": "Start Shift"
+    "startShift": "Start Shift",
+    "invalidDuration": "Please enter a duration."
   },
   "end-shift": {
     "confirmButton": "Ok"

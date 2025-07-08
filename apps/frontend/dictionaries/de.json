@@ -39,7 +39,8 @@
     "signUpError": "Signup fehlgeschlagen"
   },
   "start-shift": {
-    "startShift": "Schicht starten"
+    "startShift": "Schicht starten",
+    "invalidDuration": "Bitte geben Sie die Dauer ein."
   },
   "end-shift": {
     "confirmButton": "Ok"
