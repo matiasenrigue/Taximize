@@ -130,7 +130,7 @@ export const RideContextProvider = (props: PropsWithChildren) => {
         stopTaximeter();
         api.post("/rides/end-ride", {
             "fare_cents": fare,
-            "actual_distance_km": distance * 1000,
+            "actual_distance_km": distance / 1000,
         })
             .then((response) => console.log(response))
             .catch((error) => console.warn(error));

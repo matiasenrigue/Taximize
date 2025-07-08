@@ -67,35 +67,35 @@ export default function MapPage() {
                 </div>
 
                 <div className={styles.button_container}>
-                    {isOnRide && <TaxiMeter/>}
-                    <FlexGroup
-                        direction={"row"}
-                        align={"center"}
-                        justify={"end"}>
-                        {isOnRide
-                            ? <FlexGroup
-                                direction={"column"}
-                                align={"start"}>
-                                <Button
+                        {isOnRide && <TaxiMeter/>}
+                        <FlexGroup
+                            direction={"row"}
+                            align={"center"}
+                            justify={"end"}>
+                            {isOnRide
+                                ? <FlexGroup
+                                    direction={"column"}
+                                    align={"start"}>
+                                    <Button
+                                        elevated={true}
+                                        onClick={() => endModalRef.current?.open()}>
+                                        {t("endRide")}
+                                    </Button>
+                                </FlexGroup>
+                                : (destination && isRouteAvailable && <Button
                                     elevated={true}
-                                    onClick={() => endModalRef.current?.open()}>
-                                    {t("endRide")}
-                                </Button>
-                            </FlexGroup>
-                            : (destination && isRouteAvailable && <Button
-                                elevated={true}
-                                onClick={() => startModalRef.current?.open()}>
-                                {t("startRide")}
-                            </Button>)}
-                        {!isOnRide && <OptionsMenu>
-                            <MenuOption onClick={openPauseModal}>
-                                {t("pauseShift")}
-                            </MenuOption>
-                            <MenuOption onClick={endShift}>
-                                {t("endShift")}
-                            </MenuOption>
-                        </OptionsMenu>}
-                    </FlexGroup>
+                                    onClick={() => startModalRef.current?.open()}>
+                                    {t("startRide")}
+                                </Button>)}
+                            {!isOnRide && <OptionsMenu>
+                                <MenuOption onClick={openPauseModal}>
+                                    {t("pauseShift")}
+                                </MenuOption>
+                                <MenuOption onClick={endShift}>
+                                    {t("endShift")}
+                                </MenuOption>
+                            </OptionsMenu>}
+                        </FlexGroup>
                 </div>
             </div>
         </APIProvider>
