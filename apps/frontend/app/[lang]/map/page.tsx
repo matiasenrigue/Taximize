@@ -46,8 +46,8 @@ export default function MapPage() {
 
     if (!isAvailable)
         return <LocationUnavailable/>;
-    if (!location)
-        return <LocationLoading/>;
+    // if (!location)
+    //     return <LocationLoading/>;
 
     return (
         <APIProvider apiKey={API_KEY}>

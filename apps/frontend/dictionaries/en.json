@@ -67,7 +67,7 @@
   },
   "StartBreakModal": {
     "title": "Take a break!",
-    "text": "Are you sure you want to do a 15 minute break?",
+    "text": "How long would you like to take a break for?",
     "confirmButton": "Take a break",
     "cancelButton": "Cancel"
   },

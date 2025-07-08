@@ -16,7 +16,7 @@ interface ShiftContextType {
     isOvertime: boolean;
     startShift: (duration: number) => void;
     endShift: () => void;
-    pauseShift: () => void;
+    pauseShift: (duration?: number) => void;
     continueShift: () => void;
     getRemainingTime: () => string;
     checkBreakTime: () => boolean;
@@ -44,7 +44,9 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const [isPaused, setIsPaused] = useState<boolean>(false);
     const [duration, setDuration] = useState<number>(0);
     const [startTime, setStartTime] = useState<number|null>(null);
+
     const [lastBreakTime, setLastBreakTime] = useState<number|null>(null);
+    const [breakDuration, setBreakDuration] = useState<number>(DEFAULT_BREAK_DURATION);
     const [totalBreakDuration, setTotalBreakDuration] = useState<number>(0);
     const [isOvertime, setIsOvertime] = useState<boolean>(false);
 
@@ -101,6 +103,8 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     }, []);
 
     const endShift = useCallback(() => {
+        if (!isShift)
+            return;
         setIsShift(false);
         api.post("/shifts/end-shift", {})
             .then((response) => {
@@ -127,10 +131,11 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             })
             .catch((error) => console.warn(error));
         router.push('/end-shift');
-    }, []);
+    }, [isShift]);
 
-    const pauseShift = useCallback(() => {
+    const pauseShift = useCallback((duration: number = DEFAULT_BREAK_DURATION) => {
         setLastBreakTime(moment.now());
+        setBreakDuration(duration);
         setIsPaused(true);
         if (!breakModalRef || typeof breakModalRef === "function")
             return;
@@ -160,8 +165,8 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     // returns the remaining break duration in milliseconds
     const getRemainingBreakDuration = useCallback((): number => {
         const passedTime = moment.now() - lastBreakTime;
-        return Math.max(0, DEFAULT_BREAK_DURATION - passedTime)
-    }, [lastBreakTime]);
+        return Math.max(0, breakDuration - passedTime)
+    }, [lastBreakTime, breakDuration]);
 
     // skips the current break
     const skipBreak = useCallback(() => {
