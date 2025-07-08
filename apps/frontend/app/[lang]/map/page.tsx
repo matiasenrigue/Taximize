@@ -73,15 +73,11 @@ export default function MapPage() {
                             align={"center"}
                             justify={"end"}>
                             {isOnRide
-                                ? <FlexGroup
-                                    direction={"column"}
-                                    align={"start"}>
-                                    <Button
+                                ? <Button
                                         elevated={true}
                                         onClick={() => endModalRef.current?.open()}>
                                         {t("endRide")}
-                                    </Button>
-                                </FlexGroup>
+                            </Button>
                                 : (destination && isRouteAvailable && <Button
                                     elevated={true}
                                     onClick={() => startModalRef.current?.open()}>
