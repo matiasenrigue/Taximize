@@ -40,14 +40,14 @@ export default function Signin() {
                 // when the status is 200, but the response does not contain a token(e.g. invalid credentials)
                     setMsg({ type: "error", text: response.data.message || t("signinFailed") });
                 }
-        }).catch((err) => {
-            // when the status is not 200, the response will contain an error message
-            console.error("Signin error:", err);
-            if (err.response && err.response.data && err.response.data.error) {
-                setMsg({ type: "error", text: err.response.data.error });
-            } else {
-                setMsg({ type: "error", text: t("signinFailed") });
-            }
+            }).catch((err) => {
+                // when the status is not 200, the response will contain an error message
+                console.error("Signin error:", err);
+                if (err.response && err.response.data && err.response.data.error) {
+                    setMsg({ type: "error", text: err.response.data.error });
+                } else {
+                    setMsg({ type: "error", text: t("signinFailed") });
+                }
         });
     };
 

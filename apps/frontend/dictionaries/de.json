@@ -75,5 +75,79 @@
     "title": "Interner Fehler",
     "text": "Ein unbekannter Fehler ist aufgetreten. Die Route kann nicht angezeigt werden.",
     "confirmButton": "Ok"
+  },
+  "account": {
+    "account": "Konto",
+    "shiftSettings": "Schichteinstellungen",
+    "preferences": "Einstellungen",
+    "statistics": "Statistiken"
+  },
+  "preferences": {
+    "preferences": "Einstellungen",
+    "colorScheme": "Farbschema",
+    "language": "Sprache",
+    "geolocation": "Geolocation",
+    "breakWarnings": "Pause Warnungen",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  },
+  "profile": {
+    "profile": "Profil",
+    "personalInformation": "Persönliche Informationen",
+    "username": "Benutzername",
+    "email": "E-Mail",
+    "manageAccount": "Konto verwalten",
+    "changePassword": "Passwort ändern",
+    "deleteAccount": "Konto löschen",
+    "signout": "Abmelden",
+    "signOutWarning": "Sind Sie sicher, dass Sie sich abmelden möchten?",
+    "deleteAccountWarning": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten?",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen"
+  },
+  "changeUsername": {
+    "changeUsername": "Benutzername ändern",
+    "newUsername": "Neuer Benutzername",
+    "newUsernamePlaceholder": "Geben Sie Ihren neuen Benutzernamen ein",
+    "saveChanges": "Änderungen speichern",
+    "cancel": "Abbrechen"
+  },
+  "changeEmail": {
+    "changeEmail": "E-Mail ändern",
+    "newEmail": "Neue E-Mail",
+    "newEmailPlaceholder": "Geben Sie Ihre neue E-Mail-Adresse ein",
+    "saveChanges": "Änderungen speichern",
+    "cancel": "Abbrechen"
+  },
+  "changePassword": {
+    "changePassword": "Passwort ändern",
+    "newPassword": "Neues Passwort",
+    "newPasswordPlaceholder": "Geben Sie Ihr neues Passwort ein",
+    "saveChanges": "Änderungen speichern",
+    "cancel": "Abbrechen"
+  },
+  "shiftSettings": {
+    "shiftSettings": "Schichteinstellungen",
+    "Monday": "Mon",
+    "Tuesday": "Tue",
+    "Wednesday": "Wed",
+    "Thursday": "Thu",
+    "Friday": "Fri",
+    "Saturday": "Sat",
+    "Sunday": "Sun"
+  },
+  "statistics": {
+    "title": "Statistiken",
+    "worktimeTitle": "Durchschnittliche Arbeitszeit in Stunden",
+    "earningsTitle": "Durchschnittlicher Verdienst in €",
+    "weekly": "Wöchentlich",
+    "monthly": "Monatlich",
+    "loadingWorktime": "Arbeitszeitdaten werden geladen...",
+    "errorWorktime": "Fehler beim Laden der Arbeitszeitdaten",
+    "loadingEarnings": "Verdienstdaten werden geladen...",
+    "errorEarnings": "Fehler beim Laden der Verdienstdaten",
+    "withPassenger": "mit Fahrgast",
+    "empty": "leer"
   }
 }

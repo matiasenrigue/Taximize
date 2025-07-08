@@ -5,6 +5,7 @@ import { RideService } from './ride.service';
 import { ShiftService } from '../shifts/shift.service';
 import { modelToResponse, requestToModel } from '../../shared/utils/caseTransformer';
 
+
 export class RideController {
   // @desc    Evaluate ride coordinates and get ML prediction score
   // @route   POST /api/rides/evaluate-ride
@@ -65,7 +66,19 @@ export class RideController {
     }
 
     try {
-      // Get active shift for driver (simplified approach - in real app would get from request or service)
+      // Get active shift for driver
+      const activeShift = await Shift.findOne({
+        where: { 
+          driver_id: driverId,
+          shift_end: null
+        }
+      });
+
+      if (!activeShift) {
+        res.status(400);
+        throw new Error('No active shift found for driver');
+      }
+
       const coords = {
         startLat: startLatitude,
         startLng: startLongitude,
