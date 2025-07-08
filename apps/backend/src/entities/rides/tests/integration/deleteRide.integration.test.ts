@@ -292,7 +292,7 @@ describe('Delete Ride Operations', () => {
         .get('/api/users/me/stats')
         .set('Authorization', `Bearer ${token}`);
       
-      const initialRideCount = initialStatsResponse.body.total_rides;
+      const initialRideCount = initialStatsResponse.body.totalRides;
 
       // Delete the ride
       await request(app)
@@ -304,7 +304,7 @@ describe('Delete Ride Operations', () => {
         .get('/api/users/me/stats')
         .set('Authorization', `Bearer ${token}`);
       
-      expect(updatedStatsResponse.body.total_rides).toBe(initialRideCount - 1);
+      expect(updatedStatsResponse.body.totalRides).toBe(initialRideCount - 1);
     });
   });
 });

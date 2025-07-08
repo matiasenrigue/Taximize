@@ -65,10 +65,10 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(startRideRes.status).toBe(200);
@@ -76,26 +76,25 @@ describe('Ride Workflow Integration Tests', () => {
 
       // 2. Get ride status
       const statusRes = await request(app)
-        .post('/api/rides/get-ride-status')
-        .set('Authorization', `Bearer ${token}`)
-        .send({});
+        .get('/api/rides/current')
+        .set('Authorization', `Bearer ${token}`);
 
       expect(statusRes.status).toBe(200);
       expect(statusRes.body.data.rideId).toBe(rideId);
-      expect(statusRes.body.data.elapsed_time_ms).toBeGreaterThan(0);
+      expect(statusRes.body.data.elapsedTimeMs).toBeGreaterThan(0);
 
       // 3. End ride
       const endRideRes = await request(app)
         .post('/api/rides/end-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          fare_cents: 1500,
-          actual_distance_km: 5.2
+          fareCents: 1500,
+          actualDistanceKm: 5.2
         });
 
       expect(endRideRes.status).toBe(200);
       expect(endRideRes.body.data.rideId).toBe(rideId);
-      expect(endRideRes.body.data.earning_cents).toBe(1500);
+      expect(endRideRes.body.data.earningCents).toBe(1500);
 
       // 4. Verify ride is ended in database
       const finalRide = await Ride.findByPk(rideId);
@@ -112,10 +111,10 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(ride1Res.status).toBe(200);
@@ -126,8 +125,8 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/end-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          fare_cents: 1000,
-          actual_distance_km: 3.0
+          fareCents: 1000,
+          actualDistanceKm: 3.0
         });
 
       // Second ride should succeed
@@ -135,10 +134,10 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.359805,
-          start_longitude: -6.270310,
-          destination_latitude: 53.369805,
-          destination_longitude: -6.280310
+          startLatitude: 53.359805,
+          startLongitude: -6.270310,
+          destinationLatitude: 53.369805,
+          destinationLongitude: -6.280310
         });
 
       expect(ride2Res.status).toBe(200);
@@ -161,24 +160,20 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
-      // Get status with override destination
+      // Get status (override destination feature was removed)
       const statusRes = await request(app)
-        .post('/api/rides/get-ride-status')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          destination_latitude: 53.369805,
-          destination_longitude: -6.280310
-        });
+        .get('/api/rides/current')
+        .set('Authorization', `Bearer ${token}`);
 
       expect(statusRes.status).toBe(200);
-      expect(statusRes.body.data.current_destination_latitude).toBe(53.369805);
-      expect(statusRes.body.data.current_destination_longitude).toBe(-6.280310);
+      expect(statusRes.body.data.currentDestinationLatitude).toBe(53.359805);
+      expect(statusRes.body.data.currentDestinationLongitude).toBe(-6.270310);
     });
   });
 
@@ -192,10 +187,10 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(ride1Res.status).toBe(200);
@@ -206,8 +201,8 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/end-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          fare_cents: 1000,
-          actual_distance_km: 3.0
+          fareCents: 1000,
+          actualDistanceKm: 3.0
         });
 
       await shift1.update({ shift_end: new Date() });
@@ -218,10 +213,10 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.369805,
-          start_longitude: -6.280310,
-          destination_latitude: 53.379805,
-          destination_longitude: -6.290310
+          startLatitude: 53.369805,
+          startLongitude: -6.280310,
+          destinationLatitude: 53.379805,
+          destinationLongitude: -6.290310
         });
 
       expect(ride2Res.status).toBe(200);
@@ -247,10 +242,10 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(ride1Res.status).toBe(200);
@@ -260,10 +255,10 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.359805,
-          start_longitude: -6.270310,
-          destination_latitude: 53.369805,
-          destination_longitude: -6.280310
+          startLatitude: 53.359805,
+          startLongitude: -6.270310,
+          destinationLatitude: 53.369805,
+          destinationLongitude: -6.280310
         });
 
       expect(ride2Res.status).toBe(400);
@@ -279,10 +274,10 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(ride1Res.status).toBe(200);
@@ -291,8 +286,8 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/end-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          fare_cents: 1000,
-          actual_distance_km: 3.0
+          fareCents: 1000,
+          actualDistanceKm: 3.0
         });
 
       // Immediate second ride should succeed
@@ -300,10 +295,10 @@ describe('Ride Workflow Integration Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.359805,
-          start_longitude: -6.270310,
-          destination_latitude: 53.369805,
-          destination_longitude: -6.280310
+          startLatitude: 53.359805,
+          startLongitude: -6.270310,
+          destinationLatitude: 53.369805,
+          destinationLongitude: -6.280310
         });
 
       expect(ride2Res.status).toBe(200);

@@ -20,7 +20,18 @@ async function createAuthenticatedUser(email: string = 'driver@test.com', userna
     password: 'password123'
   });
   const token = generateAccessToken(user.id);
-  return { user, token };
+  return { user, token, driver: user };
+}
+
+// Helper function to create active shift
+async function createActiveShift(driverId: string) {
+  return await Shift.create({
+    driver_id: driverId,
+    shift_start: new Date(),
+    shift_end: null,
+    shift_start_location_latitude: 53.349805,
+    shift_start_location_longitude: -6.260310
+  });
 }
 
 beforeAll(async () => {
@@ -48,10 +59,10 @@ describe('Ride API Integration Tests', () => {
     it('should return 401 when no authentication provided', async () => {
       // Test POST /api/rides/evaluate-ride returns 401 when no authentication provided
       const requestBody = {
-        start_latitude: 53.349805,
-        start_longitude: -6.260310,
-        destination_latitude: 53.359805,
-        destination_longitude: -6.270310
+        startLatitude: 53.349805,
+        startLongitude: -6.260310,
+        destinationLatitude: 53.359805,
+        destinationLongitude: -6.270310
       };
 
       const res = await request(app)
@@ -67,10 +78,10 @@ describe('Ride API Integration Tests', () => {
       const { token } = await createAuthenticatedUser();
       
       const requestBody = {
-        start_latitude: 53.349805,
-        start_longitude: -6.260310,
-        destination_latitude: 53.359805,
-        destination_longitude: -6.270310
+        startLatitude: 53.349805,
+        startLongitude: -6.260310,
+        destinationLatitude: 53.359805,
+        destinationLongitude: -6.270310
       };
 
       const res = await request(app)
@@ -89,10 +100,10 @@ describe('Ride API Integration Tests', () => {
       const { token } = await createAuthenticatedUser();
       
       const requestBody = {
-        start_latitude: 'invalid',
-        start_longitude: -6.260310,
-        destination_latitude: 53.359805,
-        destination_longitude: -6.270310
+        startLatitude: 'invalid',
+        startLongitude: -6.260310,
+        destinationLatitude: 53.359805,
+        destinationLongitude: -6.270310
       };
 
       const res = await request(app)
@@ -110,8 +121,8 @@ describe('Ride API Integration Tests', () => {
       const { token } = await createAuthenticatedUser();
       
       const requestBody = {
-        start_latitude: 53.349805,
-        start_longitude: -6.260310
+        startLatitude: 53.349805,
+        startLongitude: -6.260310
         // Missing destination coordinates
       };
 
@@ -130,10 +141,10 @@ describe('Ride API Integration Tests', () => {
     it('should return 401 when no authentication provided', async () => {
       // Test POST /api/rides/start-ride returns 401 when no authentication provided
       const requestBody = {
-        start_latitude: 53.349805,
-        start_longitude: -6.260310,
-        destination_latitude: 53.359805,
-        destination_longitude: -6.270310
+        startLatitude: 53.349805,
+        startLongitude: -6.260310,
+        destinationLatitude: 53.359805,
+        destinationLongitude: -6.270310
       };
 
       const res = await request(app)
@@ -149,10 +160,10 @@ describe('Ride API Integration Tests', () => {
       const { token } = await createAuthenticatedUser();
       
       const requestBody = {
-        start_latitude: 53.349805,
-        start_longitude: -6.260310,
-        destination_latitude: 53.359805,
-        destination_longitude: -6.270310
+        startLatitude: 53.349805,
+        startLongitude: -6.260310,
+        destinationLatitude: 53.359805,
+        destinationLongitude: -6.270310
       };
 
       const res = await request(app)
@@ -170,10 +181,10 @@ describe('Ride API Integration Tests', () => {
       const { token } = await createAuthenticatedUser();
       
       const requestBody = {
-        start_latitude: 'invalid',
-        start_longitude: -6.260310,
-        destination_latitude: 53.359805,
-        destination_longitude: -6.270310
+        startLatitude: 'invalid',
+        startLongitude: -6.260310,
+        destinationLatitude: 53.359805,
+        destinationLongitude: -6.270310
       };
 
       const res = await request(app)
@@ -187,48 +198,41 @@ describe('Ride API Integration Tests', () => {
     });
   });
 
-  describe('POST /api/rides/get-ride-status', () => {
+  describe('GET /api/rides/current', () => {
     it('should return 401 when no authentication provided', async () => {
-      // Test POST /api/rides/get-ride-status returns 401 when no authentication provided
+      // Test GET /api/rides/current returns 401 when no authentication provided
       const res = await request(app)
-        .post('/api/rides/get-ride-status')
-        .send({});
+        .get('/api/rides/current');
         
       // Expecting 401 since routes are implemented but require authentication (Green phase)
       expect(res.status).toBe(401);
     });
 
-    it('should return 400 when authenticated driver has no active ride', async () => {
-      // Test authenticated driver with no active ride gets appropriate error
+    it('should return 400 when authenticated driver has no active shift', async () => {
+      // Test authenticated driver with no active shift gets appropriate error
       const { token } = await createAuthenticatedUser();
 
       const res = await request(app)
-        .post('/api/rides/get-ride-status')
-        .set('Authorization', `Bearer ${token}`)
-        .send({});
+        .get('/api/rides/current')
+        .set('Authorization', `Bearer ${token}`);
         
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
       expect(res.body.error).toContain('No active shift found. Please start a shift before checking ride status.');
     });
 
-    it('should return 400 when authenticated but invalid override destination provided', async () => {
-      // Test authenticated user gets validation error for invalid override destination
-      const { token } = await createAuthenticatedUser();
-      
-      const requestBody = {
-        destination_latitude: 'invalid',
-        destination_longitude: -6.262321
-      };
+    it('should return 400 when authenticated but no active ride exists', async () => {
+      // Test authenticated driver with active shift but no ride
+      const { token, driver } = await createAuthenticatedUser();
+      await createActiveShift(driver.id);
 
       const res = await request(app)
-        .post('/api/rides/get-ride-status')
-        .set('Authorization', `Bearer ${token}`)
-        .send(requestBody);
+        .get('/api/rides/current')
+        .set('Authorization', `Bearer ${token}`);
         
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
-      expect(res.body.error).toContain('Invalid coordinates');
+      expect(res.body.error).toContain('No active ride found. Please start a ride first.');
     });
   });
 
@@ -236,8 +240,8 @@ describe('Ride API Integration Tests', () => {
     it('should return 401 when no authentication provided', async () => {
       // Test POST /api/rides/end-ride returns 401 when no authentication provided
       const requestBody = {
-        fare_cents: 1450,
-        actual_distance_km: 4.2
+        fareCents: 1450,
+        actualDistanceKm: 4.2
       };
 
       const res = await request(app)
@@ -253,8 +257,8 @@ describe('Ride API Integration Tests', () => {
       const { token } = await createAuthenticatedUser();
       
       const requestBody = {
-        fare_cents: 1450,
-        actual_distance_km: 4.2
+        fareCents: 1450,
+        actualDistanceKm: 4.2
       };
 
       const res = await request(app)
@@ -272,8 +276,8 @@ describe('Ride API Integration Tests', () => {
       const { token } = await createAuthenticatedUser();
       
       const requestBody = {
-        fare_cents: 1450
-        // Missing actual_distance_km
+        fareCents: 1450
+        // Missing actualDistanceKm
       };
 
       const res = await request(app)
@@ -291,8 +295,8 @@ describe('Ride API Integration Tests', () => {
       const { token } = await createAuthenticatedUser();
       
       const requestBody = {
-        fare_cents: 'invalid',
-        actual_distance_km: 4.2
+        fareCents: 'invalid',
+        actualDistanceKm: 4.2
       };
 
       const res = await request(app)
@@ -338,10 +342,10 @@ describe('Ride API Integration Tests', () => {
       await expect(Ride.create({
         shift_id: shift.id, // Same shift
         driver_id: user.id,
-        start_latitude: 53.359805,
-        start_longitude: -6.270310,
-        destination_latitude: 53.369805,
-        destination_longitude: -6.280310,
+        startLatitude: 53.359805,
+        startLongitude: -6.270310,
+        destinationLatitude: 53.369805,
+        destinationLongitude: -6.280310,
         start_time: new Date(),
         predicted_score: 4,
         end_time: null // Active ride - should violate constraint

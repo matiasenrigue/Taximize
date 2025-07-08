@@ -67,10 +67,10 @@ describe('Ride State Transition Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(rideRes.status).toBe(400);
@@ -86,10 +86,10 @@ describe('Ride State Transition Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(startRes.status).toBe(200);
@@ -99,9 +99,8 @@ describe('Ride State Transition Tests', () => {
 
       // Get ride status should fail (no active shift)
       const statusRes = await request(app)
-        .post('/api/rides/get-ride-status')
-        .set('Authorization', `Bearer ${token}`)
-        .send({});
+        .get('/api/rides/current')
+        .set('Authorization', `Bearer ${token}`);
 
       expect(statusRes.status).toBe(400);
       expect(statusRes.body.error).toContain('No active shift found');
@@ -116,10 +115,10 @@ describe('Ride State Transition Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(startRes.status).toBe(200);
@@ -132,8 +131,8 @@ describe('Ride State Transition Tests', () => {
         .post('/api/rides/end-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          fare_cents: 1500,
-          actual_distance_km: 5.0
+          fareCents: 1500,
+          actualDistanceKm: 5.0
         });
 
       expect(endRes.status).toBe(400);
@@ -158,10 +157,10 @@ describe('Ride State Transition Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(rideRes.status).toBe(400);
@@ -191,10 +190,10 @@ describe('Ride State Transition Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(rideRes.status).toBe(200);
@@ -213,10 +212,10 @@ describe('Ride State Transition Tests', () => {
           .post('/api/rides/start-ride')
           .set('Authorization', `Bearer ${token}`)
           .send({
-            start_latitude: 53.349805,
-            start_longitude: -6.260310,
-            destination_latitude: 53.359805,
-            destination_longitude: -6.270310
+            startLatitude: 53.349805,
+            startLongitude: -6.260310,
+            destinationLatitude: 53.359805,
+            destinationLongitude: -6.270310
           })
       );
 
@@ -250,19 +249,19 @@ describe('Ride State Transition Tests', () => {
           .post('/api/rides/start-ride')
           .set('Authorization', `Bearer ${token1}`)
           .send({
-            start_latitude: 53.349805,
-            start_longitude: -6.260310,
-            destination_latitude: 53.359805,
-            destination_longitude: -6.270310
+            startLatitude: 53.349805,
+            startLongitude: -6.260310,
+            destinationLatitude: 53.359805,
+            destinationLongitude: -6.270310
           }),
         request(app)
           .post('/api/rides/start-ride')
           .set('Authorization', `Bearer ${token2}`)
           .send({
-            start_latitude: 53.369805,
-            start_longitude: -6.280310,
-            destination_latitude: 53.379805,
-            destination_longitude: -6.290310
+            startLatitude: 53.369805,
+            startLongitude: -6.280310,
+            destinationLatitude: 53.379805,
+            destinationLongitude: -6.290310
           })
       ];
 
@@ -289,10 +288,10 @@ describe('Ride State Transition Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       const rideId = startRes.body.data.rideId;
@@ -308,8 +307,8 @@ describe('Ride State Transition Tests', () => {
         .post('/api/rides/end-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          fare_cents: 1500,
-          actual_distance_km: 5.0
+          fareCents: 1500,
+          actualDistanceKm: 5.0
         });
 
       // Check final state
@@ -328,10 +327,10 @@ describe('Ride State Transition Tests', () => {
         .post('/api/rides/start-ride')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          start_latitude: 53.349805,
-          start_longitude: -6.260310,
-          destination_latitude: 53.359805,
-          destination_longitude: -6.270310
+          startLatitude: 53.349805,
+          startLongitude: -6.260310,
+          destinationLatitude: 53.359805,
+          destinationLongitude: -6.270310
         });
 
       expect(startRes.status).toBe(200);

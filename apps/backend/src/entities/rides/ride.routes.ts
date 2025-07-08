@@ -8,7 +8,7 @@ const router = Router();
 // All routes are protected by JWT authentication
 router.post('/evaluate-ride', protect, RideController.evaluateRide);
 router.post('/start-ride', protect, RideController.startRide);
-router.post('/get-ride-status', protect, RideController.getRideStatus);
+router.get('/current', protect, RideController.getRideStatus);
 router.post('/end-ride', protect, RideController.endRide);
 
 // Edit and Delete routes

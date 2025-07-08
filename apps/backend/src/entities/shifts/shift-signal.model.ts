@@ -7,6 +7,7 @@ export class ShiftSignal extends Model {
   public timestamp!: Date;
   public shift_id!: string;
   public signal!: 'start' | 'stop' | 'pause' | 'continue';
+  public planned_duration_ms!: number | null;
   public created_at!: Date;
   public updated_at!: Date;
 }
@@ -29,6 +30,10 @@ ShiftSignal.init(
     signal: {
       type: DataTypes.ENUM('start', 'stop', 'pause', 'continue'),
       allowNull: false,
+    },
+    planned_duration_ms: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
     },
   },
   {

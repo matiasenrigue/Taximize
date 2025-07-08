@@ -13,6 +13,8 @@ interface ShiftStatus {
   isPaused: boolean;
   pauseStart: number | null;
   lastPauseEnd: number | null;
+  duration: number | null;
+  pauseDuration: number | null;
 }
 
 export class ShiftService {
@@ -30,7 +32,7 @@ export class ShiftService {
     return SignalValidation.isValidTransition(lastSignal, newSignal as Signal);
   }
 
-  static async handleSignal(driverId: string, timestamp: number, signal: string): Promise<any> {
+  static async handleSignal(driverId: string, timestamp: number, signal: string, additionalData?: number): Promise<any> {
     // Validate the signal
     const isValid = await this.isValidSignal(driverId, signal);
     if (!isValid) {
@@ -41,7 +43,7 @@ export class ShiftService {
 
     // Handle different signal types
     if (signal === 'start') {
-      await this.handleStartSignal(driverId, timestamp);
+      await this.handleStartSignal(driverId, timestamp, additionalData); // additionalData is duration
     } else if (signal === 'stop') {
       result = await this.handleStopSignal(driverId, timestamp);
     } else if (signal === 'continue') {
@@ -55,7 +57,8 @@ export class ShiftService {
         await ShiftSignal.create({
           timestamp: new Date(timestamp),
           shift_id: activeShift.id,
-          signal: signal as Signal
+          signal: signal as Signal,
+          planned_duration_ms: (signal === 'pause' && additionalData) ? additionalData : null
         });
       }
     }
@@ -80,13 +83,24 @@ export class ShiftService {
     
     // Find pause times
     const pauseInfo = await this.getPauseInfo(driverId);
+    
+    // Get active shift to retrieve planned durations
+    const activeShift = await this.getActiveShift(driverId);
+    
+    // Get planned pause duration from the current pause signal if paused
+    let plannedPauseDuration = null;
+    if (lastSignal.signal === 'pause') {
+      plannedPauseDuration = lastSignal.planned_duration_ms || null;
+    }
 
     return {
       isOnShift: true,
       shiftStart: shiftStartSignal ? shiftStartSignal.timestamp.getTime() : null,
       isPaused: lastSignal.signal === 'pause',
       pauseStart: lastSignal.signal === 'pause' ? lastSignal.timestamp.getTime() : null,
-      lastPauseEnd: pauseInfo.lastContinue ? pauseInfo.lastContinue.getTime() : null
+      lastPauseEnd: pauseInfo.lastContinue ? pauseInfo.lastContinue.getTime() : null,
+      duration: activeShift ? activeShift.planned_duration_ms : null,
+      pauseDuration: plannedPauseDuration
     };
   }
 
@@ -371,7 +385,7 @@ export class ShiftService {
     };
   }
 
-  private static async handleStartSignal(driverId: string, timestamp: number): Promise<void> {
+  private static async handleStartSignal(driverId: string, timestamp: number, duration?: number): Promise<void> {
     // Check for existing active shift
     const existingShift = await Shift.findOne({
       where: { 
@@ -393,7 +407,8 @@ export class ShiftService {
       work_time_ms: null,
       break_time_ms: null,
       num_breaks: null,
-      avg_break_ms: null
+      avg_break_ms: null,
+      planned_duration_ms: duration || null
     });
   }
 

@@ -113,7 +113,7 @@ describe('Edit Ride Operations', () => {
         .put(`/api/rides/${ride.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          end_time: new Date(ride.start_time.getTime() - 3600000) // 1 hour before start
+          endTime: new Date(ride.start_time.getTime() - 3600000) // 1 hour before start
         });
 
       expect(response.status).toBe(400);
@@ -129,7 +129,7 @@ describe('Edit Ride Operations', () => {
         .put(`/api/rides/${ride.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          distance_km: -5.0
+          distanceKm: -5.0
         });
 
       expect(response.status).toBe(400);
@@ -145,7 +145,7 @@ describe('Edit Ride Operations', () => {
         .put(`/api/rides/${ride.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          earning_cents: -100
+          earningCents: -100
         });
 
       expect(response.status).toBe(400);
@@ -197,13 +197,13 @@ describe('Edit Ride Operations', () => {
         .put(`/api/rides/${ride.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          destination_latitude: 53.350000,
-          destination_longitude: -6.250000
+          destinationLatitude: 53.350000,
+          destinationLongitude: -6.250000
         });
 
       expect(response.status).toBe(200);
-      expect(response.body.destination_latitude).toBe(53.350000);
-      expect(response.body.destination_longitude).toBe(-6.250000);
+      expect(response.body.destinationLatitude).toBe(53.350000);
+      expect(response.body.destinationLongitude).toBe(-6.250000);
     });
 
     it('Tests-ED-8-Can-edit-distance', async () => {
@@ -215,11 +215,11 @@ describe('Edit Ride Operations', () => {
         .put(`/api/rides/${ride.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          distance_km: 6.5
+          distanceKm: 6.5
         });
 
       expect(response.status).toBe(200);
-      expect(response.body.distance_km).toBe(6.5);
+      expect(response.body.distanceKm).toBe(6.5);
     });
 
     it('Tests-ED-9-Can-edit-earning', async () => {
@@ -231,11 +231,11 @@ describe('Edit Ride Operations', () => {
         .put(`/api/rides/${ride.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          earning_cents: 1500
+          earningCents: 1500
         });
 
       expect(response.status).toBe(200);
-      expect(response.body.earning_cents).toBe(1500);
+      expect(response.body.earningCents).toBe(1500);
     });
 
     it('Tests-ED-10-Can-edit-end-time', async () => {
@@ -248,11 +248,11 @@ describe('Edit Ride Operations', () => {
         .put(`/api/rides/${ride.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          end_time: newEndTime
+          endTime: newEndTime
         });
 
       expect(response.status).toBe(200);
-      expect(new Date(response.body.end_time)).toEqual(newEndTime);
+      expect(new Date(response.body.endTime)).toEqual(newEndTime);
     });
   });
 
@@ -367,7 +367,7 @@ describe('Edit Ride Operations', () => {
         .put(`/api/rides/${ride.id}`)
         .set('Authorization', `Bearer ${token1}`)
         .send({
-          distance_km: 10.0
+          distanceKm: 10.0
         });
 
       expect(response.status).toBe(403);

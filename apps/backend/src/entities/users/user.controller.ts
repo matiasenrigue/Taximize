@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { Ride } from '../rides/ride.model';
+import { modelToResponse } from '../../shared/utils/caseTransformer';
 
 export class UserController {
   // @desc    Get user statistics
@@ -19,8 +20,8 @@ export class UserController {
       where: { driver_id: userId }
     });
 
-    res.status(200).json({
+    res.status(200).json(modelToResponse({
       total_rides: totalRides
-    });
+    }));
   });
 }
