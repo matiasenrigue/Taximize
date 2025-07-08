@@ -10,6 +10,7 @@ import rateLimit from 'express-rate-limit';
 import authRoutes from './entities/auth/auth.routes';
 import rideRoutes from './entities/rides/ride.routes';
 import shiftRoutes from './entities/shifts/shift.routes';
+import userRoutes from './entities/users/user.routes';
 import { errorHandler } from './shared/middleware/error.middleware';
 
 const app = express();
@@ -20,24 +21,26 @@ app.use((req, res, next) => {
   next();
 });
 
-// Seguridad HTTP headers
-// app.use(helmet());
+// Security HTTP headers
+app.use(helmet());
 
-// CORS
-// app.use(
-//   cors({
-//     origin: process.env.CLIENT_URL, // definir en .env
-//     credentials: true,
-//   })
-// );
-// app.use(cors());       // 🚨 opens CORS to every origin
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
-
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 100, // limit each IP to 100 requests per windowMs
-// });
-// app.use(limiter);
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/', limiter);
 
 
 app.use(express.json());
@@ -47,6 +50,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/rides', rideRoutes);
 app.use('/api/shifts', shiftRoutes);
+app.use('/api/users', userRoutes);
 
 app.use(errorHandler);
 

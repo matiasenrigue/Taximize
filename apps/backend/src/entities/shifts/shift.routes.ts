@@ -11,6 +11,16 @@ router.post('/start-shift', protect, ShiftController.startShift);
 router.post('/pause-shift', protect, ShiftController.pauseShift);
 router.post('/continue-shift', protect, ShiftController.continueShift);
 router.post('/end-shift', protect, ShiftController.endShift);
+router.post('/skip-pause', protect, ShiftController.skipPause);
 router.get('/current', protect, ShiftController.getCurrentShift);
+router.get('/debug', protect, ShiftController.debugShiftStatus);
+
+// Edit and Delete routes
+router.put('/:shiftId', protect, ShiftController.editShift);
+router.delete('/:shiftId', protect, ShiftController.deleteShift);
+router.post('/:shiftId/restore', protect, ShiftController.restoreShift);
+router.get('/', protect, ShiftController.getShifts);
+router.get('/:shiftId', protect, ShiftController.getShift);
+router.post('/:shiftId/end', protect, ShiftController.endShiftById);
 
 export default router; 

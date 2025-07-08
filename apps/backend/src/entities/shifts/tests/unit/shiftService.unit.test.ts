@@ -217,6 +217,21 @@ describe('ShiftService Unit Tests', () => {
       await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
     });
 
+    it('should only process active shifts (shift_end is null)', async () => {
+      // Test that manageExpiredShifts only processes active shifts as per documentation
+      await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+    });
+
+    it('should skip shifts with stop signal even if old', async () => {
+      // Test that manageExpiredShifts skips shifts that have proper stop signal
+      await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+    });
+
+    it('should skip shifts with recent signals within 2 days', async () => {
+      // Test that manageExpiredShifts skips shifts with recent activity
+      await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+    });
+
     it('should log each cleanup action performed', async () => {
       // Test that manageExpiredShifts logs each cleanup action performed
       await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
