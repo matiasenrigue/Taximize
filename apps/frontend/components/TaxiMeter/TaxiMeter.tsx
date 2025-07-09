@@ -2,10 +2,9 @@
 
 import styles from "./TaxiMeter.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faClock, faEuroSign} from "@fortawesome/free-solid-svg-icons";
+import {faClock, faDollarSign} from "@fortawesome/free-solid-svg-icons";
 import {useRide} from "../../contexts/RideContext/RideContext";
 import {formatDuration} from "../../lib/formatDuration/formatDuration";
-import {MINUTE_IN_MILLISECONDS} from "../../constants/constants";
 
 export const TaxiMeter = () => {
     const {fare, duration} = useRide();
@@ -16,12 +15,16 @@ export const TaxiMeter = () => {
                 <FontAwesomeIcon
                     className={styles.icon}
                     icon={faClock}/>
-                <span>{Math.floor(duration / MINUTE_IN_MILLISECONDS)} min</span>
+                <span>{formatDuration(duration, {
+                    hours: false,
+                    minutes: true,
+                    seconds: true
+                })}</span>
             </div>
             <div className={styles.group}>
                 <FontAwesomeIcon
                     className={styles.icon}
-                    icon={faEuroSign}/>
+                    icon={faDollarSign}/>
                 <span>{(fare / 100).toFixed(2)}</span>
             </div>
         </div>

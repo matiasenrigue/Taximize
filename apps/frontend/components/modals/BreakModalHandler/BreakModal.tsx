@@ -37,10 +37,9 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
         }
         safeOpenModal();
         setRemainingDuration(getRemainingBreakDuration());
-        const delay = 1000 * 10;
         const intervalId = setInterval(() => {
             setRemainingDuration(getRemainingBreakDuration());
-        }, delay);
+        }, 1000);
 
         return () => clearInterval(intervalId);
     }, [isPaused, getRemainingBreakDuration, safeCloseModal, safeOpenModal]);
@@ -55,7 +54,13 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
                 align={"stretch"}>
                 <FlexGroup direction={"row"}>
                     <FontAwesomeIcon icon={faClock}/>
-                    <span>{formatDuration(remainingDuration)}</span>
+                    <span>
+                        {formatDuration(remainingDuration, {
+                            hours: false,
+                            minutes: true,
+                            seconds: true
+                        })}
+                    </span>
                 </FlexGroup>
                 <FlexGroup
                     direction={"row"}

@@ -91,34 +91,31 @@ export const RideContextProvider = (props: PropsWithChildren) => {
                 estimatedFareCents,
             } = data;
 
-            console.log(data);
+            const startTime = moment.now(); // missing from backend
+            const startLocation = {lat: startLatitude, lng: startLongitude};
 
-            setIsOnRide(!!rideId);
+            setIsOnRide(true);
+            setRideStartTime(startTime);
             setDestination({
                 placeId: null,
                 name: "Unknown",
                 lat: currentDestinationLatitude,
                 lng: currentDestinationLongitude
             });
+            startTaximeter(startLocation, startTime);
         }).catch((error) => {
-            console.warn(error)
+            console.warn(error);
         });
     }, [loadRide]);
 
-    // set a new destination to navigate to (may not be a ride)
-    const updateDestination = useCallback((place: Place | null) => {
-        setRouteStatus("OK");
-        setDestination(place);
-        setIsRouteAvailable(false);
-
-        if (!place || !userLocation)
+    const evaluateRide = useCallback(() => {
+        if (!destination || !userLocation)
             return;
-
         api.post("/rides/evaluate-ride", {
             "startLatitude": userLocation.lat,
             "startLongitude": userLocation.lng,
-            "destinationLatitude": place.lat,
-            "destinationLongitude": place.lng
+            "destinationLatitude": destination.lat,
+            "destinationLongitude": destination.lng
         }).then((response) => {
             const {
                 success,
@@ -136,6 +133,15 @@ export const RideContextProvider = (props: PropsWithChildren) => {
         }).catch((error) => {
             console.warn(error)
         });
+    }, [destination, userLocation]);
+
+    useEffect(evaluateRide, [evaluateRide]);
+
+    // set a new destination to navigate to (may not be a ride)
+    const updateDestination = useCallback((place: Place | null) => {
+        setRouteStatus("OK");
+        setDestination(place);
+        setIsRouteAvailable(false);
     }, [userLocation]);
 
     // start a ride to the current destination
@@ -229,7 +235,7 @@ export const RideContextProvider = (props: PropsWithChildren) => {
         if (!isOnRide)
             return;
         updateDuration();
-        const intervalId = setInterval(updateDuration, 1000 * 10);
+        const intervalId = setInterval(updateDuration, 1000);
         return () => clearInterval(intervalId);
     }, [isOnRide, updateDuration]);
 
