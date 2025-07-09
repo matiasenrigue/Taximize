@@ -28,15 +28,18 @@ export const Modal = forwardRef<ModalHandle, ModalProps>((props: ModalProps, ref
     const dialogRef = useRef<HTMLDialogElement>(null!);
 
     const open = useCallback(() => {
-        dialogRef.current?.showModal();
+        if (!dialogRef || typeof dialogRef === "function")
+            return;
+        dialogRef.current.showModal();
     }, []);
 
     const close = useCallback(() => {
-        dialogRef.current?.close();
+        if (!dialogRef || typeof dialogRef === "function")
+            return;
+        dialogRef.current.close();
     }, []);
 
     useImperativeHandle(ref, () => ({
-        test: "hello world",
         open,
         close
     }));
