@@ -3,7 +3,7 @@
 import React, {createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef, useState} from "react";
 import moment from "moment";
 import {formatDuration} from "../../lib/formatDuration/formatDuration";
-import {BREAK_MODAL_TIMEOUT, DEFAULT_BREAK_DURATION} from "../../constants/constants";
+import {BREAK_MODAL_TIMEOUT, DEFAULT_BREAK_DURATION, DEFAULT_SHIFT_DURATION} from "../../constants/constants";
 import {ModalHandle} from "../../components/Modal/Modal";
 import {BreakModal} from "../../components/modals/BreakModalHandler/BreakModal";
 import api from "../../lib/axios";
@@ -42,7 +42,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [isPaused, setIsPaused] = useState<boolean>(false);
-    const [duration, setDuration] = useState<number>(0);
+    const [duration, setDuration] = useState<number>(DEFAULT_SHIFT_DURATION);
     const [startTime, setStartTime] = useState<number|null>(null);
 
     const [lastBreakTime, setLastBreakTime] = useState<number|null>(null);
@@ -56,104 +56,203 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     // initialize shift
     useEffect(() => {
-        api.get("/shifts/current")
-            .then((response) => {
-                const {
-                    isOnShift,
-                    shiftStart,
-                    isPaused,
-                    pauseStart,
-                    lastPauseEnd,
-                    isOnRide,
-                    rideStartLatitude,
-                    rideStartLongitude,
-                    rideDestinationAddress
-                } = response.data.data;
+        api.get("/shifts/current").then((response) => {
+            const {
+                success,
+                error,
+                data
+            } = response.data;
 
-                setIsLoaded(true);
+            if (!success) {
+                console.warn("Failed loading current shift.", error);
+                return;
+            }
 
-                if (!isOnShift) {
-                    router.push("/start-shift");
-                    return;
-                }
+            const {
+                isOnShift,
+                shiftStart,
+                isPaused,
+                pauseStart,
+                lastPauseEnd,
+                duration,
+                pauseDuration,
+                isOnRide,
+                rideStartLatitude,
+                rideStartLongitude,
+                rideDestinationAddress
+            } = data;
 
-                setIsShift(isOnShift);
-                setLoadRide(isOnRide);
-                setDuration(60 * 60 * 60 * 1000);
-                setStartTime(shiftStart);
-                setIsPaused(isPaused);
-                setLastBreakTime(isPaused ? pauseStart : (lastPauseEnd ?? shiftStart));
-                router.push("/map");
-            })
-            .catch((error) => console.warn(error));
+            setIsLoaded(true);
+
+            if (!isOnShift) {
+                router.push("/start-shift");
+                return;
+            }
+
+            setIsShift(isOnShift);
+            setLoadRide(isOnRide);
+            setDuration(duration);
+            setBreakDuration(pauseDuration);
+            setStartTime(shiftStart);
+            setIsPaused(isPaused);
+            setLastBreakTime(isPaused ? pauseStart : (lastPauseEnd ?? shiftStart));
+            router.push("/map");
+        }).catch((error) => {
+            console.warn(error);
+        });
     }, []);
 
-    const startShift = useCallback((duration: number) => {
-        if (duration === 0)
+    const startShift = useCallback((duration: number = DEFAULT_SHIFT_DURATION): void => {
+        if (isShift || duration <= 0)
             return;
-        setDuration(duration);
-        setStartTime(moment.now());
-        setLastBreakTime(moment.now());
-        setIsShift(true);
 
-        api.post("/shifts/start-shift", {})
-            .then((response) => console.log(response))
-            .catch((error) => console.warn(error));
-        router.push('/map');
-    }, []);
+        const timestamp = moment.now();
+
+        api.post("/shifts/start-shift", {
+            duration,
+            timestamp
+        }).then((response) => {
+            const {
+                success,
+                error
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed starting shift.", error);
+                return;
+            }
+
+            setDuration(duration);
+            setStartTime(timestamp);
+            setLastBreakTime(timestamp);
+            setIsShift(true);
+            router.push('/map');
+        }).catch((error) => {
+            console.warn(error);
+        });
+    }, [isShift]);
 
     const endShift = useCallback(() => {
         if (!isShift)
             return;
-        setIsShift(false);
-        api.post("/shifts/end-shift", {})
-            .then((response) => {
-                const {
-                    success,
-                    data
-                } = response.data;
 
-                if (!success)
-                    return;
+        const timestamp = moment.now();
+        api.post("/shifts/end-shift", {
+            timestamp
+        }).then((response) => {
+            const {
+                success,
+                error,
+                data
+            } = response.data;
 
-                const {
-                    totalDuration,
-                    workTime,
-                    breakTime,
-                    numBreaks,
-                    averageBreak,
-                    totalEarnings
-                } = data;
+            if (!success) {
+                console.warn("Failed ending shift.", error);
+                return;
+            }
 
-                setTotalDuration(totalDuration);
-                setTotalEarnings(totalEarnings);
+            const {
+                totalDuration,
+                passengerTime,
+                pauseTime,
+                idleTime,
+                numBreaks,
+                averageBreak,
+                totalEarnings
+            } = data;
 
-            })
-            .catch((error) => console.warn(error));
-        router.push('/end-shift');
+            setIsShift(false);
+            setTotalDuration(totalDuration);
+            setTotalEarnings(totalEarnings);
+            router.push('/end-shift');
+        }).catch((error) => {
+            console.warn(error);
+        });
     }, [isShift]);
 
     const pauseShift = useCallback((duration: number = DEFAULT_BREAK_DURATION) => {
-        setLastBreakTime(moment.now());
-        setBreakDuration(duration);
-        setIsPaused(true);
-        if (!breakModalRef || typeof breakModalRef === "function")
+        if (!isShift || isPaused)
             return;
-        breakModalRef.current.open();
-        api.post("/shifts/pause-shift", {})
-            .then((response) => console.log(response))
-            .catch((error) => console.warn(error));
-    }, []);
+
+        const timestamp = moment.now();
+        api.post("/shifts/pause-shift", {
+            timestamp,
+            pauseDuration: duration
+        }).then((response) => {
+            const {
+                success,
+                error
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed pausing shift.", error);
+                return;
+            }
+
+            setLastBreakTime(timestamp);
+            setBreakDuration(duration);
+            setIsPaused(true);
+            if (!breakModalRef || typeof breakModalRef === "function")
+                return;
+            breakModalRef.current.open();
+        }).catch((error) => {
+            console.warn(error);
+        });
+    }, [isShift, isPaused]);
 
     const continueShift = useCallback(() => {
-        const breakDuration = moment.now() - lastBreakTime;
-        setTotalBreakDuration(prev => prev + breakDuration);
-        setLastBreakTime(moment.now());
-        setIsPaused(false);
-        api.post("/shifts/continue-shift", {})
-            .then((response) => console.log(response))
-            .catch((error) => console.warn(error));
-    }, [lastBreakTime]);
+        if (!isShift || !isPaused)
+            return;
+
+        const timestamp = moment.now();
+
+        api.post("/shifts/continue-shift", {
+            timestamp
+        }).then((response) => {
+            const {
+                success,
+                error
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed continuing shift.", error);
+                return;
+            }
+
+            const breakDuration = timestamp - lastBreakTime;
+            setTotalBreakDuration(prev => prev + breakDuration);
+            setLastBreakTime(timestamp);
+            setIsPaused(false);
+        }).catch((error) => {
+            console.warn(error);
+        });
+    }, [isShift, isPaused, lastBreakTime]);
+
+    // skips the current break
+    const skipBreak = useCallback(() => {
+        if (!isShift)
+            return;
+
+        const timestamp = moment.now();
+
+        api.post("/shifts/skip-pause", {
+            timestamp
+        }).then((response) => {
+            const {
+                success,
+                error
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed continuing shift.", error);
+                return;
+            }
+
+            setLastBreakTime(moment.now());
+        }).catch((error) => {
+            console.warn(error);
+        });
+    }, [isShift]);
 
     // returns the remaining shift duration, formatted "h:mm"
     const getRemainingTime = useCallback((): string => {
@@ -168,14 +267,8 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
         return Math.max(0, breakDuration - passedTime)
     }, [lastBreakTime, breakDuration]);
 
-    // skips the current break
-    const skipBreak = useCallback(() => {
-        setLastBreakTime(moment.now());
-    }, []);
-
     // returns true, if it is time for a break
     const checkBreakTime = useCallback((): boolean => {
-
         if (!isLoaded || !isShift || isPaused)
             return false;
         const time = moment.now() - lastBreakTime;

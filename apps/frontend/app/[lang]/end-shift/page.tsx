@@ -18,7 +18,7 @@ export default function EndShift() {
             <FlexGroup
                 direction={"column"}
                 align={"start"}>
-                <p>Total Earnings: ${(totalEarnings).toFixed(2)}</p>
+                <p>Total Earnings: ${(totalEarnings / 100).toFixed(2)}</p>
                 <p>Total Duration: {formatDuration(totalDuration)}</p>
                 <Button
                     onClick={() => router.push("/start-shift")}>

@@ -15,6 +15,7 @@ import api from "../../lib/axios";
 import {useUserLocationContext} from "../UserLocationContext/UserLocationContext";
 import {useTaximeter} from "../../hooks/useTaximeter";
 import {useShift} from "../ShiftContext/ShiftContext";
+import {GoogleMapsRouteStatus} from "../../constants/types";
 
 interface Place {
     placeId: string | null;
@@ -28,13 +29,15 @@ interface RideContextType {
     destination: Place | null;
     updateDestination: (place: Place | null) => void;
     startRide: () => void;
-    endRide: () => void;
+    endRide: (fare: number) => void;
     rating: number;
     fare: number;
     distance: number;
     duration: number;
     isRouteAvailable: boolean;
     setIsRouteAvailable: Dispatch<SetStateAction<boolean>>;
+    routeStatus: GoogleMapsRouteStatus;
+    setRouteStatus: Dispatch<SetStateAction<GoogleMapsRouteStatus>>;
 }
 
 const RideContext = createContext<RideContextType|null>(null);
@@ -54,87 +57,165 @@ export const RideContextProvider = (props: PropsWithChildren) => {
     const [isOnRide, setIsOnRide] = useState(false);
     const [destination, setDestination] = useState<Place|null>(null);
     const [rideStartTime, setRideStartTime] = useState<number|null>(null);
-    const [isRouteAvailable, setIsRouteAvailable] = useState<boolean>(false);
     const [rating, setRating] = useState<number>(3);
     const [duration, setDuration] = useState<number>(0);
+
+    // routing
+    const [isRouteAvailable, setIsRouteAvailable] = useState<boolean>(false);
+    const [routeStatus, setRouteStatus] = useState<GoogleMapsRouteStatus>("OK");
 
     // initialize shift
     useEffect(() => {
         if (!loadRide)
             return;
-        api.get("/rides/current")
-            .then((response) => {
-                const {
-                    current_destination_latitude,
-                    current_destination_longitude,
-                } = response.data.data;
+        api.get("/rides/current").then((response) => {
+            const {
+                success,
+                error,
+                data
+            } = response.data;
 
-                setDestination({
-                    placeId: null,
-                    name: "Unknown",
-                    lat: current_destination_latitude,
-                    lng: current_destination_longitude
-                });
-            })
-            .catch((error) => console.warn(error));
+            if (!success) {
+                console.warn("Failed getting current ride.", error);
+                return;
+            }
+
+            const {
+                rideId,
+                startLatitude,
+                startLongitude,
+                currentDestinationLatitude,
+                currentDestinationLongitude,
+                elapsedTimeMs,
+                distanceKm,
+                estimatedFareCents,
+            } = data;
+
+            console.log(data);
+
+            setIsOnRide(!!rideId);
+            setDestination({
+                placeId: null,
+                name: "Unknown",
+                lat: currentDestinationLatitude,
+                lng: currentDestinationLongitude
+            });
+        }).catch((error) => {
+            console.warn(error)
+        });
     }, [loadRide]);
 
     // set a new destination to navigate to (may not be a ride)
     const updateDestination = useCallback((place: Place | null) => {
+        setRouteStatus("OK");
         setDestination(place);
         setIsRouteAvailable(false);
+
         if (!place || !userLocation)
             return;
+
         api.post("/rides/evaluate-ride", {
-            "start_latitude": userLocation.lat,
-            "start_longitude": userLocation.lng,
-            "destination_latitude": place.lat,
-            "destination_longitude": place.lng
-        })
-            .then((response) => {
-                const {success, rating, error} = response.data;
-                if (!success) {
-                    console.warn(error);
-                    return;
-                }
-                const clampedRating = Math.max(1, Math.min(5, rating));
-                setRating(clampedRating);
-            })
-            .catch((error) => {
-                console.warn(error)
-            });
+            "startLatitude": userLocation.lat,
+            "startLongitude": userLocation.lng,
+            "destinationLatitude": place.lat,
+            "destinationLongitude": place.lng
+        }).then((response) => {
+            const {
+                success,
+                error,
+                rating
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed evaluating ride.", error);
+                return;
+            }
+
+            const clampedRating = Math.max(1, Math.min(5, rating));
+            setRating(clampedRating);
+        }).catch((error) => {
+            console.warn(error)
+        });
     }, [userLocation]);
 
     // start a ride to the current destination
     const startRide = useCallback(() => {
         if (isOnRide || !destination || !userLocation)
             return;
-        setIsOnRide(true);
-        setRideStartTime(moment.now());
-        startTaximeter();
+
+        const timestamp = moment.now();
+
         api.post("/rides/start-ride", {
-            "start_latitude": userLocation.lat,
-            "start_longitude": userLocation.lng,
-            "destination_latitude": destination.lat,
-            "destination_longitude": destination.lng
-        })
-            .then((response) => console.log(response))
-            .catch((error) => console.warn(error));
-    }, [startTaximeter, destination, userLocation]);
+            timestamp,
+            "startLatitude": userLocation.lat,
+            "startLongitude": userLocation.lng,
+            "destinationLatitude": destination.lat,
+            "destinationLongitude": destination.lng
+        }).then((response) => {
+            const {
+                success,
+                error,
+                data
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed starting ride.", error);
+                return;
+            }
+
+            const {
+                rideId,
+                startTime,
+                predicted_score
+            } = data;
+
+            setIsOnRide(true);
+            setRideStartTime(timestamp);
+            startTaximeter();
+        }).catch((error) => {
+            console.warn(error)
+        });
+    }, [startTaximeter, destination, userLocation, isOnRide]);
 
     // end the current ride
-    const endRide = useCallback(() => {
-        setIsOnRide(false);
-        setRideStartTime(null);
-        setDestination(null);
-        stopTaximeter();
+    const endRide = useCallback((editedFare: number = fare) => {
+        if (!isOnRide)
+            return;
+
+        const timestamp = moment.now();
+
         api.post("/rides/end-ride", {
-            "fare_cents": fare,
-            "actual_distance_km": distance / 1000,
-        })
-            .then((response) => console.log(response))
-            .catch((error) => console.warn(error));
-    }, [stopTaximeter, fare, distance]);
+            timestamp,
+            fareCents: editedFare,
+            actualDistanceKm: distance / 1000,
+        }).then((response) => {
+            const {
+                success,
+                error,
+                data
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed ending ride.", error);
+                return;
+            }
+
+            const {
+                rideId,
+                total_time_ms,
+                distance_km,
+                earning_cents,
+                earning_per_min
+            } = data;
+
+            setIsOnRide(false);
+            setRideStartTime(null);
+            setDestination(null);
+            stopTaximeter();
+        }).catch((error) => {
+            console.warn(error)
+        });
+    }, [stopTaximeter, fare, distance, isOnRide]);
 
     const updateDuration = useCallback(() => {
         if (!rideStartTime)
@@ -164,7 +245,9 @@ export const RideContextProvider = (props: PropsWithChildren) => {
             distance,
             duration,
             isRouteAvailable,
-            setIsRouteAvailable
+            setIsRouteAvailable,
+            routeStatus,
+            setRouteStatus
         }}>
             {children}
         </RideContext.Provider>
