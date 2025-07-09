@@ -152,4 +152,38 @@ All wrapped with `express-async-handler` to catch errors and forward to `errorMi
   * **401** if missing cookie
   * **403** if token invalid
 
+---
+
+## API: User Routes
+
+All routes are mounted under **`/api/users`** and require authentication via JWT token.
+
+| Route         | HTTP Method | Middleware  | Controller    | Description                          |
+| ------------- | ----------- | ----------- | ------------- | ------------------------------------ |
+| `/me/stats`   | GET         | protect     | `getMyStats`  | Get user statistics (total rides)    |
+
+### Request / Response Details
+
+#### **GET** `/api/users/me/stats`
+
+* **Headers**:
+  ```
+  Authorization: Bearer <access_token>
+  ```
+* **Behavior**:
+  1. Authenticate user via JWT token
+  2. Count total non-deleted rides for the authenticated user
+  3. Return statistics object
+* **Responses**:
+  * **200 OK**
+    ```json
+    {
+      "success": true,
+      "data": {
+        "totalRides": 42
+      }
+    }
+    ```
+  * **401 Unauthorized** (missing or invalid token)
+
 
