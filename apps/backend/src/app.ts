@@ -11,6 +11,7 @@ import authRoutes from './entities/auth/auth.routes';
 import rideRoutes from './entities/rides/ride.routes';
 import shiftRoutes from './entities/shifts/shift.routes';
 import userRoutes from './entities/users/user.routes';
+import hostpotsRoutes from './entities/hotspots/hotspots.routes';
 import { errorHandler } from './shared/middleware/error.middleware';
 
 const app = express();
@@ -51,6 +52,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/rides', rideRoutes);
 app.use('/api/shifts', shiftRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/hotspots', hostpotsRoutes);
 
 app.use(errorHandler);
 
