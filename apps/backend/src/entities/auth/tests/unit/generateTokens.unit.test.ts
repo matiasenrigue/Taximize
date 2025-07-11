@@ -5,10 +5,12 @@ import { generateAccessToken, generateRefreshToken } from '../../utils/generateT
 process.env.ACCESS_TOKEN_SECRET = 'test-access-token-secret';
 process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
 
+
 describe('Token Generators Unit Tests', () => {
 
     describe('generateAccessToken', () => {
         const testUserId = 'test-user-id-123';
+
 
         it('should generate a valid JWT token', () => {
             const token = generateAccessToken(testUserId);
@@ -18,12 +20,14 @@ describe('Token Generators Unit Tests', () => {
             expect(token.split('.')).toHaveLength(3); // JWT has 3 parts separated by dots
         });
 
+
         it('should contain the correct user ID in payload', () => {
             const token = generateAccessToken(testUserId);
             
             const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
             expect(decoded.id).toBe(testUserId);
         });
+
 
         it('should be signed with ACCESS_TOKEN_SECRET', () => {
             const token = generateAccessToken(testUserId);
@@ -39,6 +43,7 @@ describe('Token Generators Unit Tests', () => {
             }).toThrow();
         });
 
+
         it('should expire in approximately 15 minutes', () => {
             const token = generateAccessToken(testUserId);
             
@@ -51,6 +56,7 @@ describe('Token Generators Unit Tests', () => {
             expect(decoded.exp).toBeLessThanOrEqual(expectedExpiry + 5);
         });
 
+
         it('should have issued at timestamp', () => {
             const token = generateAccessToken(testUserId);
             
@@ -61,6 +67,7 @@ describe('Token Generators Unit Tests', () => {
             expect(decoded.iat).toBeGreaterThanOrEqual(now - 5);
             expect(decoded.iat).toBeLessThanOrEqual(now + 5);
         });
+
 
         it('should generate different tokens for different user IDs', () => {
             const token1 = generateAccessToken('user-1');
@@ -75,6 +82,7 @@ describe('Token Generators Unit Tests', () => {
             expect(decoded2.id).toBe('user-2');
         });
 
+
         it('should generate different tokens for same user ID at different times', () => {
             const token1 = generateAccessToken(testUserId);
             
@@ -86,8 +94,10 @@ describe('Token Generators Unit Tests', () => {
         });
     });
 
+
     describe('generateRefreshToken', () => {
         const testUserId = 'test-user-id-456';
+
 
         it('should generate a valid JWT token', () => {
             const token = generateRefreshToken(testUserId);
@@ -97,12 +107,14 @@ describe('Token Generators Unit Tests', () => {
             expect(token.split('.')).toHaveLength(3); // JWT has 3 parts separated by dots
         });
 
+
         it('should contain the correct user ID in payload', () => {
             const token = generateRefreshToken(testUserId);
             
             const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET!) as any;
             expect(decoded.id).toBe(testUserId);
         });
+
 
         it('should be signed with REFRESH_TOKEN_SECRET', () => {
             const token = generateRefreshToken(testUserId);
@@ -123,6 +135,7 @@ describe('Token Generators Unit Tests', () => {
             }).toThrow();
         });
 
+
         it('should expire in approximately 7 days', () => {
             const token = generateRefreshToken(testUserId);
             
@@ -135,6 +148,7 @@ describe('Token Generators Unit Tests', () => {
             expect(decoded.exp).toBeLessThanOrEqual(expectedExpiry + 5);
         });
 
+
         it('should have issued at timestamp', () => {
             const token = generateRefreshToken(testUserId);
             
@@ -145,6 +159,7 @@ describe('Token Generators Unit Tests', () => {
             expect(decoded.iat).toBeGreaterThanOrEqual(now - 5);
             expect(decoded.iat).toBeLessThanOrEqual(now + 5);
         });
+
 
         it('should generate different tokens for different user IDs', () => {
             const token1 = generateRefreshToken('user-1');
@@ -160,8 +175,10 @@ describe('Token Generators Unit Tests', () => {
         });
     });
 
+
     describe('Token Differences', () => {
         const testUserId = 'test-user-comparison';
+
 
         it('should generate different tokens between access and refresh for same user', () => {
             const accessToken = generateAccessToken(testUserId);
@@ -169,6 +186,7 @@ describe('Token Generators Unit Tests', () => {
             
             expect(accessToken).not.toBe(refreshToken);
         });
+
 
         it('should have different expiry times between access and refresh tokens', () => {
             const accessToken = generateAccessToken(testUserId);
@@ -188,6 +206,7 @@ describe('Token Generators Unit Tests', () => {
             expect(actualDifference).toBeGreaterThanOrEqual(expectedDifference - 10);
             expect(actualDifference).toBeLessThanOrEqual(expectedDifference + 10);
         });
+
 
         it('should use different secrets for access and refresh tokens', () => {
             const accessToken = generateAccessToken(testUserId);

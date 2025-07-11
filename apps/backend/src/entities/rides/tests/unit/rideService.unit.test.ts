@@ -11,6 +11,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('RideService Unit Tests', () => {
 
     describe('hasActiveRide', () => {
@@ -24,6 +25,7 @@ describe('RideService Unit Tests', () => {
             expect(typeof result).toBe('boolean');
         });
 
+
         it('should return false when the driver has no active ride', async () => {
             // Test that hasActiveRide returns false when the driver has no active ride
             const driverId = 'test-driver-2';
@@ -31,6 +33,7 @@ describe('RideService Unit Tests', () => {
             expect(typeof result).toBe('boolean');
         });
     });
+
 
     describe('canStartRide', () => {
         
@@ -43,6 +46,7 @@ describe('RideService Unit Tests', () => {
             expect(typeof result.canStart).toBe('boolean');
         });
 
+
         it('should return false when driver has no active shift', async () => {
             // Test that canStartRide returns false when driver has no active shift
             const driverId = 'test-driver-2';
@@ -53,6 +57,7 @@ describe('RideService Unit Tests', () => {
             expect(result.reason).toContain('No active shift found');
         });
 
+
         it('should return false when driver already has active ride', async () => {
             // Test that canStartRide returns false when driver already has active ride
             const driverId = 'test-driver-3';
@@ -61,6 +66,7 @@ describe('RideService Unit Tests', () => {
             expect(result).toHaveProperty('canStart');
             expect(result.canStart).toBe(false);
         });
+
 
         it('should return false when driver is on pause', async () => {
             // Test that canStartRide returns false when driver is on pause
@@ -71,6 +77,7 @@ describe('RideService Unit Tests', () => {
             expect(result.canStart).toBe(false);
         });
     });
+
 
     describe('evaluateRide', () => {
         it('should return a valid score when given valid coordinates', async () => {
@@ -86,6 +93,7 @@ describe('RideService Unit Tests', () => {
             expect(result).toBeLessThanOrEqual(5);
         });
 
+
         it('should return a score in valid range (1-5)', async () => {
             // Test that evaluateRide returns a score in valid range (1-5)
             const startLat = 53.349805;
@@ -99,6 +107,7 @@ describe('RideService Unit Tests', () => {
             expect(Number.isInteger(result)).toBe(true);
         });
     });
+
 
     describe('startRide', () => {
         it('should throw BadRequest when invalid latitude/longitude provided', async () => {
@@ -117,6 +126,7 @@ describe('RideService Unit Tests', () => {
                 .rejects.toThrow('Invalid latitude provided');
         });
 
+
         it('should throw BadRequest when invalid longitude provided', async () => {
             // Test that startRide throws BadRequest on invalid longitude
             const driverId = 'test-driver-1';
@@ -133,6 +143,7 @@ describe('RideService Unit Tests', () => {
                 .rejects.toThrow('Invalid longitude provided');
         });
 
+
         it('should throw error when driver cannot start ride', async () => {
             // Test that startRide throws error when driver cannot start ride
             const driverId = 'test-driver-2';
@@ -148,6 +159,7 @@ describe('RideService Unit Tests', () => {
             await expect(RideService.startRide(driverId, shiftId, coords))
                 .rejects.toThrow();
         });
+
 
         it('should successfully start a ride when all conditions are met', async () => {
             // Test that startRide successfully starts a ride when all conditions are met
@@ -172,6 +184,7 @@ describe('RideService Unit Tests', () => {
             }
         });
 
+
         it('should violate unique constraint when inserting second active ride for same shift', async () => {
             // Test that inserting a second ride for the same shift_id with end_time IS NULL violates the one_active_ride_per_shift unique constraint
             const driverId = 'test-driver-1';
@@ -194,6 +207,7 @@ describe('RideService Unit Tests', () => {
         });
     });
 
+
     describe('endRide', () => {
         it('should throw error when ride is not found', async () => {
             // Test that endRide throws error when ride is not found
@@ -204,6 +218,7 @@ describe('RideService Unit Tests', () => {
             await expect(RideService.endRide(rideId, fareCents, actualDistanceKm))
                 .rejects.toThrow('Ride not found');
         });
+
 
         it('should successfully end a ride with correct calculations', async () => {
             // Test that endRide successfully ends a ride with correct calculations
@@ -220,6 +235,7 @@ describe('RideService Unit Tests', () => {
             }
         });
 
+
         it('should throw error when ride is already ended', async () => {
             // Test that endRide throws error when ride is already ended
             const rideId = 'test-ride-ended';
@@ -235,6 +251,7 @@ describe('RideService Unit Tests', () => {
         });
     });
 
+
     describe('getRideStatus', () => {
         it('should return current ride status when driver has active ride', async () => {
             // Test that getRideStatus returns current ride status when driver has active ride
@@ -249,6 +266,7 @@ describe('RideService Unit Tests', () => {
             }
         });
 
+
         it('should throw when driver has no active shift', async () => {
             // Test that getRideStatus throws when driver has no active shift
             const driverId = 'test-driver-2';
@@ -261,6 +279,7 @@ describe('RideService Unit Tests', () => {
                 expect(error).toBeDefined();
             }
         });
+
 
         it('should use override destination when provided', async () => {
             // Test that getRideStatus uses override destination when provided
@@ -277,6 +296,7 @@ describe('RideService Unit Tests', () => {
         });
     });
 
+
     describe('manageExpiredRides', () => {
         it('should end expired rides that have exceeded time limit', async () => {
             // Test that manageExpiredRides ends expired rides that have exceeded time limit
@@ -284,10 +304,12 @@ describe('RideService Unit Tests', () => {
             await expect(RideService.manageExpiredRides()).resolves.not.toThrow();
         });
 
+
         it('should not alter any active ride that began less than 4 hours ago', async () => {
             // Test that manageExpiredRides does not alter any active ride that began less than 4 hours ago
             await expect(RideService.manageExpiredRides()).resolves.not.toThrow();
         });
+
 
         it('should close rides older than 4 hours by setting duration 0', async () => {
             // Test that manageExpiredRides closes rides older than 4 hours by setting duration 0

@@ -36,6 +36,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Auth Controller Unit Tests', () => {
 
     describe('signup', () => {
@@ -62,6 +63,7 @@ describe('Auth Controller Unit Tests', () => {
             });
         });
 
+
         it('should throw error when missing email', async () => {
             const req = {
                 body: {
@@ -79,6 +81,7 @@ describe('Auth Controller Unit Tests', () => {
 
             expect(res.status).toHaveBeenCalledWith(400);
         });
+
 
         it('should throw error when missing username', async () => {
             const req = {
@@ -98,6 +101,7 @@ describe('Auth Controller Unit Tests', () => {
             expect(res.status).toHaveBeenCalledWith(400);
         });
 
+
         it('should throw error when missing password', async () => {
             const req = {
                 body: {
@@ -115,6 +119,7 @@ describe('Auth Controller Unit Tests', () => {
 
             expect(res.status).toHaveBeenCalledWith(400);
         });
+
 
         it('should throw error when email is invalid', async () => {
             const req = {
@@ -135,6 +140,7 @@ describe('Auth Controller Unit Tests', () => {
             expect(res.status).toHaveBeenCalledWith(400);
         });
 
+
         it('should throw error when password is too short', async () => {
             const req = {
                 body: {
@@ -153,6 +159,7 @@ describe('Auth Controller Unit Tests', () => {
 
             expect(res.status).toHaveBeenCalledWith(400);
         });
+
 
         it('should return 400 error when user already exists', async () => {
             // Create user first
@@ -180,6 +187,7 @@ describe('Auth Controller Unit Tests', () => {
             });
         });
 
+
         it('should hash password before saving', async () => {
             const req = {
                 body: {
@@ -197,6 +205,7 @@ describe('Auth Controller Unit Tests', () => {
             expect(user!.password).not.toBe('password123'); // Should be hashed
             expect(user!.password.length).toBeGreaterThan(50); // Hashed passwords are longer
         });
+
 
         it('should create user with correct data', async () => {
             const req = {
@@ -221,6 +230,7 @@ describe('Auth Controller Unit Tests', () => {
         });
     });
 
+
     describe('signin', () => {
         let testUser: User;
 
@@ -231,6 +241,7 @@ describe('Auth Controller Unit Tests', () => {
                 password: 'password123'
             });
         });
+
 
         it('should sign in user and return token when valid credentials provided', async () => {
             const req = {
@@ -264,6 +275,7 @@ describe('Auth Controller Unit Tests', () => {
             );
         });
 
+
         it('should return 400 error when user does not exist', async () => {
             const req = {
                 body: {
@@ -281,6 +293,7 @@ describe('Auth Controller Unit Tests', () => {
                 error: 'Invalid email or password'
             });
         });
+
 
         it('should return 400 error when password is incorrect', async () => {
             const req = {
@@ -300,6 +313,7 @@ describe('Auth Controller Unit Tests', () => {
             });
         });
 
+
         it('should throw error when missing email', async () => {
             const req = {
                 body: {
@@ -317,6 +331,7 @@ describe('Auth Controller Unit Tests', () => {
             expect(res.status).toHaveBeenCalledWith(400);
         });
 
+
         it('should throw error when missing password', async () => {
             const req = {
                 body: {
@@ -333,6 +348,7 @@ describe('Auth Controller Unit Tests', () => {
 
             expect(res.status).toHaveBeenCalledWith(400);
         });
+
 
         it('should generate valid access token on signin', async () => {
             const req = {
@@ -356,6 +372,7 @@ describe('Auth Controller Unit Tests', () => {
         });
     });
 
+
     describe('refresh', () => {
         let testUser: User;
         let validRefreshToken: string;
@@ -368,6 +385,7 @@ describe('Auth Controller Unit Tests', () => {
             });
             validRefreshToken = generateRefreshToken(testUser.id);
         });
+
 
         it('should generate new access token when valid refresh token provided', async () => {
             const req = {
@@ -387,6 +405,7 @@ describe('Auth Controller Unit Tests', () => {
             });
         });
 
+
         it('should return 401 error when no refresh token provided', async () => {
             const req = {
                 cookies: {}
@@ -401,6 +420,7 @@ describe('Auth Controller Unit Tests', () => {
                 error: 'No refresh token'
             });
         });
+
 
         it('should return 403 error when refresh token is invalid', async () => {
             const req = {
@@ -418,6 +438,7 @@ describe('Auth Controller Unit Tests', () => {
                 error: 'Invalid refresh token'
             });
         });
+
 
         it('should return 403 error when refresh token is signed with wrong secret', async () => {
             const invalidToken = jwt.sign({ id: testUser.id }, 'wrong-secret', { expiresIn: '7d' });
@@ -437,6 +458,7 @@ describe('Auth Controller Unit Tests', () => {
                 error: 'Invalid refresh token'
             });
         });
+
 
         it('should return 200 when user ID in refresh token does not exist', async () => {
             const nonExistentUserId = 'non-existent-user-id';

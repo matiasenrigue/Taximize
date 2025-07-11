@@ -31,6 +31,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('HotspotsController Unit Tests', () => {
     describe('getHotspots', () => {
         it('should return hotspots data when service returns data successfully', async () => {
@@ -57,6 +58,7 @@ describe('HotspotsController Unit Tests', () => {
             });
         });
 
+
         it('should return 500 error when service throws an error', async () => {
             const req = {} as Request;
             const res = mockResponse();
@@ -76,6 +78,7 @@ describe('HotspotsController Unit Tests', () => {
             });
         });
 
+
         it('should handle non-Error objects thrown by service', async () => {
             const req = {} as Request;
             const res = mockResponse();
@@ -93,6 +96,7 @@ describe('HotspotsController Unit Tests', () => {
             });
         });
 
+
         it('should call HotspotsService.getHotspotsData exactly once', async () => {
             const req = {} as Request;
             const res = mockResponse();
@@ -104,6 +108,7 @@ describe('HotspotsController Unit Tests', () => {
             expect(HotspotsService.getHotspotsData).toHaveBeenCalledTimes(1);
             expect(HotspotsService.getHotspotsData).toHaveBeenCalledWith();
         });
+
 
         it('should return empty data object when service returns empty data', async () => {
             const req = {} as Request;
@@ -119,6 +124,7 @@ describe('HotspotsController Unit Tests', () => {
                 data: {},
             });
         });
+
 
         it('should return null data when service returns null', async () => {
             const req = {} as Request;

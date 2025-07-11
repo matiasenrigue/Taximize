@@ -25,6 +25,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Ride Database Constraints Tests', () => {
 
     describe('Foreign Key Constraints', () => {
@@ -49,6 +50,7 @@ describe('Ride Database Constraints Tests', () => {
                 end_time: null
             })).rejects.toThrow(ForeignKeyConstraintError);
         });
+
 
         it('should enforce foreign key constraint on driver_id', async () => {
             const user = await User.create({
@@ -82,6 +84,8 @@ describe('Ride Database Constraints Tests', () => {
 
         // SQLite doesn't enforce foreign key constraints with soft deletes (paranoid mode)
         // This test would pass in PostgreSQL but fails in SQLite test environment
+
+
         it.skip('should prevent shift deletion while rides reference it', async () => {
             const user = await User.create({
                 email: 'driver@test.com',
@@ -114,6 +118,7 @@ describe('Ride Database Constraints Tests', () => {
             await expect(shift.destroy()).rejects.toThrow(ForeignKeyConstraintError);
         });
     });
+
 
     describe('Unique Constraints', () => {
         it('should enforce one_active_ride_per_shift unique constraint', async () => {
@@ -159,6 +164,7 @@ describe('Ride Database Constraints Tests', () => {
                 end_time: null // Active ride - should violate constraint
             })).rejects.toThrow();
         });
+
 
         it('should allow multiple ended rides for same shift', async () => {
             const user = await User.create({
@@ -210,6 +216,7 @@ describe('Ride Database Constraints Tests', () => {
             expect(secondRide.id).toBeDefined();
             expect(secondRide.shift_id).toBe(shift.id);
         });
+
 
         it('should allow new active ride after ending previous one', async () => {
             const user = await User.create({
@@ -266,9 +273,12 @@ describe('Ride Database Constraints Tests', () => {
         });
     });
 
+
     describe('Check Constraints', () => {
         // SQLite doesn't enforce check constraints
         // The application validates these bounds in RideService.validateCoordinates()
+
+
         it.skip('should enforce latitude bounds (-90 to 90)', async () => {
             const user = await User.create({
                 email: 'driver@test.com',
@@ -313,6 +323,8 @@ describe('Ride Database Constraints Tests', () => {
 
         // SQLite doesn't enforce check constraints
         // The application validates these bounds in RideService.validateCoordinates()
+
+
         it.skip('should enforce longitude bounds (-180 to 180)', async () => {
             const user = await User.create({
                 email: 'driver@test.com',
@@ -357,6 +369,8 @@ describe('Ride Database Constraints Tests', () => {
 
         // SQLite doesn't enforce check constraints
         // The application ensures valid scores via MlStub.getRandomScore()
+
+
         it.skip('should enforce predicted_score bounds (1 to 5)', async () => {
             const user = await User.create({
                 email: 'driver@test.com',
@@ -399,6 +413,7 @@ describe('Ride Database Constraints Tests', () => {
             })).rejects.toThrow();
         });
     });
+
 
     describe('NOT NULL Constraints', () => {
         it('should enforce NOT NULL constraints on required fields', async () => {
@@ -454,6 +469,7 @@ describe('Ride Database Constraints Tests', () => {
         });
     });
 
+
     describe('Data Type Constraints', () => {
         it('should enforce UUID format for shift_id and driver_id', async () => {
             const user = await User.create({
@@ -496,6 +512,7 @@ describe('Ride Database Constraints Tests', () => {
                 end_time: null
             })).rejects.toThrow();
         });
+
 
         it('should enforce numeric constraints for coordinates and scores', async () => {
             const user = await User.create({

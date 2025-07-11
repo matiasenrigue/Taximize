@@ -1,5 +1,6 @@
 import { RideCalculator } from '../../utils/rideCalculator';
 
+
 describe('RideCalculator Unit Tests', () => {
     describe('computeDistanceKm', () => {
         it('should return 0 when computing distance between two identical coordinates', () => {
@@ -10,6 +11,7 @@ describe('RideCalculator Unit Tests', () => {
             const result = RideCalculator.computeDistanceKm(lat, lng, lat, lng);
             expect(result).toBe(0);
         });
+
 
         it('should return the expected haversine result between known points', () => {
             // Test that when computing distance between known points, computeDistanceKm returns the expected haversine result
@@ -25,12 +27,14 @@ describe('RideCalculator Unit Tests', () => {
         });
     });
 
+
     describe('computeFare', () => {
         it('should return 0 when passing zero time and distance', () => {
             // Test that when passing zero time and distance to computeFare, it returns 0
             const result = RideCalculator.computeFare(0, 0);
             expect(result).toBe(0);
         });
+
 
         it('should apply the correct formula when passing positive elapsedMs and distanceKm', () => {
             // Test that when passing positive elapsedMs and distanceKm to computeFare, it applies the correct formula

@@ -53,6 +53,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Ride Workflow Integration Tests', () => {
 
     describe('Complete Ride Lifecycle', () => {
@@ -107,6 +108,7 @@ describe('Ride Workflow Integration Tests', () => {
             expect(finalRide!.earning_cents).toBe(1500);
         });
 
+
         it('should handle multiple sequential rides on same shift', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -158,6 +160,7 @@ describe('Ride Workflow Integration Tests', () => {
             expect(rides[1].shift_id).toBe(shift.id);
         });
 
+
         it('should handle ride with override destination in status check', async () => {
             const { user, token } = await createAuthenticatedUser();
             await createActiveShift(user.id);
@@ -184,6 +187,7 @@ describe('Ride Workflow Integration Tests', () => {
             expect(statusRes.body.data.currentDestinationLongitude).toBe(-6.270310);
         });
     });
+
 
     describe('Multiple Shifts and Rides', () => {
         it('should handle rides across different shifts', async () => {
@@ -242,6 +246,7 @@ describe('Ride Workflow Integration Tests', () => {
         });
     });
 
+
     describe('Error Recovery Scenarios', () => {
         it('should prevent second ride start while first is active', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -276,6 +281,7 @@ describe('Ride Workflow Integration Tests', () => {
             expect(ride2Res.status).toBe(400);
             expect(ride2Res.body.error).toContain('Another ride is already in progress. Please end the current ride first.');
         });
+
 
         it('should handle ride start immediately after ending previous ride', async () => {
             const { user, token } = await createAuthenticatedUser();

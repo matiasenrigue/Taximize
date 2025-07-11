@@ -106,6 +106,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Edit Shift Operations', () => {
     describe('Active Shift Restrictions', () => {
         it('Tests-ED-30-Cannot-edit-active-shift', async () => {
@@ -122,6 +123,7 @@ describe('Edit Shift Operations', () => {
             expect(response.status).toBe(400);
             expect(response.body.error).toContain('Cannot edit active shift');
         });
+
 
         it('Tests-ED-31-Must-end-shift-before-editing', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -144,6 +146,7 @@ describe('Edit Shift Operations', () => {
         });
     });
 
+
     describe('Temporal Boundaries', () => {
         it('Tests-ED-32-Shift-cannot-exceed-24-hours', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -161,6 +164,7 @@ describe('Edit Shift Operations', () => {
             expect(response.body.error).toContain('Shift cannot exceed 24 hours');
         });
 
+
         it('Tests-ED-33-Shift-start-must-be-before-end', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createCompletedShift(user.id);
@@ -177,6 +181,7 @@ describe('Edit Shift Operations', () => {
             expect(response.body.error).toContain('Shift start must be before shift end');
         });
     });
+
 
     describe('Consistency with Rides', () => {
         it('Tests-ED-34-Shift-must-encompass-all-rides', async () => {
@@ -198,6 +203,7 @@ describe('Edit Shift Operations', () => {
             expect(response.body.error).toContain('Shift must encompass all rides');
         });
 
+
         it('Tests-ED-35-Cannot-edit-shift-times-invalidating-rides', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createCompletedShift(user.id);
@@ -218,6 +224,7 @@ describe('Edit Shift Operations', () => {
             expect(response.body.error).toContain('Shift must encompass all rides');
         });
 
+
         it('Tests-ED-36-Auto-recalculates-shift-statistics', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createCompletedShift(user.id);
@@ -236,6 +243,7 @@ describe('Edit Shift Operations', () => {
             expect(response.body.work_time_ms).toBeLessThan(shift.work_time_ms || 0);
         });
     });
+
 
     describe('Break Time Validation', () => {
         it('Tests-ED-37-Break-times-must-be-within-shift', async () => {
@@ -263,6 +271,7 @@ describe('Edit Shift Operations', () => {
         });
     });
 
+
     describe('Allowed Edit Fields', () => {
         it('Tests-ED-38-Can-edit-shift-start-time', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -280,6 +289,7 @@ describe('Edit Shift Operations', () => {
             expect(new Date(response.body.shift_start)).toEqual(newStartTime);
         });
 
+
         it('Tests-ED-39-Can-edit-shift-end-time', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createCompletedShift(user.id);
@@ -296,6 +306,7 @@ describe('Edit Shift Operations', () => {
             expect(new Date(response.body.shift_end)).toEqual(newEndTime);
         });
     });
+
 
     describe('Auto-Recalculated Fields', () => {
         it('Tests-ED-40-Recalculates-total-duration', async () => {
@@ -315,6 +326,7 @@ describe('Edit Shift Operations', () => {
             expect(response.status).toBe(200);
             expect(response.body.total_duration_ms).toBe(originalDuration + 3600000);
         });
+
 
         it('Tests-ED-41-Recalculates-work-time', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -340,6 +352,7 @@ describe('Edit Shift Operations', () => {
             expect(response.body.break_time_ms).toBeGreaterThan(0);
         });
 
+
         it('Tests-ED-42-Recalculates-break-statistics', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createCompletedShift(user.id);
@@ -356,6 +369,7 @@ describe('Edit Shift Operations', () => {
             expect(response.body.avg_break_ms).toBeDefined();
         });
     });
+
 
     describe('Authorization', () => {
         it('Tests-ED-43-Cannot-edit-other-driver-shift', async () => {
@@ -374,6 +388,7 @@ describe('Edit Shift Operations', () => {
             expect(response.status).toBe(403);
             expect(response.body.error).toContain('Not authorized');
         });
+
 
         it('Tests-ED-44-Driver-can-edit-own-shift', async () => {
             const { user, token } = await createAuthenticatedUser();

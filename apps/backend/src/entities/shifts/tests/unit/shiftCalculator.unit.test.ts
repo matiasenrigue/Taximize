@@ -1,10 +1,12 @@
 import { ShiftCalculator } from '../../utils/shiftCalculator';
 
+
 describe('ShiftCalculator Unit Tests', () => {
     beforeEach(() => {
         // Clear pause data before each test
         ShiftCalculator.clearPauseData();
     });
+
 
     describe('computeBreaks', () => {
         it('should compute break statistics from shift pauses', () => {
@@ -28,6 +30,7 @@ describe('ShiftCalculator Unit Tests', () => {
             expect(result.averageBreakDurationMs).toBe(22.5 * 60 * 1000); // 22.5 minutes
         });
 
+
         it('should return correct break statistics when no pauses exist', () => {
             // Test that computeBreaks returns correct break statistics when no pauses exist
             const shiftStart = new Date('2024-01-01T09:00:00Z');
@@ -43,6 +46,7 @@ describe('ShiftCalculator Unit Tests', () => {
         });
     });
 
+
     describe('computeWorkTime', () => {
         it('should calculate work time by subtracting break time from total duration', () => {
             // Test that computeWorkTime calculates work time by subtracting break time from total duration
@@ -53,6 +57,7 @@ describe('ShiftCalculator Unit Tests', () => {
             
             expect(result).toBe(7 * 60 * 60 * 1000); // 7 hours
         });
+
 
         it('should return total duration when no break time', () => {
             // Test that computeWorkTime returns total duration when no break time

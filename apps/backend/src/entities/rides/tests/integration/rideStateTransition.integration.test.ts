@@ -52,6 +52,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Ride State Transition Tests', () => {
 
     describe('Shift State Impact on Rides', () => {
@@ -77,6 +78,7 @@ describe('Ride State Transition Tests', () => {
             expect(rideRes.status).toBe(400);
             expect(rideRes.body.error).toContain('No active shift found');
         });
+
 
         it('should handle ride status check after shift termination', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -107,6 +109,7 @@ describe('Ride State Transition Tests', () => {
             expect(statusRes.status).toBe(400);
             expect(statusRes.body.error).toContain('No active shift found');
         });
+
 
         it('should handle ride end after shift termination', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -143,6 +146,7 @@ describe('Ride State Transition Tests', () => {
         });
     });
 
+
     describe('Driver Availability State Changes', () => {
         it('should prevent ride start when driver becomes unavailable', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -170,6 +174,7 @@ describe('Ride State Transition Tests', () => {
             expect(rideRes.status).toBe(400);
             expect(rideRes.body.error).toContain('Cannot start ride while on break. Please continue your shift first.');
         });
+
 
         it('should allow ride start after driver becomes available again', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -206,6 +211,7 @@ describe('Ride State Transition Tests', () => {
         });
     });
 
+
     describe('Concurrent Operation Scenarios', () => {
         it('should handle rapid successive ride attempts', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -239,6 +245,7 @@ describe('Ride State Transition Tests', () => {
                 expect(res.body.error).toMatch(/Already has active ride|Validation error/);
             });
         });
+
 
         it('should handle concurrent ride operations on different shifts', async () => {
             // Create two different drivers
@@ -286,6 +293,7 @@ describe('Ride State Transition Tests', () => {
         });
     });
 
+
     describe('Database State Consistency', () => {
         it('should maintain consistent state during ride lifecycle', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -326,6 +334,7 @@ describe('Ride State Transition Tests', () => {
             expect(ride!.earning_cents).toBe(1500);
             expect(ride!.distance_km).toBe(5.0);
         });
+
 
         it('should handle shift deletion edge cases', async () => {
             const { user, token } = await createAuthenticatedUser();

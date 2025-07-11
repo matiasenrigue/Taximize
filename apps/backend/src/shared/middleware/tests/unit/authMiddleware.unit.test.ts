@@ -35,6 +35,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Auth Middleware Unit Tests', () => {
 
     describe('protect middleware', () => {
@@ -49,6 +50,7 @@ describe('Auth Middleware Unit Tests', () => {
             });
             validToken = generateAccessToken(testUser.id);
         });
+
 
         it('should call next() and attach user to req when valid token provided', async () => {
             const req = {
@@ -67,6 +69,7 @@ describe('Auth Middleware Unit Tests', () => {
             expect(req.user?.username).toBe(testUser.username);
         });
 
+
         it('should call next with error when no Authorization header', async () => {
             const req = {
                 headers: {}
@@ -83,6 +86,7 @@ describe('Auth Middleware Unit Tests', () => {
                 })
             );
         });
+
 
         it('should call next with error when Authorization header does not start with Bearer', async () => {
             const req = {
@@ -103,6 +107,7 @@ describe('Auth Middleware Unit Tests', () => {
             );
         });
 
+
         it('should call next with error when Authorization header is malformed', async () => {
             const req = {
                 headers: {
@@ -122,6 +127,7 @@ describe('Auth Middleware Unit Tests', () => {
             );
         });
 
+
         it('should call next with error when token is invalid', async () => {
             const req = {
                 headers: {
@@ -140,6 +146,7 @@ describe('Auth Middleware Unit Tests', () => {
                 })
             );
         });
+
 
         it('should call next with error when token is signed with wrong secret', async () => {
             const invalidToken = jwt.sign({ id: testUser.id }, 'wrong-secret', { expiresIn: '15m' });
@@ -161,6 +168,7 @@ describe('Auth Middleware Unit Tests', () => {
                 })
             );
         });
+
 
         it('should call next with error when token is expired', async () => {
             const expiredToken = jwt.sign(
@@ -187,6 +195,7 @@ describe('Auth Middleware Unit Tests', () => {
             );
         });
 
+
         it('should call next with error when user ID in token does not exist in database', async () => {
             const nonExistentUserId = 'non-existent-user-id';
             const tokenWithInvalidUserId = generateAccessToken(nonExistentUserId);
@@ -208,6 +217,7 @@ describe('Auth Middleware Unit Tests', () => {
                 })
             );
         });
+
 
         it('should call next with error when token has missing id field', async () => {
             const tokenWithoutId = jwt.sign(
@@ -234,6 +244,7 @@ describe('Auth Middleware Unit Tests', () => {
             );
         });
 
+
         it('should work with different valid token formats', async () => {
             // Test the actual expected format
             const req = {
@@ -247,6 +258,7 @@ describe('Auth Middleware Unit Tests', () => {
             expect(mockNext).toHaveBeenCalledWith();
             expect(req.user?.id).toBe(testUser.id);
         });
+
 
         it('should call next with error for case-sensitive Bearer keyword', async () => {
             const req = {
@@ -267,6 +279,7 @@ describe('Auth Middleware Unit Tests', () => {
             );
         });
 
+
         it('should overwrite existing user when valid token provided', async () => {
             const existingUser = { id: 'existing-id', email: 'existing@test.com' };
             const req = {
@@ -284,6 +297,7 @@ describe('Auth Middleware Unit Tests', () => {
             expect(req.user.id).toBe(testUser.id);
             expect(req.user.id).not.toBe(existingUser.id);
         });
+
 
         it('should work correctly after user data is updated', async () => {
             // Update user data

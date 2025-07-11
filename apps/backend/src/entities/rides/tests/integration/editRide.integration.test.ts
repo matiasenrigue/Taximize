@@ -85,6 +85,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Edit Ride Operations', () => {
     describe('Active Ride Restrictions', () => {
         it('Tests-ED-1-Cannot-edit-active-ride', async () => {
@@ -105,6 +106,7 @@ describe('Edit Ride Operations', () => {
         });
     });
 
+
     describe('Basic Data Integrity Rules', () => {
         it('Tests-ED-2-End-time-must-be-after-start-time', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -122,6 +124,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.error).toContain('End time must be after start time');
         });
 
+
         it('Tests-ED-3-Distance-must-be-positive', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -138,6 +141,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.error).toContain('Distance must be positive');
         });
 
+
         it('Tests-ED-4-Earning-must-be-positive', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -153,6 +157,7 @@ describe('Edit Ride Operations', () => {
             expect(response.status).toBe(400);
             expect(response.body.error).toContain('Earning must be positive');
         });
+
 
         it('Tests-ED-5-Coordinates-must-be-within-valid-ranges', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -171,6 +176,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.error).toContain('Invalid coordinates');
         });
 
+
         it('Tests-ED-6-Cannot-modify-start-time-to-future', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -188,6 +194,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.error).toContain('Cannot modify start_time');
         });
     });
+
 
     describe('Allowed Edit Fields', () => {
         it('Tests-ED-7-Can-edit-destination-coordinates', async () => {
@@ -208,6 +215,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.destinationLongitude).toBe(-6.250000);
         });
 
+
         it('Tests-ED-8-Can-edit-distance', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -224,6 +232,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.distanceKm).toBe(6.5);
         });
 
+
         it('Tests-ED-9-Can-edit-earning', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -239,6 +248,7 @@ describe('Edit Ride Operations', () => {
             expect(response.status).toBe(200);
             expect(response.body.earningCents).toBe(1500);
         });
+
 
         it('Tests-ED-10-Can-edit-end-time', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -258,6 +268,7 @@ describe('Edit Ride Operations', () => {
         });
     });
 
+
     describe('Forbidden Edit Fields', () => {
         it('Tests-ED-11-Cannot-edit-ride-id', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -275,6 +286,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.error).toContain('Cannot modify id');
         });
 
+
         it('Tests-ED-12-Cannot-edit-shift-id', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -290,6 +302,7 @@ describe('Edit Ride Operations', () => {
             expect(response.status).toBe(400);
             expect(response.body.error).toContain('Cannot modify shift_id');
         });
+
 
         it('Tests-ED-13-Cannot-edit-driver-id', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -307,6 +320,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.error).toContain('Cannot modify driver_id');
         });
 
+
         it('Tests-ED-14-Cannot-edit-start-time', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -322,6 +336,7 @@ describe('Edit Ride Operations', () => {
             expect(response.status).toBe(400);
             expect(response.body.error).toContain('Cannot modify start_time');
         });
+
 
         it('Tests-ED-15-Cannot-edit-start-coordinates', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -340,6 +355,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.error).toContain('Cannot modify start_latitude');
         });
 
+
         it('Tests-ED-16-Cannot-edit-predicted-score', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -356,6 +372,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.error).toContain('Cannot modify predicted_score');
         });
     });
+
 
     describe('Authorization', () => {
         it('Tests-ED-17-Cannot-edit-other-driver-ride', async () => {
@@ -376,6 +393,7 @@ describe('Edit Ride Operations', () => {
             expect(response.body.error).toContain('Not authorized');
         });
     });
+
 
     describe('Shift Statistics Update', () => {
         it('Tests-ED-18-Updates-shift-statistics-on-ride-edit', async () => {

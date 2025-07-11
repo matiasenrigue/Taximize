@@ -85,6 +85,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Delete Ride Operations', () => {
     describe('Soft Delete Implementation', () => {
         it('Tests-ED-19-Soft-delete-completed-ride', async () => {
@@ -107,6 +108,7 @@ describe('Delete Ride Operations', () => {
             expect(deletedAt).toBeTruthy();
         });
 
+
         it('Tests-ED-20-Cannot-delete-active-ride', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -119,6 +121,7 @@ describe('Delete Ride Operations', () => {
             expect(response.status).toBe(400);
             expect(response.body.error).toContain('Cannot delete active ride');
         });
+
 
         it('Tests-ED-21-Standard-queries-exclude-deleted-rides', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -142,6 +145,7 @@ describe('Delete Ride Operations', () => {
         });
     });
 
+
     describe('Authorization', () => {
         it('Tests-ED-22-Cannot-delete-other-driver-ride', async () => {
             const { user: driver1, token: token1 } = await createAuthenticatedUser('driver1@test.com', 'driver1');
@@ -158,6 +162,7 @@ describe('Delete Ride Operations', () => {
             expect(response.body.error).toContain('Not authorized');
         });
 
+
         it('Tests-ED-23-Driver-can-delete-own-completed-ride', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -171,6 +176,7 @@ describe('Delete Ride Operations', () => {
             expect(response.body.message).toContain('Ride deleted successfully');
         });
     });
+
 
     describe('Restore Operations', () => {
         it('Tests-ED-24-Can-restore-soft-deleted-ride', async () => {
@@ -199,6 +205,7 @@ describe('Delete Ride Operations', () => {
             expect(deletedAt).toBeNull();
         });
 
+
         it('Tests-ED-25-Cannot-restore-non-deleted-ride', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -211,6 +218,7 @@ describe('Delete Ride Operations', () => {
             expect(response.status).toBe(400);
             expect(response.body.error).toContain('not deleted');
         });
+
 
         it('Tests-ED-26-Cannot-restore-other-driver-ride', async () => {
             const { user: driver1, token: token1 } = await createAuthenticatedUser('driver1@test.com', 'driver1');
@@ -233,6 +241,7 @@ describe('Delete Ride Operations', () => {
             expect(response.body.error).toContain('Not authorized');
         });
     });
+
 
     describe('Data Consistency', () => {
         it('Tests-ED-27-Updates-shift-statistics-on-ride-delete', async () => {
@@ -263,6 +272,7 @@ describe('Delete Ride Operations', () => {
             expect(updatedShiftResponse.body.total_distance_km).toBeLessThan(initialDistance);
         });
 
+
         it('Tests-ED-28-Maintains-referential-integrity', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -282,6 +292,7 @@ describe('Delete Ride Operations', () => {
             expect(shiftResponse.body.id).toBe(shift.id);
         });
     });
+
 
     describe('Performance Metrics Update', () => {
         it('Tests-ED-29-Recalculates-driver-performance-on-delete', async () => {

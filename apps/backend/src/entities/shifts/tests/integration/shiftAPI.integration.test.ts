@@ -42,6 +42,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Shift API Integration Tests', () => {
 
     describe('POST /api/shifts/signal', () => {
@@ -59,6 +60,7 @@ describe('Shift API Integration Tests', () => {
             // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
+
 
         it('should return 400 when authenticated but invalid signal provided', async () => {
             // Test authenticated user gets validation error for invalid signal
@@ -78,6 +80,7 @@ describe('Shift API Integration Tests', () => {
             expect(res.body.success).toBe(false);
             expect(res.body.error).toContain('Invalid signal type');
         });
+
 
         it('should return 400 when authenticated but missing signal', async () => {
             // Test authenticated user gets validation error for missing signal
@@ -99,6 +102,7 @@ describe('Shift API Integration Tests', () => {
         });
     });
 
+
     describe('POST /api/shifts/start-shift', () => {
         it('should return 401 when no authentication provided', async () => {
             // Test POST /api/shifts/start-shift returns 401 when no authentication provided
@@ -113,6 +117,7 @@ describe('Shift API Integration Tests', () => {
             // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
+
 
         it('should return 200 when authenticated driver starts first shift', async () => {
             // Test authenticated driver can successfully start first shift
@@ -133,6 +138,7 @@ describe('Shift API Integration Tests', () => {
         });
     });
 
+
     describe('POST /api/shifts/pause-shift', () => {
         it('should return 401 when no authentication provided', async () => {
             // Test POST /api/shifts/pause-shift returns 401 when no authentication provided
@@ -147,6 +153,7 @@ describe('Shift API Integration Tests', () => {
             // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
+
 
         it('should return 400 when authenticated driver has no active shift', async () => {
             // Test authenticated driver cannot pause non-existent shift
@@ -167,6 +174,7 @@ describe('Shift API Integration Tests', () => {
         });
     });
 
+
     describe('POST /api/shifts/continue-shift', () => {
         it('should return 401 when no authentication provided', async () => {
             // Test POST /api/shifts/continue-shift returns 401 when no authentication provided
@@ -181,6 +189,7 @@ describe('Shift API Integration Tests', () => {
             // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
+
 
         it('should return 400 when authenticated driver has no paused shift', async () => {
             // Test authenticated driver cannot continue non-paused shift
@@ -201,6 +210,7 @@ describe('Shift API Integration Tests', () => {
         });
     });
 
+
     describe('POST /api/shifts/end-shift', () => {
         it('should return 401 when no authentication provided', async () => {
             // Test POST /api/shifts/end-shift returns 401 when no authentication provided
@@ -215,6 +225,7 @@ describe('Shift API Integration Tests', () => {
             // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
+
 
         it('should return 400 when authenticated driver has no active shift', async () => {
             // Test authenticated driver cannot end non-existent shift
@@ -235,6 +246,7 @@ describe('Shift API Integration Tests', () => {
         });
     });
 
+
     describe('GET /api/shifts/current', () => {
         it('should return 401 when no authentication provided', async () => {
             // Test GET /api/shifts/current returns 401 when no authentication provided
@@ -244,6 +256,7 @@ describe('Shift API Integration Tests', () => {
             // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
+
 
         it('should return 200 with no shift status when authenticated driver has no shift', async () => {
             // Test authenticated driver with no shift gets appropriate response
@@ -258,6 +271,7 @@ describe('Shift API Integration Tests', () => {
             expect(res.body.data.isOnShift).toBe(false);
         });
     });
+
 
     describe('Database Constraints', () => {
         it('should prevent multiple active shifts for same driver', async () => {
@@ -280,6 +294,7 @@ describe('Shift API Integration Tests', () => {
             expect(res.body.success).toBe(false);
             expect(res.body.error).toContain('already an active Shift');
         });
+
 
         it('should allow new shift after ending previous shift', async () => {
             // Test that driver can start new shift after properly ending previous one

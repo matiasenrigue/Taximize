@@ -11,6 +11,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('ShiftService Unit Tests', () => {
     describe('isValidSignal', () => {
         it('should return true when signal transition is valid', async () => {
@@ -24,6 +25,7 @@ describe('ShiftService Unit Tests', () => {
             expect(result).toBe(true);
         });
 
+
         it('should return false when signal transition is invalid', async () => {
             // Test that isValidSignal returns false when signal transition is invalid
             const driverId = 'test-driver-2';
@@ -36,6 +38,7 @@ describe('ShiftService Unit Tests', () => {
         });
     });
 
+
     describe('handleSignal', () => {
         it('should throw error when signal is invalid', async () => {
             // Test that handleSignal throws error when signal is invalid
@@ -46,6 +49,7 @@ describe('ShiftService Unit Tests', () => {
             await expect(ShiftService.handleSignal(driverId, timestamp, signal))
                 .rejects.toThrow('Invalid signal transition');
         });
+
 
         it('should successfully handle start signal', async () => {
             // Test that handleSignal successfully handles start signal
@@ -62,6 +66,7 @@ describe('ShiftService Unit Tests', () => {
             }
         });
 
+
         it('should successfully handle pause signal', async () => {
             // Test that handleSignal successfully handles pause signal
             const driverId = 'test-driver-1';
@@ -76,6 +81,7 @@ describe('ShiftService Unit Tests', () => {
             }
         });
 
+
         it('should successfully handle continue signal', async () => {
             // Test that handleSignal successfully handles continue signal
             const driverId = 'test-driver-1';
@@ -89,6 +95,7 @@ describe('ShiftService Unit Tests', () => {
                 expect(error).toBeDefined();
             }
         });
+
 
         it('should successfully handle stop signal', async () => {
             // Test that handleSignal successfully handles stop signal
@@ -105,6 +112,7 @@ describe('ShiftService Unit Tests', () => {
         });
     });
 
+
     describe('getCurrentShiftStatus', () => {
         it('should return current shift status when driver has active shift', async () => {
             // Test that getCurrentShiftStatus returns current shift status when driver has active shift
@@ -114,6 +122,7 @@ describe('ShiftService Unit Tests', () => {
             expect(result).toBe(null); // Expected to be null without database setup
         });
 
+
         it('should return null when driver has no active shift', async () => {
             // Test that getCurrentShiftStatus returns null when driver has no active shift
             const driverId = 'test-driver-2';
@@ -122,6 +131,7 @@ describe('ShiftService Unit Tests', () => {
             expect(result).toBe(null);
         });
     });
+
 
     describe('driverIsAvailable', () => {
         it('should return true when driver is available (has active shift and not on pause)', async () => {
@@ -133,6 +143,7 @@ describe('ShiftService Unit Tests', () => {
             expect(result).toBe(false); // Expected to be false without database setup
         });
 
+
         it('should return false when driver has no active shift', async () => {
             // Test that driverIsAvailable returns false when driver has no active shift
             const driverId = 'test-driver-2';
@@ -141,6 +152,7 @@ describe('ShiftService Unit Tests', () => {
             expect(typeof result).toBe('boolean');
             expect(result).toBe(false);
         });
+
 
         it('should return false when driver is on pause', async () => {
             // Test that driverIsAvailable returns false when driver is on pause
@@ -152,6 +164,7 @@ describe('ShiftService Unit Tests', () => {
         });
     });
 
+
     describe('saveShift', () => {
         it('should throw error when no active shift exists', async () => {
             // Test that saveShift throws error when no active shift exists
@@ -160,6 +173,7 @@ describe('ShiftService Unit Tests', () => {
             await expect(ShiftService.saveShift(driverId))
                 .rejects.toThrow('No active shift to save');
         });
+
 
         it('should successfully save shift with computed statistics', async () => {
             // Test that saveShift successfully saves shift with computed statistics
@@ -174,6 +188,7 @@ describe('ShiftService Unit Tests', () => {
         });
     });
 
+
     describe('saveShiftPause', () => {
         it('should throw error when driver is not on pause', async () => {
             // Test that saveShiftPause throws error when driver is not on pause
@@ -182,6 +197,7 @@ describe('ShiftService Unit Tests', () => {
             await expect(ShiftService.saveShiftPause(driverId))
                 .rejects.toThrow('No active shift found');
         });
+
 
         it('should successfully save shift pause when continuing from pause', async () => {
             // Test that saveShiftPause successfully saves shift pause when continuing from pause
@@ -196,47 +212,56 @@ describe('ShiftService Unit Tests', () => {
         });
     });
 
+
     describe('manageExpiredShifts', () => {
         it('should end expired shifts that have exceeded time limit', async () => {
             // Test that manageExpiredShifts ends expired shifts that have exceeded time limit
             await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
         });
 
+
         it('should purge shifts older than 2 days with no rides', async () => {
             // Test that manageExpiredShifts purges shifts older than 2 days with no rides
             await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
         });
+
 
         it('should generate synthetic stop for stale shifts that have rides', async () => {
             // Test that manageExpiredShifts generates synthetic stop for stale shifts that have rides
             await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
         });
 
+
         it('should not affect active or recently stopped shifts', async () => {
             // Test that manageExpiredShifts does not affect active or recently stopped shifts
             await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
         });
+
 
         it('should only process active shifts (shift_end is null)', async () => {
             // Test that manageExpiredShifts only processes active shifts as per documentation
             await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
         });
 
+
         it('should skip shifts with stop signal even if old', async () => {
             // Test that manageExpiredShifts skips shifts that have proper stop signal
             await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
         });
+
 
         it('should skip shifts with recent signals within 2 days', async () => {
             // Test that manageExpiredShifts skips shifts with recent activity
             await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
         });
 
+
         it('should log each cleanup action performed', async () => {
             // Test that manageExpiredShifts logs each cleanup action performed
             await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
         });
     });
+
 
     describe('computeBreaks', () => {
         it('should return correct break statistics for given shift period', async () => {
@@ -252,6 +277,7 @@ describe('ShiftService Unit Tests', () => {
             expect(typeof result.averageBreakDurationMs).toBe('number');
         });
     });
+
 
     describe('computeWorkTime', () => {
         it('should calculate work time correctly from shift duration and breaks', async () => {

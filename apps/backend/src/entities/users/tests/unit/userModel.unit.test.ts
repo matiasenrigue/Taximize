@@ -15,6 +15,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('User Model Unit Tests', () => {
 
     describe('Password Hashing Hook', () => {
@@ -32,6 +33,7 @@ describe('User Model Unit Tests', () => {
             expect(user.password.length).toBeGreaterThan(50); // bcrypt hashes are long
         });
 
+
         it('should not re-hash password when updating user without changing password', async () => {
             const user = await User.create({
                 email: 'test@example.com',
@@ -48,6 +50,7 @@ describe('User Model Unit Tests', () => {
             // Password hash should remain unchanged
             expect(user.password).toBe(originalHashedPassword);
         });
+
 
         it('should re-hash password when updating user with new password', async () => {
             const user = await User.create({
@@ -67,6 +70,7 @@ describe('User Model Unit Tests', () => {
             expect(user.password).toMatch(/^\$2[aby]\$\d+\$/); // bcrypt hash pattern
             expect(user.password.length).toBeGreaterThan(50);
         });
+
 
         it('should hash password even when other fields are updated simultaneously', async () => {
             const user = await User.create({
@@ -91,6 +95,7 @@ describe('User Model Unit Tests', () => {
         });
     });
 
+
     describe('matchPassword Method', () => {
         let user: User;
 
@@ -102,26 +107,31 @@ describe('User Model Unit Tests', () => {
             });
         });
 
+
         it('should return true when given the correct plain password', async () => {
             const isMatch = await user.matchPassword('password123');
             expect(isMatch).toBe(true);
         });
+
 
         it('should return false when given an incorrect password', async () => {
             const isMatch = await user.matchPassword('wrongpassword');
             expect(isMatch).toBe(false);
         });
 
+
         it('should return false when given empty string', async () => {
             const isMatch = await user.matchPassword('');
             expect(isMatch).toBe(false);
         });
+
 
         it('should handle null/undefined gracefully', async () => {
             // bcrypt.compare throws error with null/undefined, so we expect the test to throw
             await expect(user.matchPassword(null as any)).rejects.toThrow();
             await expect(user.matchPassword(undefined as any)).rejects.toThrow();
         });
+
 
         it('should work correctly after password update', async () => {
             // First verify original password works
@@ -138,6 +148,7 @@ describe('User Model Unit Tests', () => {
             expect(await user.matchPassword('newpassword456')).toBe(true);
         });
 
+
         it('should handle special characters in passwords', async () => {
             const specialPassword = 'P@ssw0rd!#$%^&*()';
             
@@ -152,12 +163,14 @@ describe('User Model Unit Tests', () => {
             expect(await userWithSpecialPassword.matchPassword('P@ssw0rd!#$%^&*')).toBe(false);
         });
 
+
         it('should be case sensitive', async () => {
             expect(await user.matchPassword('Password123')).toBe(false);
             expect(await user.matchPassword('PASSWORD123')).toBe(false);
             expect(await user.matchPassword('password123')).toBe(true);
         });
     });
+
 
     describe('User Model Validation', () => {
         it('should require email field', async () => {
@@ -168,6 +181,7 @@ describe('User Model Unit Tests', () => {
             } as any)).rejects.toThrow();
         });
 
+
         it('should require username field', async () => {
             await expect(User.create({
                 email: 'test@example.com',
@@ -176,6 +190,7 @@ describe('User Model Unit Tests', () => {
             } as any)).rejects.toThrow();
         });
 
+
         it('should require password field', async () => {
             await expect(User.create({
                 email: 'test@example.com',
@@ -183,6 +198,7 @@ describe('User Model Unit Tests', () => {
                 // Missing password
             } as any)).rejects.toThrow();
         });
+
 
         it('should enforce unique email constraint', async () => {
             await User.create({
@@ -198,6 +214,7 @@ describe('User Model Unit Tests', () => {
             })).rejects.toThrow();
         });
 
+
         it('should validate email format', async () => {
             await expect(User.create({
                 email: 'invalid-email',
@@ -212,6 +229,7 @@ describe('User Model Unit Tests', () => {
             })).rejects.toThrow();
         });
 
+
         it('should enforce minimum password length', async () => {
             await expect(User.create({
                 email: 'test@example.com',
@@ -219,6 +237,7 @@ describe('User Model Unit Tests', () => {
                 password: 'short'
             })).rejects.toThrow();
         });
+
 
         it('should allow valid user creation', async () => {
             const user = await User.create({

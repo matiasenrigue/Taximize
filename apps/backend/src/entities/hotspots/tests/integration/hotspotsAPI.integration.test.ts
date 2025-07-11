@@ -68,6 +68,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Hotspots API Integration Tests', () => {
     describe('GET /api/hotspots', () => {
         it('should return 401 when no authentication token provided', async () => {
@@ -81,6 +82,7 @@ describe('Hotspots API Integration Tests', () => {
             });
         });
 
+
         it('should return 401 when invalid token provided', async () => {
             const response = await request(app)
                 .get('/api/hotspots')
@@ -92,6 +94,7 @@ describe('Hotspots API Integration Tests', () => {
                 error: 'Not authorized, token failed'
             });
         });
+
 
         it('should return recent hotspots data when authenticated', async () => {
             const { token } = await createAuthenticatedUser();
@@ -114,6 +117,7 @@ describe('Hotspots API Integration Tests', () => {
                 data: hotspotsData
             });
         });
+
 
         it('should return cached data when recent data is older than 1 hour', async () => {
             const { token } = await createAuthenticatedUser();
@@ -138,6 +142,7 @@ describe('Hotspots API Integration Tests', () => {
             });
         });
 
+
         it('should return 500 error when no data is available', async () => {
             const { token } = await createAuthenticatedUser();
             
@@ -153,6 +158,7 @@ describe('Hotspots API Integration Tests', () => {
                 data: null
             });
         });
+
 
         it('should handle multiple concurrent requests efficiently', async () => {
             const { token } = await createAuthenticatedUser();
@@ -181,6 +187,7 @@ describe('Hotspots API Integration Tests', () => {
             });
         });
 
+
         it('should return most recent data when multiple entries exist', async () => {
             const { token } = await createAuthenticatedUser();
             
@@ -208,6 +215,7 @@ describe('Hotspots API Integration Tests', () => {
                 data: newData
             });
         });
+
 
         it('should work correctly with user having non-standard ID format', async () => {
             // Create user with specific ID

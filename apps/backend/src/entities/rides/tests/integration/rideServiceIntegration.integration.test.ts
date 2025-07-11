@@ -26,6 +26,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Ride Service Integration Tests', () => {
 
     describe('Service Layer Data Flow', () => {
@@ -56,6 +57,7 @@ describe('Ride Service Integration Tests', () => {
             const hasActive = await RideService.hasActiveRide(user.id);
             expect(hasActive).toBe(false);
         });
+
 
         it('should correctly propagate state changes through service layers', async () => {
             const user = await User.create({
@@ -97,6 +99,7 @@ describe('Ride Service Integration Tests', () => {
             expect(hasActive).toBe(true);
         });
 
+
         it('should handle service layer error propagation correctly', async () => {
             const user = await User.create({
                 email: 'driver@test.com',
@@ -121,6 +124,7 @@ describe('Ride Service Integration Tests', () => {
                 .rejects.toThrow('No active shift found');
         });
     });
+
 
     describe('Cross-Service Data Integrity', () => {
         it('should maintain data consistency across Ride and Shift services', async () => {
@@ -166,6 +170,7 @@ describe('Ride Service Integration Tests', () => {
             expect(dbRide!.driver_id).toBe(dbShift!.driver_id);
         });
 
+
         it('should handle shift termination impact on ride services', async () => {
             const user = await User.create({
                 email: 'driver@test.com',
@@ -210,6 +215,7 @@ describe('Ride Service Integration Tests', () => {
         });
     });
 
+
     describe('Service Layer Transaction Handling', () => {
         it('should handle concurrent ride start attempts correctly', async () => {
             const user = await User.create({
@@ -252,6 +258,7 @@ describe('Ride Service Integration Tests', () => {
             const rides = await Ride.findAll({ where: { driver_id: user.id } });
             expect(rides).toHaveLength(1);
         });
+
 
         it('should handle ride end with proper data validation', async () => {
             const user = await User.create({
@@ -299,6 +306,7 @@ describe('Ride Service Integration Tests', () => {
         });
     });
 
+
     describe('Service Layer Edge Cases', () => {
         it('should handle malformed UUID inputs gracefully', async () => {
             const coords = {
@@ -321,6 +329,7 @@ describe('Ride Service Integration Tests', () => {
             await expect(RideService.getRideStatus('invalid-uuid'))
                 .rejects.toThrow('No active shift found. Please start a shift before checking ride status.');
         });
+
 
         it('should handle coordinate validation through service layer', async () => {
             const user = await User.create({
@@ -359,6 +368,7 @@ describe('Ride Service Integration Tests', () => {
             await expect(RideService.startRide(user.id, shift.id, invalidLngCoords))
                 .rejects.toThrow('Invalid longitude provided');
         });
+
 
         it('should handle expired rides cleanup correctly', async () => {
             const user = await User.create({
@@ -399,6 +409,7 @@ describe('Ride Service Integration Tests', () => {
             expect(updatedRide!.distance_km).toBe(0);
         });
     });
+
 
     describe('Service Layer Performance', () => {
         it('should handle multiple drivers efficiently', async () => {

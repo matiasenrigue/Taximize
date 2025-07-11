@@ -23,6 +23,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Auth API Integration Tests', () => {
 
     describe('POST /api/auth/signup', () => {
@@ -50,6 +51,7 @@ describe('Auth API Integration Tests', () => {
             expect(user!.password).not.toBe('password123'); // Should be hashed
         });
 
+
         it('should return 400 when email already exists', async () => {
             // Create user first
             await User.create({
@@ -73,6 +75,7 @@ describe('Auth API Integration Tests', () => {
             expect(res.body.error).toBe('User with this email already exists');
         });
 
+
         it('should return 400 when missing required fields', async () => {
             const testCases = [
                 { body: { username: 'user', password: 'password123' }, missing: 'email' },
@@ -90,6 +93,7 @@ describe('Auth API Integration Tests', () => {
             }
         });
 
+
         it('should return 400 when email format is invalid', async () => {
             const userData = {
                 email: 'invalid-email-format',
@@ -105,6 +109,7 @@ describe('Auth API Integration Tests', () => {
             expect(res.body.error).toBe('Invalid email or password');
         });
 
+
         it('should return 400 when password is too short', async () => {
             const userData = {
                 email: 'test@example.com',
@@ -119,6 +124,7 @@ describe('Auth API Integration Tests', () => {
             expect(res.status).toBe(400);
             expect(res.body.error).toBe('Invalid email or password');
         });
+
 
         it('should handle special characters in email and username', async () => {
             const userData = {
@@ -137,6 +143,7 @@ describe('Auth API Integration Tests', () => {
         });
     });
 
+
     describe('POST /api/auth/signin', () => {
         let testUser: User;
 
@@ -147,6 +154,7 @@ describe('Auth API Integration Tests', () => {
                 password: 'password123'
             });
         });
+
 
         it('should return 200 and tokens with valid credentials', async () => {
             const credentials = {
@@ -168,6 +176,7 @@ describe('Auth API Integration Tests', () => {
             const token = res.body.data.token;
             expect(token.split('.')).toHaveLength(3); // JWT format
         });
+
 
         it('should set HTTP-only refresh token cookie on successful signin', async () => {
             const credentials = {
@@ -196,6 +205,7 @@ describe('Auth API Integration Tests', () => {
             expect(refreshTokenCookie).toMatch(/SameSite=Strict/);
         });
 
+
         it('should return 400 with invalid email', async () => {
             const credentials = {
                 email: 'nonexistent@example.com',
@@ -211,6 +221,7 @@ describe('Auth API Integration Tests', () => {
             expect(res.body.error).toBe('Invalid email or password');
         });
 
+
         it('should return 400 with invalid password', async () => {
             const credentials = {
                 email: 'test@example.com',
@@ -225,6 +236,7 @@ describe('Auth API Integration Tests', () => {
             expect(res.body.success).toBe(false);
             expect(res.body.error).toBe('Invalid email or password');
         });
+
 
         it('should return 400 when missing email or password', async () => {
             const testCases = [
@@ -243,6 +255,7 @@ describe('Auth API Integration Tests', () => {
             }
         });
 
+
         it('should handle case-sensitive email correctly', async () => {
             const credentials = {
                 email: 'TEST@EXAMPLE.COM', // Different case
@@ -257,6 +270,7 @@ describe('Auth API Integration Tests', () => {
             expect(res.status).toBe(400);
             expect(res.body.error).toBe('Invalid email or password');
         });
+
 
         it('should handle password case sensitivity correctly', async () => {
             const credentials = {
@@ -273,6 +287,7 @@ describe('Auth API Integration Tests', () => {
         });
     });
 
+
     describe('POST /api/auth/refresh', () => {
         let testUser: User;
         let validRefreshToken: string;
@@ -285,6 +300,7 @@ describe('Auth API Integration Tests', () => {
             });
             validRefreshToken = generateRefreshToken(testUser.id);
         });
+
 
         it('should return 200 and new access token with valid refresh token', async () => {
             const res = await request(app)
@@ -301,6 +317,7 @@ describe('Auth API Integration Tests', () => {
             expect(newToken.split('.')).toHaveLength(3); // JWT format
         });
 
+
         it('should return 401 when no refresh token cookie', async () => {
             const res = await request(app)
                 .post('/api/auth/refresh');
@@ -309,6 +326,7 @@ describe('Auth API Integration Tests', () => {
             expect(res.body.success).toBe(false);
             expect(res.body.error).toBe('No refresh token');
         });
+
 
         it('should return 403 when refresh token is invalid', async () => {
             const res = await request(app)
@@ -320,6 +338,7 @@ describe('Auth API Integration Tests', () => {
             expect(res.body.error).toBe('Invalid refresh token');
         });
 
+
         it('should return 403 when refresh token is expired', async () => {
             // This test would require creating an expired token, which is complex
             // For now, we'll test with a malformed token that will fail verification
@@ -330,6 +349,7 @@ describe('Auth API Integration Tests', () => {
             expect(res.status).toBe(403);
             expect(res.body.error).toBe('Invalid refresh token');
         });
+
 
         it('should work with multiple cookies present', async () => {
             const res = await request(app)
@@ -345,6 +365,7 @@ describe('Auth API Integration Tests', () => {
             expect(res.body.data).toHaveProperty('token');
         });
     });
+
 
     describe('Full Authentication Flow Integration', () => {
         it('should complete full signup -> signin -> refresh flow', async () => {
@@ -396,6 +417,7 @@ describe('Auth API Integration Tests', () => {
             // Verify the new token is different from the original
             expect(refreshRes.body.data.token).not.toBe(signinRes.body.data.token);
         });
+
 
         it('should maintain user data consistency across authentication flow', async () => {
             // Create user

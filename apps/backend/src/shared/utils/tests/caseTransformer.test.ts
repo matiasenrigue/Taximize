@@ -6,6 +6,7 @@ import {
     modelToResponse
 } from '../caseTransformer';
 
+
 describe('Case Transformer Utilities', () => {
     describe('snakeToCamel', () => {
         it('should convert snake_case to camelCase', () => {
@@ -17,6 +18,7 @@ describe('Case Transformer Utilities', () => {
         });
     });
 
+
     describe('camelToSnake', () => {
         it('should convert camelCase to snake_case', () => {
             expect(camelToSnake('helloWorld')).toBe('hello_world');
@@ -26,11 +28,13 @@ describe('Case Transformer Utilities', () => {
         });
     });
 
+
     describe('transformKeysSnakeToCamel', () => {
         it('should handle null and undefined', () => {
             expect(transformKeysSnakeToCamel(null)).toBeNull();
             expect(transformKeysSnakeToCamel(undefined)).toBeUndefined();
         });
+
 
         it('should handle primitive values', () => {
             expect(transformKeysSnakeToCamel('string')).toBe('string');
@@ -38,10 +42,12 @@ describe('Case Transformer Utilities', () => {
             expect(transformKeysSnakeToCamel(true)).toBe(true);
         });
 
+
         it('should handle dates', () => {
             const date = new Date();
             expect(transformKeysSnakeToCamel(date)).toBe(date);
         });
+
 
         it('should transform object keys', () => {
             const input = {
@@ -60,6 +66,7 @@ describe('Case Transformer Utilities', () => {
 
             expect(transformKeysSnakeToCamel(input)).toEqual(expected);
         });
+
 
         it('should handle nested objects', () => {
             const input = {
@@ -89,6 +96,7 @@ describe('Case Transformer Utilities', () => {
             expect(transformKeysSnakeToCamel(input)).toEqual(expected);
         });
 
+
         it('should handle arrays', () => {
             const input = [
                 { ride_id: '1', start_time: '2024-01-01' },
@@ -103,6 +111,7 @@ describe('Case Transformer Utilities', () => {
             expect(transformKeysSnakeToCamel(input)).toEqual(expected);
         });
     });
+
 
     describe('transformKeysCamelToSnake', () => {
         it('should transform object keys from camelCase to snake_case', () => {
@@ -124,6 +133,7 @@ describe('Case Transformer Utilities', () => {
         });
     });
 
+
     describe('modelToResponse', () => {
         it('should handle Sequelize model with toJSON method', () => {
             const mockModel = {
@@ -142,6 +152,7 @@ describe('Case Transformer Utilities', () => {
 
             expect(modelToResponse(mockModel)).toEqual(expected);
         });
+
 
         it('should handle plain objects', () => {
             const input = {

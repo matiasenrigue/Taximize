@@ -53,6 +53,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Ride API Integration Tests', () => {
 
     describe('POST /api/rides/evaluate-ride', () => {
@@ -72,6 +73,7 @@ describe('Ride API Integration Tests', () => {
             // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
+
 
         it('should return 200 and predicted score when authenticated with valid coordinates', async () => {
             // Test authenticated user can successfully evaluate ride
@@ -95,6 +97,7 @@ describe('Ride API Integration Tests', () => {
             expect(res.body.rating).toBeLessThanOrEqual(5);
         });
 
+
         it('should return 400 when authenticated but invalid coordinates provided', async () => {
             // Test authenticated user gets validation error for invalid coordinates
             const { token } = await createAuthenticatedUser();
@@ -115,6 +118,7 @@ describe('Ride API Integration Tests', () => {
             expect(res.body.success).toBe(false);
             expect(res.body.error).toContain('Invalid coordinates');
         });
+
 
         it('should return 400 when authenticated but missing required coordinates', async () => {
             // Test authenticated user gets validation error for missing coordinates
@@ -137,6 +141,7 @@ describe('Ride API Integration Tests', () => {
         });
     });
 
+
     describe('POST /api/rides/start-ride', () => {
         it('should return 401 when no authentication provided', async () => {
             // Test POST /api/rides/start-ride returns 401 when no authentication provided
@@ -154,6 +159,7 @@ describe('Ride API Integration Tests', () => {
             // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
+
 
         it('should return 400 when authenticated driver has no active shift', async () => {
             // Test authenticated driver cannot start ride without active shift
@@ -176,6 +182,7 @@ describe('Ride API Integration Tests', () => {
             expect(res.body.success).toBe(false);
             expect(res.body.error).toContain('No active shift found');
         });
+
 
         it('should return 400 when authenticated but invalid coordinates provided', async () => {
             // Test authenticated user gets validation error for invalid coordinates
@@ -200,6 +207,7 @@ describe('Ride API Integration Tests', () => {
         });
     });
 
+
     describe('GET /api/rides/current', () => {
         it('should return 401 when no authentication provided', async () => {
             // Test GET /api/rides/current returns 401 when no authentication provided
@@ -209,6 +217,7 @@ describe('Ride API Integration Tests', () => {
             // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
+
 
         it('should return 400 when authenticated driver has no active shift', async () => {
             // Test authenticated driver with no active shift gets appropriate error
@@ -222,6 +231,7 @@ describe('Ride API Integration Tests', () => {
             expect(res.body.success).toBe(false);
             expect(res.body.error).toContain('No active shift found. Please start a shift before checking ride status.');
         });
+
 
         it('should return 400 when authenticated but no active ride exists', async () => {
             // Test authenticated driver with active shift but no ride
@@ -238,6 +248,7 @@ describe('Ride API Integration Tests', () => {
         });
     });
 
+
     describe('POST /api/rides/end-ride', () => {
         it('should return 401 when no authentication provided', async () => {
             // Test POST /api/rides/end-ride returns 401 when no authentication provided
@@ -253,6 +264,7 @@ describe('Ride API Integration Tests', () => {
             // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
+
 
         it('should return 400 when authenticated driver has no active ride', async () => {
             // Test authenticated driver with no active ride cannot end ride
@@ -273,6 +285,7 @@ describe('Ride API Integration Tests', () => {
             expect(res.body.error).toContain('No active shift found. Please start a shift before checking ride status.');
         });
 
+
         it('should return 400 when authenticated but missing required fields', async () => {
             // Test authenticated user gets validation error for missing fields
             const { token } = await createAuthenticatedUser();
@@ -291,6 +304,7 @@ describe('Ride API Integration Tests', () => {
             expect(res.body.success).toBe(false);
             expect(res.body.error).toContain('Missing required fields');
         });
+
 
         it('should return 400 when authenticated but invalid field types provided', async () => {
             // Test authenticated user gets validation error for invalid field types
@@ -311,6 +325,7 @@ describe('Ride API Integration Tests', () => {
             expect(res.body.error).toContain('Invalid fare or distance');
         });
     });
+
 
     describe('Database Constraints', () => {
         it('should violate unique constraint when creating second active ride for same shift', async () => {

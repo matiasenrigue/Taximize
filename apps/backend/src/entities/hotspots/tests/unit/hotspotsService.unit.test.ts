@@ -25,6 +25,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('HotspotsService Unit Tests', () => {
     describe('isHotspotDataRecent', () => {
         it('should return data when hotspot was created within the last hour', async () => {
@@ -47,6 +48,7 @@ describe('HotspotsService Unit Tests', () => {
             });
         });
 
+
         it('should return null when no hotspots exist', async () => {
             (Hotspots.findOne as jest.Mock).mockResolvedValue(null);
 
@@ -54,6 +56,7 @@ describe('HotspotsService Unit Tests', () => {
 
             expect(result).toBeNull();
         });
+
 
         it('should return null when hotspot is older than 1 hour', async () => {
             const mockHotspotData = { zones: [{ name: "Zone1", count: 10 }] };
@@ -71,6 +74,7 @@ describe('HotspotsService Unit Tests', () => {
 
             expect(result).toBeNull();
         });
+
 
         it('should return data when hotspot is exactly 59 minutes old', async () => {
             const mockHotspotData = { zones: [{ name: "Zone1", count: 10 }] };
@@ -90,12 +94,14 @@ describe('HotspotsService Unit Tests', () => {
         });
     });
 
+
     describe('hotspotsApiCall', () => {
         it('should return null as placeholder', async () => {
             const result = await HotspotsService.hotspotsApiCall();
             expect(result).toBeNull();
         });
     });
+
 
     describe('fetchNewHotspotsData', () => {
         it('should create new hotspot when API call returns data', async () => {
@@ -116,6 +122,7 @@ describe('HotspotsService Unit Tests', () => {
             expect(HotspotsService.hotspotsApiCall).toHaveBeenCalledTimes(1);
             expect(Hotspots.create).toHaveBeenCalledWith({ data: mockApiData });
         });
+
 
         it('should retry up to 5 times when API call fails', async () => {
             // Mock the API call to return null 4 times, then data on 5th attempt
@@ -141,6 +148,7 @@ describe('HotspotsService Unit Tests', () => {
             expect(HotspotsService.hotspotsApiCall).toHaveBeenCalledTimes(5);
         });
 
+
         it('should return false after 5 failed attempts', async () => {
             jest.spyOn(HotspotsService, 'hotspotsApiCall').mockResolvedValue(null);
 
@@ -150,6 +158,7 @@ describe('HotspotsService Unit Tests', () => {
             expect(HotspotsService.hotspotsApiCall).toHaveBeenCalledTimes(5);
             expect(Hotspots.create).not.toHaveBeenCalled();
         });
+
 
         it('should log error when all attempts fail', async () => {
             const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
@@ -161,6 +170,7 @@ describe('HotspotsService Unit Tests', () => {
             consoleSpy.mockRestore();
         });
     });
+
 
     describe('retrieveCachedHotspotsData', () => {
         it('should return most recent cached data when available', async () => {
@@ -181,6 +191,7 @@ describe('HotspotsService Unit Tests', () => {
             });
         });
 
+
         it('should return false when no cached data exists', async () => {
             (Hotspots.findAll as jest.Mock).mockResolvedValue([]);
 
@@ -189,6 +200,7 @@ describe('HotspotsService Unit Tests', () => {
             expect(result).toBe(false);
         });
     });
+
 
     describe('getHotspotsData', () => {
         it('should return recent data without fetching new data', async () => {
@@ -203,6 +215,7 @@ describe('HotspotsService Unit Tests', () => {
             expect(HotspotsService.fetchNewHotspotsData).not.toHaveBeenCalled();
         });
 
+
         it('should fetch new data when no recent data exists', async () => {
             const mockNewData = { zones: [{ name: "Zone1", count: 10 }] };
             jest.spyOn(HotspotsService, 'isHotspotDataRecent').mockResolvedValue(null);
@@ -213,6 +226,7 @@ describe('HotspotsService Unit Tests', () => {
             expect(result).toEqual(mockNewData);
             expect(HotspotsService.fetchNewHotspotsData).toHaveBeenCalled();
         });
+
 
         it('should return cached data when fetching new data fails', async () => {
             const mockCachedData = { zones: [{ name: "Zone1", count: 10 }] };
@@ -225,6 +239,7 @@ describe('HotspotsService Unit Tests', () => {
             expect(result).toEqual(mockCachedData);
             expect(HotspotsService.retrieveCachedHotspotsData).toHaveBeenCalled();
         });
+
 
         it('should throw error when no data is available at all', async () => {
             jest.spyOn(HotspotsService, 'isHotspotDataRecent').mockResolvedValue(null);

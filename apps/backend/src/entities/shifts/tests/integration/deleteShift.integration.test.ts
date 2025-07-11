@@ -109,6 +109,7 @@ afterAll(async () => {
     await sequelize.close();
 });
 
+
 describe('Delete Shift Operations', () => {
     describe('Cascade Rules', () => {
         it('Tests-ED-45-Cannot-delete-shift-with-rides', async () => {
@@ -123,6 +124,7 @@ describe('Delete Shift Operations', () => {
             expect(response.status).toBe(400);
             expect(response.body.error).toContain('Cannot delete shift with associated rides');
         });
+
 
         it('Tests-ED-46-Can-delete-shift-after-deleting-rides', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -143,6 +145,7 @@ describe('Delete Shift Operations', () => {
             expect(response.body.message).toContain('Shift deleted successfully');
         });
 
+
         it('Tests-ED-47-Shows-warning-about-data-loss', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createCompletedShift(user.id);
@@ -155,6 +158,7 @@ describe('Delete Shift Operations', () => {
             expect(response.status).toBe(400);
             expect(response.body.error).toContain('delete rides first');
         });
+
 
         it('Tests-ED-48-Can-delete-shift-with-only-deleted-rides', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -169,6 +173,7 @@ describe('Delete Shift Operations', () => {
             expect(response.body.message).toContain('Shift deleted successfully');
         });
     });
+
 
     describe('Soft Delete Implementation', () => {
         it('Tests-ED-49-Implements-soft-delete-with-timestamp', async () => {
@@ -188,6 +193,7 @@ describe('Delete Shift Operations', () => {
             const deletedAt = deletedShift!.deleted_at || (deletedShift as any).deletedAt;
             expect(deletedAt).toBeTruthy();
         });
+
 
         it('Tests-ED-50-Standard-queries-exclude-deleted-shifts', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -209,6 +215,7 @@ describe('Delete Shift Operations', () => {
             expect(response.body[0].id).toBe(shift2.id);
         });
 
+
         it('Tests-ED-51-Cannot-delete-active-shift', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createActiveShift(user.id);
@@ -221,6 +228,7 @@ describe('Delete Shift Operations', () => {
             expect(response.body.error).toContain('Cannot delete active shift');
         });
     });
+
 
     describe('Restore Operations', () => {
         it('Tests-ED-52-Can-restore-deleted-shift', async () => {
@@ -248,6 +256,7 @@ describe('Delete Shift Operations', () => {
             expect(deletedAt).toBeNull();
         });
 
+
         it('Tests-ED-53-Cannot-restore-non-deleted-shift', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createCompletedShift(user.id);
@@ -259,6 +268,7 @@ describe('Delete Shift Operations', () => {
             expect(response.status).toBe(400);
             expect(response.body.error).toContain('Shift is not deleted');
         });
+
 
         it('Tests-ED-54-Restores-with-associated-data', async () => {
             const { user, token } = await createAuthenticatedUser();
@@ -289,6 +299,7 @@ describe('Delete Shift Operations', () => {
         });
     });
 
+
     describe('Authorization', () => {
         it('Tests-ED-55-Cannot-delete-other-driver-shift', async () => {
             const { user: driver1, token: token1 } = await createAuthenticatedUser('driver1@test.com', 'driver1');
@@ -304,6 +315,7 @@ describe('Delete Shift Operations', () => {
             expect(response.body.error).toContain('Not authorized');
         });
 
+
         it('Tests-ED-56-Driver-can-delete-own-shift', async () => {
             const { user, token } = await createAuthenticatedUser();
             const shift = await createCompletedShift(user.id);
@@ -315,6 +327,7 @@ describe('Delete Shift Operations', () => {
             expect(response.status).toBe(200);
             expect(response.body.message).toContain('Shift deleted successfully');
         });
+
 
         it('Tests-ED-57-Cannot-restore-other-driver-shift', async () => {
             const { user: driver1, token: token1 } = await createAuthenticatedUser('driver1@test.com', 'driver1');
@@ -336,6 +349,7 @@ describe('Delete Shift Operations', () => {
             expect(response.body.error).toContain('Not authorized');
         });
     });
+
 
     describe('Data Integrity', () => {
         it('Tests-ED-58-Preserves-shift-data-on-soft-delete', async () => {
@@ -361,6 +375,7 @@ describe('Delete Shift Operations', () => {
             expect(deletedShift!.total_duration_ms).toBe(originalData.total_duration_ms);
             expect(deletedShift!.work_time_ms).toBe(originalData.work_time_ms);
         });
+
 
         it('Tests-ED-59-Maintains-referential-integrity', async () => {
             const { user, token } = await createAuthenticatedUser();
