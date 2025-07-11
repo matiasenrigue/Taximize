@@ -68,7 +68,8 @@ describe('Ride Workflow Integration Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "123 Test Street, Dublin"
         });
 
       expect(startRideRes.status).toBe(200);
@@ -82,6 +83,10 @@ describe('Ride Workflow Integration Tests', () => {
       expect(statusRes.status).toBe(200);
       expect(statusRes.body.data.rideId).toBe(rideId);
       expect(statusRes.body.data.elapsedTimeMs).toBeGreaterThan(0);
+      // Verify new fields are returned
+      expect(statusRes.body.data.startTime).toBeDefined();
+      expect(typeof statusRes.body.data.startTime).toBe('number');
+      expect(statusRes.body.data.address).toBe("123 Test Street, Dublin");
 
       // 3. End ride
       const endRideRes = await request(app)
@@ -114,7 +119,8 @@ describe('Ride Workflow Integration Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "123 Test Street, Dublin"
         });
 
       expect(ride1Res.status).toBe(200);
@@ -137,7 +143,8 @@ describe('Ride Workflow Integration Tests', () => {
           startLatitude: 53.359805,
           startLongitude: -6.270310,
           destinationLatitude: 53.369805,
-          destinationLongitude: -6.280310
+          destinationLongitude: -6.280310,
+          address: "456 Second Street, Dublin"
         });
 
       expect(ride2Res.status).toBe(200);
@@ -163,7 +170,8 @@ describe('Ride Workflow Integration Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "789 Third Street, Dublin"
         });
 
       // Get status (override destination feature was removed)
@@ -190,7 +198,8 @@ describe('Ride Workflow Integration Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "Cross-shift Ride 1 Address"
         });
 
       expect(ride1Res.status).toBe(200);
@@ -216,7 +225,8 @@ describe('Ride Workflow Integration Tests', () => {
           startLatitude: 53.369805,
           startLongitude: -6.280310,
           destinationLatitude: 53.379805,
-          destinationLongitude: -6.290310
+          destinationLongitude: -6.290310,
+          address: "Cross-shift Ride 2 Address"
         });
 
       expect(ride2Res.status).toBe(200);
@@ -245,7 +255,8 @@ describe('Ride Workflow Integration Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "Error Recovery First Ride"
         });
 
       expect(ride1Res.status).toBe(200);
@@ -258,7 +269,8 @@ describe('Ride Workflow Integration Tests', () => {
           startLatitude: 53.359805,
           startLongitude: -6.270310,
           destinationLatitude: 53.369805,
-          destinationLongitude: -6.280310
+          destinationLongitude: -6.280310,
+          address: "Error Recovery Second Ride (Should Fail)"
         });
 
       expect(ride2Res.status).toBe(400);
@@ -277,7 +289,8 @@ describe('Ride Workflow Integration Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "Sequential First Ride"
         });
 
       expect(ride1Res.status).toBe(200);
@@ -298,7 +311,8 @@ describe('Ride Workflow Integration Tests', () => {
           startLatitude: 53.359805,
           startLongitude: -6.270310,
           destinationLatitude: 53.369805,
-          destinationLongitude: -6.280310
+          destinationLongitude: -6.280310,
+          address: "Sequential Second Ride"
         });
 
       expect(ride2Res.status).toBe(200);

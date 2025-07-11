@@ -70,7 +70,8 @@ describe('Ride State Transition Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "Test Address for Ended Shift"
         });
 
       expect(rideRes.status).toBe(400);
@@ -89,7 +90,8 @@ describe('Ride State Transition Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "Test Address Status Check After Termination"
         });
 
       expect(startRes.status).toBe(200);
@@ -118,7 +120,8 @@ describe('Ride State Transition Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "Test Address End After Termination"
         });
 
       expect(startRes.status).toBe(200);
@@ -160,7 +163,8 @@ describe('Ride State Transition Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "Test Address Driver Unavailable"
         });
 
       expect(rideRes.status).toBe(400);
@@ -193,7 +197,8 @@ describe('Ride State Transition Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "Test Address Driver Available Again"
         });
 
       expect(rideRes.status).toBe(200);
@@ -215,7 +220,8 @@ describe('Ride State Transition Tests', () => {
             startLatitude: 53.349805,
             startLongitude: -6.260310,
             destinationLatitude: 53.359805,
-            destinationLongitude: -6.270310
+            destinationLongitude: -6.270310,
+            address: "Test Address Rapid Successive Attempts"
           })
       );
 
@@ -252,7 +258,8 @@ describe('Ride State Transition Tests', () => {
             startLatitude: 53.349805,
             startLongitude: -6.260310,
             destinationLatitude: 53.359805,
-            destinationLongitude: -6.270310
+            destinationLongitude: -6.270310,
+            address: "Test Address Concurrent Driver 1"
           }),
         request(app)
           .post('/api/rides/start-ride')
@@ -261,7 +268,8 @@ describe('Ride State Transition Tests', () => {
             startLatitude: 53.369805,
             startLongitude: -6.280310,
             destinationLatitude: 53.379805,
-            destinationLongitude: -6.290310
+            destinationLongitude: -6.290310,
+            address: "Test Address Concurrent Driver 2"
           })
       ];
 
@@ -291,7 +299,8 @@ describe('Ride State Transition Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "Test Address Database State Consistency"
         });
 
       const rideId = startRes.body.data.rideId;
@@ -330,7 +339,8 @@ describe('Ride State Transition Tests', () => {
           startLatitude: 53.349805,
           startLongitude: -6.260310,
           destinationLatitude: 53.359805,
-          destinationLongitude: -6.270310
+          destinationLongitude: -6.270310,
+          address: "Test Address Shift Deletion Edge Case"
         });
 
       expect(startRes.status).toBe(200);

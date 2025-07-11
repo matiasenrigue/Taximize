@@ -43,6 +43,7 @@ describe('Ride Database Constraints Tests', () => {
         start_longitude: -6.260310,
         destination_latitude: 53.359805,
         destination_longitude: -6.270310,
+        address: "Test Foreign Key Constraint Shift",
         start_time: new Date(),
         predicted_score: 3,
         end_time: null
@@ -72,6 +73,7 @@ describe('Ride Database Constraints Tests', () => {
         start_longitude: -6.260310,
         destination_latitude: 53.359805,
         destination_longitude: -6.270310,
+        address: "Test Foreign Key Constraint Driver",
         start_time: new Date(),
         predicted_score: 3,
         end_time: null
@@ -137,6 +139,7 @@ describe('Ride Database Constraints Tests', () => {
         start_longitude: -6.260310,
         destination_latitude: 53.359805,
         destination_longitude: -6.270310,
+        address: "Test Unique Constraint First Ride",
         start_time: new Date(),
         predicted_score: 3,
         end_time: null // Active ride
@@ -150,6 +153,7 @@ describe('Ride Database Constraints Tests', () => {
         start_longitude: -6.270310,
         destination_latitude: 53.369805,
         destination_longitude: -6.280310,
+        address: "Test Unique Constraint Second Ride (Should Fail)",
         start_time: new Date(),
         predicted_score: 4,
         end_time: null // Active ride - should violate constraint
@@ -179,6 +183,7 @@ describe('Ride Database Constraints Tests', () => {
         start_longitude: -6.260310,
         destination_latitude: 53.359805,
         destination_longitude: -6.270310,
+        address: "First Ended Ride Address",
         start_time: new Date(),
         predicted_score: 3,
         end_time: new Date(), // Ended ride
@@ -194,6 +199,7 @@ describe('Ride Database Constraints Tests', () => {
         start_longitude: -6.270310,
         destination_latitude: 53.369805,
         destination_longitude: -6.280310,
+        address: "Second Ended Ride Address",
         start_time: new Date(),
         predicted_score: 4,
         end_time: new Date(), // Ended ride
@@ -228,6 +234,7 @@ describe('Ride Database Constraints Tests', () => {
         start_longitude: -6.260310,
         destination_latitude: 53.359805,
         destination_longitude: -6.270310,
+        address: "First Active Ride Address",
         start_time: new Date(),
         predicted_score: 3,
         end_time: null // Active ride
@@ -248,6 +255,7 @@ describe('Ride Database Constraints Tests', () => {
         start_longitude: -6.270310,
         destination_latitude: 53.369805,
         destination_longitude: -6.280310,
+        address: "Second Active Ride Address",
         start_time: new Date(),
         predicted_score: 4,
         end_time: null // Active ride
@@ -512,6 +520,7 @@ describe('Ride Database Constraints Tests', () => {
         start_longitude: -6.260310,
         destination_latitude: 53.359805,
         destination_longitude: -6.270310,
+        address: "Valid Ride Test Address",
         start_time: new Date(),
         predicted_score: 3,
         end_time: null

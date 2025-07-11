@@ -65,6 +65,7 @@ async function createRideInShift(shiftId: string, driverId: string) {
     start_longitude: -6.260310,
     destination_latitude: 53.343792,
     destination_longitude: -6.254572,
+    address: "Test Delete Shift Ride Address",
     distance_km: 5.2,
     earning_cents: 1250,
     predicted_score: 0.75
@@ -82,6 +83,7 @@ async function createDeletedRide(shiftId: string, driverId: string) {
     start_longitude: -6.260310,
     destination_latitude: 53.343792,
     destination_longitude: -6.254572,
+    address: "Test Deleted Ride Address",
     distance_km: 5.2,
     earning_cents: 1250,
     predicted_score: 0.75

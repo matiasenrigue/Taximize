@@ -1,4 +1,3 @@
-// Placeholder file for TDD Red phase - full implementation in Green phase
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../../shared/config/db';
 
@@ -10,6 +9,7 @@ export class Ride extends Model {
   public start_longitude!: number;
   public destination_latitude!: number;
   public destination_longitude!: number;
+  public address!: string;
   public start_time!: Date;
   public predicted_score!: number;
   public end_time!: Date | null;
@@ -53,6 +53,10 @@ Ride.init(
     },
     destination_longitude: {
       type: DataTypes.DOUBLE,
+      allowNull: false,
+    },
+    address: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     start_time: {

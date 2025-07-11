@@ -11,6 +11,8 @@ interface RideCoordinates {
   startLng: number;
   destLat: number;
   destLng: number;
+  address?: string;
+  timestamp?: number;
 }
 
 interface OverrideDestination {
@@ -94,6 +96,9 @@ export class RideService {
     // Get predicted score
     const predictedScore = await this.evaluateRide(coords.startLat, coords.startLng, coords.destLat, coords.destLng);
 
+    // Use provided timestamp or current time
+    const startTime = coords.timestamp ? new Date(coords.timestamp) : new Date();
+
     // Create new ride
     const ride = await Ride.create({
       shift_id: shiftId,
@@ -102,7 +107,8 @@ export class RideService {
       start_longitude: coords.startLng,
       destination_latitude: coords.destLat,
       destination_longitude: coords.destLng,
-      start_time: new Date(),
+      address: coords.address || "Address not provided",
+      start_time: startTime,
       predicted_score: predictedScore,
       end_time: null,
       earning_cents: null,
@@ -117,7 +123,7 @@ export class RideService {
     };
   }
 
-  static async endRide(rideId: string, fareCents: number, actualDistanceKm: number): Promise<any> {
+  static async endRide(rideId: string, fareCents: number, actualDistanceKm: number, timestamp?: number): Promise<any> {
     // Find the active ride
     const ride = await Ride.findByPk(rideId);
     
@@ -129,7 +135,8 @@ export class RideService {
       throw new Error('Ride is already ended');
     }
 
-    const endTime = new Date();
+    // Use provided timestamp or current time
+    const endTime = timestamp ? new Date(timestamp) : new Date();
     const totalTimeMs = endTime.getTime() - ride.start_time.getTime();
     const earningPerMin = Math.round((fareCents / (totalTimeMs / (1000 * 60))));
 
@@ -199,6 +206,8 @@ export class RideService {
       start_longitude: activeRide.start_longitude,
       current_destination_latitude: destLat,
       current_destination_longitude: destLng,
+      startTime: activeRide.start_time.getTime(),
+      address: activeRide.address,
       elapsed_time_ms: elapsedTimeMs,
       distance_km: distanceKm,
       estimated_fare_cents: estimatedFareCents

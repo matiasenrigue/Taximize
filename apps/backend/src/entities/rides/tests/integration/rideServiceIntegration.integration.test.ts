@@ -81,7 +81,8 @@ describe('Ride Service Integration Tests', () => {
         startLat: 53.349805,
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Service Integration Test 1"
       };
 
       const rideResult = await RideService.startRide(user.id, shift.id, coords);
@@ -112,7 +113,8 @@ describe('Ride Service Integration Tests', () => {
         startLat: 53.349805,
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Service Integration Test 2"
       };
 
       await expect(RideService.startRide(user.id, 'fake-shift-id', coords))
@@ -141,7 +143,8 @@ describe('Ride Service Integration Tests', () => {
         startLat: 53.349805,
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Service Integration Test 3"
       };
 
       const rideResult = await RideService.startRide(user.id, shift.id, coords);
@@ -183,7 +186,8 @@ describe('Ride Service Integration Tests', () => {
         startLat: 53.349805,
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Service Integration Test 4"
       };
 
       const rideResult = await RideService.startRide(user.id, shift.id, coords);
@@ -226,7 +230,8 @@ describe('Ride Service Integration Tests', () => {
         startLat: 53.349805,
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Service Integration Test 5"
       };
 
       // Make concurrent ride start attempts
@@ -268,7 +273,8 @@ describe('Ride Service Integration Tests', () => {
         startLat: 53.349805,
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Service Integration Test 6"
       };
 
       const rideResult = await RideService.startRide(user.id, shift.id, coords);
@@ -299,7 +305,8 @@ describe('Ride Service Integration Tests', () => {
         startLat: 53.349805,
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Malformed UUID Test"
       };
 
       // Test with malformed driver ID
@@ -376,6 +383,7 @@ describe('Ride Service Integration Tests', () => {
         start_longitude: -6.260310,
         destination_latitude: 53.359805,
         destination_longitude: -6.270310,
+        address: "Expired Ride Test Address",
         start_time: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
         predicted_score: 3,
         end_time: null // Still active

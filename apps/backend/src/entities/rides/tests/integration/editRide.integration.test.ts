@@ -44,6 +44,7 @@ async function createCompletedRide(shiftId: string, driverId: string) {
     start_longitude: -6.260310,
     destination_latitude: 53.343792,
     destination_longitude: -6.254572,
+    address: "Test Completed Ride Address",
     distance_km: 5.2,
     earning_cents: 1250,
     predicted_score: 0.75
@@ -61,6 +62,7 @@ async function createActiveRide(shiftId: string, driverId: string) {
     start_longitude: -6.260310,
     destination_latitude: 53.343792,
     destination_longitude: -6.254572,
+    address: "Test Active Ride Address",
     distance_km: 5.2,
     earning_cents: 1250,
     predicted_score: 0.75

@@ -1,4 +1,3 @@
-// Placeholder file for TDD Red phase - methods will be implemented in Green phase
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { RideService } from './ride.service';
@@ -42,7 +41,7 @@ export class RideController {
   // @route   POST /api/rides/start-ride  
   // @access  Protected
   static startRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { startLatitude, startLongitude, destinationLatitude, destinationLongitude } = req.body;
+    const { startLatitude, startLongitude, destinationLatitude, destinationLongitude, timestamp, address } = req.body;
     const driverId = req.user?.id;
 
     // Validate authentication
@@ -52,9 +51,9 @@ export class RideController {
     }
 
     // Validate required fields
-    if (!startLatitude || !startLongitude || !destinationLatitude || !destinationLongitude) {
+    if (!startLatitude || !startLongitude || !destinationLatitude || !destinationLongitude || !address) {
       res.status(400);
-      throw new Error('Missing required coordinates');
+      throw new Error('Missing required fields: coordinates and address');
     }
 
     // Validate coordinate types
@@ -64,13 +63,27 @@ export class RideController {
       throw new Error('Invalid coordinates provided');
     }
 
+    // Validate timestamp if provided
+    if (timestamp !== undefined && typeof timestamp !== 'number') {
+      res.status(400);
+      throw new Error('Invalid timestamp provided');
+    }
+
+    // Validate address
+    if (typeof address !== 'string' || address.trim().length === 0) {
+      res.status(400);
+      throw new Error('Invalid address provided');
+    }
+
     try {
       // Get active shift for driver (simplified approach - in real app would get from request or service)
       const coords = {
         startLat: startLatitude,
         startLng: startLongitude,
         destLat: destinationLatitude,
-        destLng: destinationLongitude
+        destLng: destinationLongitude,
+        address: address.trim(),
+        timestamp: timestamp
       };
 
       // Get the driver's current active shift
@@ -134,7 +147,7 @@ export class RideController {
   // @route   POST /api/rides/end-ride
   // @access  Protected
   static endRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { fareCents, actualDistanceKm } = req.body;
+    const { fareCents, actualDistanceKm, timestamp } = req.body;
     const driverId = req.user?.id;
 
     // Validate authentication
@@ -155,11 +168,17 @@ export class RideController {
       throw new Error('Invalid fare or distance values');
     }
 
+    // Validate timestamp if provided
+    if (timestamp !== undefined && typeof timestamp !== 'number') {
+      res.status(400);
+      throw new Error('Invalid timestamp provided');
+    }
+
     try {
       // First get the active ride to get the rideId
       const rideStatus = await RideService.getRideStatus(driverId);
 
-      const result = await RideService.endRide(rideStatus.rideId, fareCents, actualDistanceKm);
+      const result = await RideService.endRide(rideStatus.rideId, fareCents, actualDistanceKm, timestamp);
       
       res.status(200).json({
         success: true,

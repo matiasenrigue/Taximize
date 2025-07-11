@@ -163,7 +163,8 @@ describe('Ride API Integration Tests', () => {
         startLatitude: 53.349805,
         startLongitude: -6.260310,
         destinationLatitude: 53.359805,
-        destinationLongitude: -6.270310
+        destinationLongitude: -6.270310,
+        address: "Test Address, Dublin"
       };
 
       const res = await request(app)
@@ -184,7 +185,8 @@ describe('Ride API Integration Tests', () => {
         startLatitude: 'invalid',
         startLongitude: -6.260310,
         destinationLatitude: 53.359805,
-        destinationLongitude: -6.270310
+        destinationLongitude: -6.270310,
+        address: "Test Address for Invalid Coordinates"
       };
 
       const res = await request(app)
@@ -333,6 +335,7 @@ describe('Ride API Integration Tests', () => {
         start_longitude: -6.260310,
         destination_latitude: 53.359805,
         destination_longitude: -6.270310,
+        address: "First Active Ride Test Address",
         start_time: new Date(),
         predicted_score: 3,
         end_time: null // Active ride
@@ -342,10 +345,11 @@ describe('Ride API Integration Tests', () => {
       await expect(Ride.create({
         shift_id: shift.id, // Same shift
         driver_id: user.id,
-        startLatitude: 53.359805,
-        startLongitude: -6.270310,
-        destinationLatitude: 53.369805,
-        destinationLongitude: -6.280310,
+        start_latitude: 53.359805,
+        start_longitude: -6.270310,
+        destination_latitude: 53.369805,
+        destination_longitude: -6.280310,
+        address: "Second Active Ride Test Address (Should Fail)",
         start_time: new Date(),
         predicted_score: 4,
         end_time: null // Active ride - should violate constraint

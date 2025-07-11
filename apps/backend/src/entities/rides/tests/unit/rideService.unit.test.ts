@@ -109,7 +109,8 @@ describe('RideService Unit Tests', () => {
         startLat: 95, // Invalid: > 90
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Invalid Lat Test"
       };
 
       await expect(RideService.startRide(driverId, shiftId, coordsInvalidLat))
@@ -124,7 +125,8 @@ describe('RideService Unit Tests', () => {
         startLat: 53.349805,
         startLng: -185, // Invalid: < -180
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Invalid Lng Test"
       };
 
       await expect(RideService.startRide(driverId, shiftId, coordsInvalidLng))
@@ -139,7 +141,8 @@ describe('RideService Unit Tests', () => {
         startLat: 53.349805,
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Unit Test Address 1"
       };
 
       await expect(RideService.startRide(driverId, shiftId, coords))
@@ -155,7 +158,8 @@ describe('RideService Unit Tests', () => {
         startLat: 53.349805,
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Unit Test Address 2"
       };
 
       // This will likely fail in unit tests due to database dependencies
@@ -176,7 +180,8 @@ describe('RideService Unit Tests', () => {
         startLat: 53.349805,
         startLng: -6.260310,
         destLat: 53.359805,
-        destLng: -6.270310
+        destLng: -6.270310,
+        address: "Unit Test Address 3"
       };
 
       // This test will verify the unique constraint violation in the GREEN phase
