@@ -5,6 +5,44 @@ import { generateAccessToken, generateRefreshToken } from '../../utils/generateT
 process.env.ACCESS_TOKEN_SECRET = 'test-access-token-secret';
 process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
 
+// Test helper functions
+const verifyToken = (token: string, secret: string): any => {
+    return jwt.verify(token, secret);
+};
+
+const expectValidJWT = (token: string) => {
+    expect(token).toBeDefined();
+    expect(typeof token).toBe('string');
+    expect(token.split('.')).toHaveLength(3);
+};
+
+const expectTokenToExpireIn = (token: string, secret: string, expectedSeconds: number, tolerance = 5) => {
+    const decoded = verifyToken(token, secret);
+    const now = Math.floor(Date.now() / 1000);
+    const expectedExpiry = now + expectedSeconds;
+    
+    expect(decoded.exp).toBeGreaterThanOrEqual(expectedExpiry - tolerance);
+    expect(decoded.exp).toBeLessThanOrEqual(expectedExpiry + tolerance);
+};
+
+const expectValidTimestamp = (token: string, secret: string, tolerance = 5) => {
+    const decoded = verifyToken(token, secret);
+    const now = Math.floor(Date.now() / 1000);
+    
+    expect(decoded.iat).toBeGreaterThanOrEqual(now - tolerance);
+    expect(decoded.iat).toBeLessThanOrEqual(now + tolerance);
+};
+
+const expectTokenVerification = (token: string, correctSecret: string, wrongSecrets: string[]) => {
+    // Should verify successfully with correct secret
+    expect(() => verifyToken(token, correctSecret)).not.toThrow();
+    
+    // Should fail with wrong secrets
+    wrongSecrets.forEach(wrongSecret => {
+        expect(() => verifyToken(token, wrongSecret)).toThrow();
+    });
+};
+
 
 describe('Token Generators Unit Tests', () => {
 
@@ -14,84 +52,56 @@ describe('Token Generators Unit Tests', () => {
 
         it('should generate a valid JWT token', () => {
             const token = generateAccessToken(testUserId);
-            
-            expect(token).toBeDefined();
-            expect(typeof token).toBe('string');
-            expect(token.split('.')).toHaveLength(3); // JWT has 3 parts separated by dots
+            expectValidJWT(token);
         });
 
 
         it('should contain the correct user ID in payload', () => {
             const token = generateAccessToken(testUserId);
-            
-            const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
+            const decoded = verifyToken(token, process.env.ACCESS_TOKEN_SECRET!);
             expect(decoded.id).toBe(testUserId);
         });
 
 
         it('should be signed with ACCESS_TOKEN_SECRET', () => {
             const token = generateAccessToken(testUserId);
-            
-            // Should verify successfully with correct secret
-            expect(() => {
-                jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
-            }).not.toThrow();
-
-            // Should fail with wrong secret
-            expect(() => {
-                jwt.verify(token, 'wrong-secret');
-            }).toThrow();
+            expectTokenVerification(
+                token,
+                process.env.ACCESS_TOKEN_SECRET!,
+                ['wrong-secret', process.env.REFRESH_TOKEN_SECRET!]
+            );
         });
 
 
         it('should expire in approximately 15 minutes', () => {
             const token = generateAccessToken(testUserId);
-            
-            const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
-            const now = Math.floor(Date.now() / 1000);
-            const expectedExpiry = now + (15 * 60); // 15 minutes in seconds
-            
-            // Allow 5 second tolerance for test execution time
-            expect(decoded.exp).toBeGreaterThanOrEqual(expectedExpiry - 5);
-            expect(decoded.exp).toBeLessThanOrEqual(expectedExpiry + 5);
+            expectTokenToExpireIn(token, process.env.ACCESS_TOKEN_SECRET!, 15 * 60);
         });
 
 
         it('should have issued at timestamp', () => {
             const token = generateAccessToken(testUserId);
-            
-            const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as any;
-            const now = Math.floor(Date.now() / 1000);
-            
-            // Allow 5 second tolerance for test execution time
-            expect(decoded.iat).toBeGreaterThanOrEqual(now - 5);
-            expect(decoded.iat).toBeLessThanOrEqual(now + 5);
+            expectValidTimestamp(token, process.env.ACCESS_TOKEN_SECRET!);
         });
 
 
-        it('should generate different tokens for different user IDs', () => {
-            const token1 = generateAccessToken('user-1');
-            const token2 = generateAccessToken('user-2');
+        it.each([
+            ['user-1', 'user-2'],
+            ['user-3', 'user-4']
+        ])('should generate different tokens for different user IDs (%s, %s)', (userId1, userId2) => {
+            const token1 = generateAccessToken(userId1);
+            const token2 = generateAccessToken(userId2);
             
             expect(token1).not.toBe(token2);
             
-            const decoded1 = jwt.verify(token1, process.env.ACCESS_TOKEN_SECRET!) as any;
-            const decoded2 = jwt.verify(token2, process.env.ACCESS_TOKEN_SECRET!) as any;
+            const decoded1 = verifyToken(token1, process.env.ACCESS_TOKEN_SECRET!);
+            const decoded2 = verifyToken(token2, process.env.ACCESS_TOKEN_SECRET!);
             
-            expect(decoded1.id).toBe('user-1');
-            expect(decoded2.id).toBe('user-2');
+            expect(decoded1.id).toBe(userId1);
+            expect(decoded2.id).toBe(userId2);
         });
 
 
-        it('should generate different tokens for same user ID at different times', () => {
-            const token1 = generateAccessToken(testUserId);
-            
-            // Wait a moment to ensure different timestamps
-            setTimeout(() => {
-                const token2 = generateAccessToken(testUserId);
-                expect(token1).not.toBe(token2);
-            }, 1000);
-        });
     });
 
 
@@ -101,77 +111,53 @@ describe('Token Generators Unit Tests', () => {
 
         it('should generate a valid JWT token', () => {
             const token = generateRefreshToken(testUserId);
-            
-            expect(token).toBeDefined();
-            expect(typeof token).toBe('string');
-            expect(token.split('.')).toHaveLength(3); // JWT has 3 parts separated by dots
+            expectValidJWT(token);
         });
 
 
         it('should contain the correct user ID in payload', () => {
             const token = generateRefreshToken(testUserId);
-            
-            const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET!) as any;
+            const decoded = verifyToken(token, process.env.REFRESH_TOKEN_SECRET!);
             expect(decoded.id).toBe(testUserId);
         });
 
 
         it('should be signed with REFRESH_TOKEN_SECRET', () => {
             const token = generateRefreshToken(testUserId);
-            
-            // Should verify successfully with correct secret
-            expect(() => {
-                jwt.verify(token, process.env.REFRESH_TOKEN_SECRET!);
-            }).not.toThrow();
-
-            // Should fail with wrong secret
-            expect(() => {
-                jwt.verify(token, 'wrong-secret');
-            }).toThrow();
-
-            // Should fail with access token secret
-            expect(() => {
-                jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
-            }).toThrow();
+            expectTokenVerification(
+                token,
+                process.env.REFRESH_TOKEN_SECRET!,
+                ['wrong-secret', process.env.ACCESS_TOKEN_SECRET!]
+            );
         });
 
 
         it('should expire in approximately 7 days', () => {
             const token = generateRefreshToken(testUserId);
-            
-            const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET!) as any;
-            const now = Math.floor(Date.now() / 1000);
-            const expectedExpiry = now + (7 * 24 * 60 * 60); // 7 days in seconds
-            
-            // Allow 5 second tolerance for test execution time
-            expect(decoded.exp).toBeGreaterThanOrEqual(expectedExpiry - 5);
-            expect(decoded.exp).toBeLessThanOrEqual(expectedExpiry + 5);
+            expectTokenToExpireIn(token, process.env.REFRESH_TOKEN_SECRET!, 7 * 24 * 60 * 60);
         });
 
 
         it('should have issued at timestamp', () => {
             const token = generateRefreshToken(testUserId);
-            
-            const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET!) as any;
-            const now = Math.floor(Date.now() / 1000);
-            
-            // Allow 5 second tolerance for test execution time
-            expect(decoded.iat).toBeGreaterThanOrEqual(now - 5);
-            expect(decoded.iat).toBeLessThanOrEqual(now + 5);
+            expectValidTimestamp(token, process.env.REFRESH_TOKEN_SECRET!);
         });
 
 
-        it('should generate different tokens for different user IDs', () => {
-            const token1 = generateRefreshToken('user-1');
-            const token2 = generateRefreshToken('user-2');
+        it.each([
+            ['user-1', 'user-2'],
+            ['user-3', 'user-4']
+        ])('should generate different tokens for different user IDs (%s, %s)', (userId1, userId2) => {
+            const token1 = generateRefreshToken(userId1);
+            const token2 = generateRefreshToken(userId2);
             
             expect(token1).not.toBe(token2);
             
-            const decoded1 = jwt.verify(token1, process.env.REFRESH_TOKEN_SECRET!) as any;
-            const decoded2 = jwt.verify(token2, process.env.REFRESH_TOKEN_SECRET!) as any;
+            const decoded1 = verifyToken(token1, process.env.REFRESH_TOKEN_SECRET!);
+            const decoded2 = verifyToken(token2, process.env.REFRESH_TOKEN_SECRET!);
             
-            expect(decoded1.id).toBe('user-1');
-            expect(decoded2.id).toBe('user-2');
+            expect(decoded1.id).toBe(userId1);
+            expect(decoded2.id).toBe(userId2);
         });
     });
 
@@ -192,19 +178,11 @@ describe('Token Generators Unit Tests', () => {
             const accessToken = generateAccessToken(testUserId);
             const refreshToken = generateRefreshToken(testUserId);
             
-            const decodedAccess = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET!) as any;
-            const decodedRefresh = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as any;
+            const decodedAccess = verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET!);
+            const decodedRefresh = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET!);
             
             // Refresh token should expire much later than access token
             expect(decodedRefresh.exp).toBeGreaterThan(decodedAccess.exp);
-            
-            // Approximate difference should be about 7 days - 15 minutes
-            const expectedDifference = (7 * 24 * 60 * 60) - (15 * 60); // seconds
-            const actualDifference = decodedRefresh.exp - decodedAccess.exp;
-            
-            // Allow some tolerance
-            expect(actualDifference).toBeGreaterThanOrEqual(expectedDifference - 10);
-            expect(actualDifference).toBeLessThanOrEqual(expectedDifference + 10);
         });
 
 
@@ -213,12 +191,18 @@ describe('Token Generators Unit Tests', () => {
             const refreshToken = generateRefreshToken(testUserId);
             
             // Access token should verify with access secret but not refresh secret
-            expect(() => jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET!)).not.toThrow();
-            expect(() => jwt.verify(accessToken, process.env.REFRESH_TOKEN_SECRET!)).toThrow();
+            expectTokenVerification(
+                accessToken,
+                process.env.ACCESS_TOKEN_SECRET!,
+                [process.env.REFRESH_TOKEN_SECRET!]
+            );
             
             // Refresh token should verify with refresh secret but not access secret
-            expect(() => jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!)).not.toThrow();
-            expect(() => jwt.verify(refreshToken, process.env.ACCESS_TOKEN_SECRET!)).toThrow();
+            expectTokenVerification(
+                refreshToken,
+                process.env.REFRESH_TOKEN_SECRET!,
+                [process.env.ACCESS_TOKEN_SECRET!]
+            );
         });
     });
 }); 

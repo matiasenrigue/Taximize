@@ -9,6 +9,44 @@ import { generateRefreshToken } from '../../utils/generateTokens';
 process.env.ACCESS_TOKEN_SECRET = 'test-access-token-secret';
 process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
 
+// Test helper functions
+const createTestUser = async (overrides = {}) => {
+    const defaultUser = {
+        email: 'test@example.com',
+        username: 'testuser',
+        password: 'password123'
+    };
+    return User.create({ ...defaultUser, ...overrides });
+};
+
+const extractRefreshTokenFromCookie = (res: any): string | null => {
+    const cookies = res.headers['set-cookie'];
+    const cookieArray = Array.isArray(cookies) ? cookies : [cookies];
+    const refreshTokenCookie = cookieArray.find((cookie: string) => 
+        cookie.startsWith('refreshToken=')
+    );
+    return refreshTokenCookie ? refreshTokenCookie.split('=')[1].split(';')[0] : null;
+};
+
+const expectValidJWT = (token: string) => {
+    expect(typeof token).toBe('string');
+    expect(token.split('.')).toHaveLength(3);
+};
+
+const expectErrorResponse = (res: any, status: number, errorMessage: string) => {
+    expect(res.status).toBe(status);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error).toBe(errorMessage);
+};
+
+const expectSuccessResponse = (res: any, status: number, message?: string) => {
+    expect(res.status).toBe(status);
+    expect(res.body.success).toBe(true);
+    if (message) {
+        expect(res.body.message).toBe(message);
+    }
+};
+
 beforeAll(async () => {
     process.env.NODE_ENV = 'test';
     initializeAssociations();
@@ -76,53 +114,28 @@ describe('Auth API Integration Tests', () => {
         });
 
 
-        it('should return 400 when missing required fields', async () => {
-            const testCases = [
-                { body: { username: 'user', password: 'password123' }, missing: 'email' },
-                { body: { email: 'test@example.com', password: 'password123' }, missing: 'username' },
-                { body: { email: 'test@example.com', username: 'user' }, missing: 'password' },
-            ];
+        it.each([
+            { body: { username: 'user', password: 'password123' }, missing: 'email' },
+            { body: { email: 'test@example.com', password: 'password123' }, missing: 'username' },
+            { body: { email: 'test@example.com', username: 'user' }, missing: 'password' },
+        ])('should return 400 when missing $missing field', async ({ body }) => {
+            const res = await request(app)
+                .post('/api/auth/signup')
+                .send(body);
 
-            for (const testCase of testCases) {
-                const res = await request(app)
-                    .post('/api/auth/signup')
-                    .send(testCase.body);
-
-                expect(res.status).toBe(400);
-                expect(res.body.error).toBe('Please provide all fields');
-            }
+            expectErrorResponse(res, 400, 'Please provide all fields');
         });
 
 
-        it('should return 400 when email format is invalid', async () => {
-            const userData = {
-                email: 'invalid-email-format',
-                username: 'testuser',
-                password: 'password123'
-            };
-
+        it.each([
+            { email: 'invalid-email-format', username: 'testuser', password: 'password123', reason: 'invalid email format' },
+            { email: 'test@example.com', username: 'testuser', password: 'short', reason: 'password too short' }
+        ])('should return 400 when $reason', async (userData) => {
             const res = await request(app)
                 .post('/api/auth/signup')
                 .send(userData);
 
-            expect(res.status).toBe(400);
-            expect(res.body.error).toBe('Invalid email or password');
-        });
-
-
-        it('should return 400 when password is too short', async () => {
-            const userData = {
-                email: 'test@example.com',
-                username: 'testuser',
-                password: 'short'
-            };
-
-            const res = await request(app)
-                .post('/api/auth/signup')
-                .send(userData);
-
-            expect(res.status).toBe(400);
-            expect(res.body.error).toBe('Invalid email or password');
+            expectErrorResponse(res, 400, 'Invalid email or password');
         });
 
 
@@ -148,11 +161,7 @@ describe('Auth API Integration Tests', () => {
         let testUser: User;
 
         beforeEach(async () => {
-            testUser = await User.create({
-                email: 'test@example.com',
-                username: 'testuser',
-                password: 'password123'
-            });
+            testUser = await createTestUser();
         });
 
 
@@ -166,15 +175,9 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/signin')
                 .send(credentials);
 
-            expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true);
-            expect(res.body.message).toBe('User logged in successfully');
+            expectSuccessResponse(res, 200, 'User logged in successfully');
             expect(res.body.data).toHaveProperty('token');
-            expect(typeof res.body.data.token).toBe('string');
-
-            // Verify access token is valid JWT
-            const token = res.body.data.token;
-            expect(token.split('.')).toHaveLength(3); // JWT format
+            expectValidJWT(res.body.data.token);
         });
 
 
@@ -190,16 +193,15 @@ describe('Auth API Integration Tests', () => {
 
             expect(res.status).toBe(200);
             
-            // Check cookie headers
-            const cookies = res.headers['set-cookie'];
-            expect(cookies).toBeDefined();
+            const refreshToken = extractRefreshTokenFromCookie(res);
+            expect(refreshToken).toBeTruthy();
             
+            const cookies = res.headers['set-cookie'];
             const cookieArray = Array.isArray(cookies) ? cookies : [cookies];
             const refreshTokenCookie = cookieArray.find((cookie: string) => 
                 cookie.startsWith('refreshToken=')
             );
             
-            expect(refreshTokenCookie).toBeDefined();
             expect(refreshTokenCookie).toMatch(/HttpOnly/);
             expect(refreshTokenCookie).toMatch(/Path=\/api\/auth\/refresh/);
             expect(refreshTokenCookie).toMatch(/SameSite=Strict/);
@@ -238,52 +240,28 @@ describe('Auth API Integration Tests', () => {
         });
 
 
-        it('should return 400 when missing email or password', async () => {
-            const testCases = [
-                { body: { password: 'password123' } },
-                { body: { email: 'test@example.com' } },
-                { body: {} }
-            ];
+        it.each([
+            { body: { password: 'password123' }, missing: 'email' },
+            { body: { email: 'test@example.com' }, missing: 'password' },
+            { body: {}, missing: 'both fields' }
+        ])('should return 400 when missing $missing', async ({ body }) => {
+            const res = await request(app)
+                .post('/api/auth/signin')
+                .send(body);
 
-            for (const testCase of testCases) {
-                const res = await request(app)
-                    .post('/api/auth/signin')
-                    .send(testCase.body);
-
-                expect(res.status).toBe(400);
-                expect(res.body.error).toBe('Invalid email or password');
-            }
+            expectErrorResponse(res, 400, 'Invalid email or password');
         });
 
 
-        it('should handle case-sensitive email correctly', async () => {
-            const credentials = {
-                email: 'TEST@EXAMPLE.COM', // Different case
-                password: 'password123'
-            };
-
+        it.each([
+            { email: 'TEST@EXAMPLE.COM', password: 'password123', field: 'email' },
+            { email: 'test@example.com', password: 'PASSWORD123', field: 'password' }
+        ])('should handle $field case sensitivity correctly', async (credentials) => {
             const res = await request(app)
                 .post('/api/auth/signin')
                 .send(credentials);
 
-            // Should fail since email is case-sensitive in our implementation
-            expect(res.status).toBe(400);
-            expect(res.body.error).toBe('Invalid email or password');
-        });
-
-
-        it('should handle password case sensitivity correctly', async () => {
-            const credentials = {
-                email: 'test@example.com',
-                password: 'PASSWORD123' // Different case
-            };
-
-            const res = await request(app)
-                .post('/api/auth/signin')
-                .send(credentials);
-
-            expect(res.status).toBe(400);
-            expect(res.body.error).toBe('Invalid email or password');
+            expectErrorResponse(res, 400, 'Invalid email or password');
         });
     });
 
@@ -293,11 +271,7 @@ describe('Auth API Integration Tests', () => {
         let validRefreshToken: string;
 
         beforeEach(async () => {
-            testUser = await User.create({
-                email: 'test@example.com',
-                username: 'testuser',
-                password: 'password123'
-            });
+            testUser = await createTestUser();
             validRefreshToken = generateRefreshToken(testUser.id);
         });
 
@@ -307,14 +281,9 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/refresh')
                 .set('Cookie', [`refreshToken=${validRefreshToken}`]);
 
-            expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true);
+            expectSuccessResponse(res, 200);
             expect(res.body.data).toHaveProperty('token');
-            expect(typeof res.body.data.token).toBe('string');
-
-            // Verify new access token is valid JWT
-            const newToken = res.body.data.token;
-            expect(newToken.split('.')).toHaveLength(3); // JWT format
+            expectValidJWT(res.body.data.token);
         });
 
 
@@ -322,9 +291,7 @@ describe('Auth API Integration Tests', () => {
             const res = await request(app)
                 .post('/api/auth/refresh');
 
-            expect(res.status).toBe(401);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toBe('No refresh token');
+            expectErrorResponse(res, 401, 'No refresh token');
         });
 
 
@@ -333,9 +300,7 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/refresh')
                 .set('Cookie', ['refreshToken=invalid.token.here']);
 
-            expect(res.status).toBe(403);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toBe('Invalid refresh token');
+            expectErrorResponse(res, 403, 'Invalid refresh token');
         });
 
 
@@ -346,8 +311,7 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/refresh')
                 .set('Cookie', ['refreshToken=expired.token.here']);
 
-            expect(res.status).toBe(403);
-            expect(res.body.error).toBe('Invalid refresh token');
+            expectErrorResponse(res, 403, 'Invalid refresh token');
         });
 
 
@@ -360,8 +324,7 @@ describe('Auth API Integration Tests', () => {
                     'anotherCookie=anotherValue'
                 ]);
 
-            expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true);
+            expectSuccessResponse(res, 200);
             expect(res.body.data).toHaveProperty('token');
         });
     });
@@ -394,14 +357,8 @@ describe('Auth API Integration Tests', () => {
             expect(signinRes.body.data).toHaveProperty('token');
 
             // Extract refresh token from cookie
-            const cookies = signinRes.headers['set-cookie'];
-            const cookieArray = Array.isArray(cookies) ? cookies : [cookies];
-            const refreshTokenCookie = cookieArray.find((cookie: string) => 
-                cookie.startsWith('refreshToken=')
-            );
-            expect(refreshTokenCookie).toBeDefined();
-
-            const refreshToken = refreshTokenCookie!.split('=')[1].split(';')[0];
+            const refreshToken = extractRefreshTokenFromCookie(signinRes);
+            expect(refreshToken).toBeTruthy();
 
             // Add a small delay to ensure different timestamps
             await new Promise(resolve => setTimeout(resolve, 1000));
