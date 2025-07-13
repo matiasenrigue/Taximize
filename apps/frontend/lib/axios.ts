@@ -63,10 +63,9 @@ api.interceptors.response.use(
             return api(originalRequest);
           }
         } catch (refreshError) {
-          // Refresh failed, redirect to login
-          console.error('Token refresh failed - redirecting to login');
+          // Refresh failed
+          console.error('Token refresh failed');
           clearAllTokens();
-          window.location.href = '/signin';
           return Promise.reject(refreshError);
         }
       } else if (error.response.status === 403) {
