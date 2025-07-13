@@ -2,8 +2,8 @@ import { Ride } from './ride.model';
 import { Shift } from '../shifts/shift.model';
 import { ShiftSignal } from '../shifts/shift-signal.model';
 import { ShiftService } from '../shifts/shift.service';
-import { MlStub } from './utils/mlStub';
 import { Op } from 'sequelize';
+import { getZonesForRide } from './utils/zoneDetector';
 
 interface RideCoordinates {
     startLat: number;
@@ -75,8 +75,30 @@ export class RideService {
         // Validate coordinates
         this.validateCoordinates(startLat, startLng, destLat, destLng);
         
-        // Use ML stub to get random score
-        return MlStub.getRandomScore();
+        // Get zones for origin and destination
+        const zones = getZonesForRide(startLat, startLng, destLat, destLng);
+        
+        console.log('Ride evaluation:', {
+            origin: { lat: startLat, lng: startLng, zone: zones.originZone },
+            destination: { lat: destLat, lng: destLng, zone: zones.destinationZone }
+        });
+        
+        // TODO: Replace this with actual API call
+        // For now, using placeholder prediction value
+        const prediction = 0.73; // Placeholder API response (0-1 scale)
+        
+        // Validate prediction is in valid range
+        if (prediction < 0 || prediction > 1) {
+            throw new Error('Invalid prediction value from API');
+        }
+        
+        // Convert prediction from 0-1 scale to 1-5 rating scale
+        // Formula: rating = 1 + (prediction * 4)
+        // This maps: 0 -> 1, 0.25 -> 2, 0.5 -> 3, 0.75 -> 4, 1 -> 5
+        const rating = Math.round(1 + (prediction * 4));
+        
+        // Ensure rating is within valid bounds (1-5)
+        return Math.max(1, Math.min(5, rating));
     }
 
     static async startRide(driverId: string, shiftId: string, coords: RideCoordinates): Promise<any> {

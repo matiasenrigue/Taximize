@@ -1,5 +1,7 @@
 # Taxi Driver App
 
+> **Disclaimer**: AI has been used to generate `.md` documentation files
+
 ## Project Structure
 ```
 ├── apps/

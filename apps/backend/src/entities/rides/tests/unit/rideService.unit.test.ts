@@ -106,6 +106,40 @@ describe('RideService Unit Tests', () => {
             expect(result).toBeLessThanOrEqual(5);
             expect(Number.isInteger(result)).toBe(true);
         });
+
+        it('should return consistent rating for placeholder API value', async () => {
+            // Test that the placeholder API value (0.73) always returns rating 4
+            const startLat = 53.349805;
+            const startLng = -6.260310;
+            const destLat = 53.359805;
+            const destLng = -6.270310;
+            
+            const result = await RideService.evaluateRide(startLat, startLng, destLat, destLng);
+            // 0.73 * 4 + 1 = 3.92, which rounds to 4
+            expect(result).toBe(4);
+        });
+
+        it('should throw error for invalid latitude', async () => {
+            // Test that evaluateRide throws error for invalid latitude
+            const startLat = 91; // Invalid latitude
+            const startLng = -6.260310;
+            const destLat = 53.359805;
+            const destLng = -6.270310;
+            
+            await expect(RideService.evaluateRide(startLat, startLng, destLat, destLng))
+                .rejects.toThrow('Invalid latitude provided');
+        });
+
+        it('should throw error for invalid longitude', async () => {
+            // Test that evaluateRide throws error for invalid longitude
+            const startLat = 53.349805;
+            const startLng = 181; // Invalid longitude
+            const destLat = 53.359805;
+            const destLng = -6.270310;
+            
+            await expect(RideService.evaluateRide(startLat, startLng, destLat, destLng))
+                .rejects.toThrow('Invalid longitude provided');
+        });
     });
 
 

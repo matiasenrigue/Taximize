@@ -213,7 +213,7 @@ describe('Ride Database Constraints Tests', () => {
         });
 
         // SQLite doesn't enforce check constraints
-        // The application ensures valid scores via MlStub.getRandomScore()
+        // The application ensures valid scores via API prediction conversion
 
 
         it.skip('should enforce predicted_score bounds (1 to 5)', async () => {
