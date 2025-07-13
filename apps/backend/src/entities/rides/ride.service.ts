@@ -3,7 +3,6 @@ import { Shift } from '../shifts/shift.model';
 import { ShiftSignal } from '../shifts/shift-signal.model';
 import { ShiftService } from '../shifts/shift.service';
 import { MlStub } from './utils/mlStub';
-import { RideCalculator } from './utils/rideCalculator';
 import { Op } from 'sequelize';
 
 interface RideCoordinates {
@@ -13,12 +12,9 @@ interface RideCoordinates {
     destLng: number;
     address?: string;
     timestamp?: number;
+    predictedScore: number;
 }
 
-interface OverrideDestination {
-    lat: number;
-    lng: number;
-}
 
 export class RideService {
     static async hasActiveRide(driverId: string): Promise<boolean> {
@@ -93,8 +89,8 @@ export class RideService {
             throw new Error(canStartResult.reason || 'Cannot start ride');
         }
 
-        // Get predicted score
-        const predictedScore = await this.evaluateRide(coords.startLat, coords.startLng, coords.destLat, coords.destLng);
+        // Use predicted score from request
+        const predictedScore = coords.predictedScore;
 
         // Use provided timestamp or current time
         const startTime = coords.timestamp ? new Date(coords.timestamp) : new Date();
@@ -157,7 +153,7 @@ export class RideService {
         };
     }
 
-    static async getRideStatus(driverId: string, overrideDest?: OverrideDestination): Promise<any> {
+    static async getRideStatus(driverId: string): Promise<any> {
         // Get active shift for driver first
         const activeShift = await Shift.findOne({
             where: { 
@@ -186,19 +182,9 @@ export class RideService {
         const currentTime = new Date();
         const elapsedTimeMs = currentTime.getTime() - activeRide.start_time.getTime();
 
-        // Use override destination if provided, otherwise use original
-        const destLat = overrideDest ? overrideDest.lat : activeRide.destination_latitude;
-        const destLng = overrideDest ? overrideDest.lng : activeRide.destination_longitude;
-
-        // Calculate distance and estimated fare
-        const distanceKm = RideCalculator.computeDistanceKm(
-            activeRide.start_latitude,
-            activeRide.start_longitude,
-            destLat,
-            destLng
-        );
-
-        const estimatedFareCents = Math.round(RideCalculator.computeFare(elapsedTimeMs, distanceKm));
+        // Use original destination coordinates
+        const destLat = activeRide.destination_latitude;
+        const destLng = activeRide.destination_longitude;
 
         return {
             rideId: activeRide.id,
@@ -209,8 +195,6 @@ export class RideService {
             startTime: activeRide.start_time.getTime(),
             address: activeRide.address,
             elapsed_time_ms: elapsedTimeMs,
-            distance_km: distanceKm,
-            estimated_fare_cents: estimatedFareCents
         };
     }
 
@@ -301,8 +285,6 @@ export class RideService {
         // Update the ride
         await ride.update(updateData);
 
-        // Update shift statistics
-        await this.updateShiftStatistics(ride.shift_id);
 
         return ride;
     }
@@ -327,8 +309,6 @@ export class RideService {
         // Soft delete the ride
         await ride.destroy();
 
-        // Update shift statistics
-        await this.updateShiftStatistics(ride.shift_id);
     }
 
     static async restoreRide(rideId: string, driverId: string): Promise<void> {
@@ -352,8 +332,6 @@ export class RideService {
         // Restore the ride using Sequelize's restore method
         await ride.restore();
 
-        // Update shift statistics
-        await this.updateShiftStatistics(ride.shift_id);
     }
 
     static async getRidesByDriver(driverId: string): Promise<Ride[]> {
@@ -363,25 +341,4 @@ export class RideService {
         });
     }
 
-    private static async updateShiftStatistics(shiftId: string): Promise<void> {
-        const shift = await Shift.findByPk(shiftId);
-        if (!shift) return;
-
-        // Get all non-deleted rides for this shift
-        const rides = await Ride.findAll({
-            where: { shift_id: shiftId }
-        });
-
-        // Calculate totals
-        let totalEarnings = 0;
-        let totalDistance = 0;
-
-        for (const ride of rides) {
-            if (ride.earning_cents) totalEarnings += ride.earning_cents;
-            if (ride.distance_km) totalDistance += ride.distance_km;
-        }
-
-        // Update shift with new totals (if needed - depends on your shift model)
-        // This is a placeholder - adjust based on your actual shift model structure
-    }
 } 

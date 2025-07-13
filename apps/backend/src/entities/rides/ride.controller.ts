@@ -41,7 +41,7 @@ export class RideController {
     // @route   POST /api/rides/start-ride  
     // @access  Protected
     static startRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { startLatitude, startLongitude, destinationLatitude, destinationLongitude, timestamp, address } = req.body;
+        const { startLatitude, startLongitude, destinationLatitude, destinationLongitude, timestamp, address, predictedScore } = req.body;
         const driverId = req.user?.id;
 
         // Validate authentication
@@ -51,9 +51,9 @@ export class RideController {
         }
 
         // Validate required fields
-        if (!startLatitude || !startLongitude || !destinationLatitude || !destinationLongitude || !address) {
+        if (!startLatitude || !startLongitude || !destinationLatitude || !destinationLongitude || !address || predictedScore === undefined) {
             res.status(400);
-            throw new Error('Missing required fields: coordinates and address');
+            throw new Error('Missing required fields: coordinates, address, and predictedScore');
         }
 
         // Validate coordinate types
@@ -75,15 +75,22 @@ export class RideController {
             throw new Error('Invalid address provided');
         }
 
+        // Validate predicted score
+        if (typeof predictedScore !== 'number' || predictedScore < 0 || predictedScore > 1) {
+            res.status(400);
+            throw new Error('Invalid predicted score provided. Must be a number between 0 and 1');
+        }
+
         try {
-            // Get active shift for driver (simplified approach - in real app would get from request or service)
+            // Get active shift for driver 
             const coords = {
                 startLat: startLatitude,
                 startLng: startLongitude,
                 destLat: destinationLatitude,
                 destLng: destinationLongitude,
                 address: address.trim(),
-                timestamp: timestamp
+                timestamp: timestamp,
+                predictedScore: predictedScore
             };
 
             // Get the driver's current active shift

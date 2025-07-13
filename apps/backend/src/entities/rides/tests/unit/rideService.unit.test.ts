@@ -119,7 +119,8 @@ describe('RideService Unit Tests', () => {
                 startLng: -6.260310,
                 destLat: 53.359805,
                 destLng: -6.270310,
-                address: "Invalid Lat Test"
+                address: "Invalid Lat Test",
+                predictedScore: 0.75
             };
 
             await expect(RideService.startRide(driverId, shiftId, coordsInvalidLat))
@@ -136,7 +137,8 @@ describe('RideService Unit Tests', () => {
                 startLng: -185, // Invalid: < -180
                 destLat: 53.359805,
                 destLng: -6.270310,
-                address: "Invalid Lng Test"
+                address: "Invalid Lng Test",
+                predictedScore: 0.75
             };
 
             await expect(RideService.startRide(driverId, shiftId, coordsInvalidLng))
@@ -153,7 +155,8 @@ describe('RideService Unit Tests', () => {
                 startLng: -6.260310,
                 destLat: 53.359805,
                 destLng: -6.270310,
-                address: "Unit Test Address 1"
+                address: "Unit Test Address 1",
+                predictedScore: 0.75
             };
 
             await expect(RideService.startRide(driverId, shiftId, coords))
@@ -171,7 +174,8 @@ describe('RideService Unit Tests', () => {
                 startLng: -6.260310,
                 destLat: 53.359805,
                 destLng: -6.270310,
-                address: "Unit Test Address 2"
+                address: "Unit Test Address 2",
+                predictedScore: 0.8
             };
 
             // This will likely fail in unit tests due to database dependencies
@@ -194,7 +198,8 @@ describe('RideService Unit Tests', () => {
                 startLng: -6.260310,
                 destLat: 53.359805,
                 destLng: -6.270310,
-                address: "Unit Test Address 3"
+                address: "Unit Test Address 3",
+                predictedScore: 0.9
             };
 
             // This test will verify the unique constraint violation in the GREEN phase
@@ -280,20 +285,6 @@ describe('RideService Unit Tests', () => {
             }
         });
 
-
-        it('should use override destination when provided', async () => {
-            // Test that getRideStatus uses override destination when provided
-            const driverId = 'test-driver-1';
-            const overrideDest = { lat: 53.359805, lng: -6.270310 };
-
-            try {
-                const result = await RideService.getRideStatus(driverId, overrideDest);
-                expect(result).toBe(null); // Expected to be null without database setup
-            } catch (error) {
-                // Expected to throw in unit test environment
-                expect(error).toBeDefined();
-            }
-        });
     });
 
 

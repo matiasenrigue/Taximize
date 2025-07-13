@@ -1,29 +1,32 @@
-import { sequelize } from '../../../../shared/config/db';
 import { initializeAssociations } from '../../../../shared/config/associations';
 import { RideService } from '../../ride.service';
 import { ShiftService } from '../../../shifts/shift.service';
-import User from '../../../users/user.model';
 import Ride from '../../ride.model';
 import Shift from '../../../shifts/shift.model';
-import ShiftSignal from '../../../shifts/shift-signal.model';
+import { TestHelpers } from '../../../../shared/tests/utils/testHelpers';
+
+TestHelpers.setupEnvironment();
+
+// Common test coordinates
+const DEFAULT_COORDS = {
+    startLat: 53.349805,
+    startLng: -6.260310,
+    destLat: 53.359805,
+    destLng: -6.270310,
+    predictedScore: 0.75
+};
 
 beforeAll(async () => {
-    process.env.NODE_ENV = 'test';
     initializeAssociations();
-    await sequelize.sync({ force: true });
+    await TestHelpers.setupDatabase();
 });
 
 afterEach(async () => {
-    // Clean up in correct order due to foreign key constraints
-    // Use force: true to hard delete even with paranoid mode
-    await Ride.destroy({ where: {}, force: true });
-    await ShiftSignal.destroy({ where: {}, force: true });
-    await Shift.destroy({ where: {}, force: true });
-    await User.destroy({ where: {}, force: true });
+    await TestHelpers.cleanupDatabase();
 });
 
 afterAll(async () => {
-    await sequelize.close();
+    await TestHelpers.closeDatabase();
 });
 
 
@@ -31,19 +34,8 @@ describe('Ride Service Integration Tests', () => {
 
     describe('Service Layer Data Flow', () => {
         it('should correctly handle driver availability check through service layers', async () => {
-            const user = await User.create({
-                email: 'driver@test.com',
-                username: 'testdriver',
-                password: 'password123'
-            });
-
-            const shift = await Shift.create({
-                driver_id: user.id,
-                shift_start: new Date(),
-                shift_end: null,
-                shift_start_location_latitude: 53.349805,
-                shift_start_location_longitude: -6.260310
-            });
+            const { user } = await TestHelpers.createAuthenticatedUser();
+            const shift = await TestHelpers.createActiveShift(user.id);
 
             // Test driver availability through ShiftService
             const isAvailable = await ShiftService.driverIsAvailable(user.id);
@@ -60,19 +52,8 @@ describe('Ride Service Integration Tests', () => {
 
 
         it('should correctly propagate state changes through service layers', async () => {
-            const user = await User.create({
-                email: 'driver@test.com',
-                username: 'testdriver',
-                password: 'password123'
-            });
-
-            const shift = await Shift.create({
-                driver_id: user.id,
-                shift_start: new Date(),
-                shift_end: null,
-                shift_start_location_latitude: 53.349805,
-                shift_start_location_longitude: -6.260310
-            });
+            const { user } = await TestHelpers.createAuthenticatedUser();
+            const shift = await TestHelpers.createActiveShift(user.id);
 
             // Initially should be able to start ride
             let canStartResult = await RideService.canStartRide(user.id);
@@ -80,10 +61,7 @@ describe('Ride Service Integration Tests', () => {
 
             // Start a ride
             const coords = {
-                startLat: 53.349805,
-                startLng: -6.260310,
-                destLat: 53.359805,
-                destLng: -6.270310,
+                ...DEFAULT_COORDS,
                 address: "Service Integration Test 1"
             };
 
@@ -101,11 +79,7 @@ describe('Ride Service Integration Tests', () => {
 
 
         it('should handle service layer error propagation correctly', async () => {
-            const user = await User.create({
-                email: 'driver@test.com',
-                username: 'testdriver',
-                password: 'password123'
-            });
+            const { user } = await TestHelpers.createAuthenticatedUser();
 
             // No active shift scenario
             const canStartResult = await RideService.canStartRide(user.id);
@@ -113,10 +87,7 @@ describe('Ride Service Integration Tests', () => {
 
             // Attempt to start ride without shift should fail
             const coords = {
-                startLat: 53.349805,
-                startLng: -6.260310,
-                destLat: 53.359805,
-                destLng: -6.270310,
+                ...DEFAULT_COORDS,
                 address: "Service Integration Test 2"
             };
 
@@ -128,26 +99,12 @@ describe('Ride Service Integration Tests', () => {
 
     describe('Cross-Service Data Integrity', () => {
         it('should maintain data consistency across Ride and Shift services', async () => {
-            const user = await User.create({
-                email: 'driver@test.com',
-                username: 'testdriver',
-                password: 'password123'
-            });
-
-            const shift = await Shift.create({
-                driver_id: user.id,
-                shift_start: new Date(),
-                shift_end: null,
-                shift_start_location_latitude: 53.349805,
-                shift_start_location_longitude: -6.260310
-            });
+            const { user } = await TestHelpers.createAuthenticatedUser();
+            const shift = await TestHelpers.createActiveShift(user.id);
 
             // Start ride through RideService
             const coords = {
-                startLat: 53.349805,
-                startLng: -6.260310,
-                destLat: 53.359805,
-                destLng: -6.270310,
+                ...DEFAULT_COORDS,
                 address: "Service Integration Test 3"
             };
 
@@ -172,26 +129,12 @@ describe('Ride Service Integration Tests', () => {
 
 
         it('should handle shift termination impact on ride services', async () => {
-            const user = await User.create({
-                email: 'driver@test.com',
-                username: 'testdriver',
-                password: 'password123'
-            });
-
-            const shift = await Shift.create({
-                driver_id: user.id,
-                shift_start: new Date(),
-                shift_end: null,
-                shift_start_location_latitude: 53.349805,
-                shift_start_location_longitude: -6.260310
-            });
+            const { user } = await TestHelpers.createAuthenticatedUser();
+            const shift = await TestHelpers.createActiveShift(user.id);
 
             // Start ride
             const coords = {
-                startLat: 53.349805,
-                startLng: -6.260310,
-                destLat: 53.359805,
-                destLng: -6.270310,
+                ...DEFAULT_COORDS,
                 address: "Service Integration Test 4"
             };
 
@@ -218,25 +161,11 @@ describe('Ride Service Integration Tests', () => {
 
     describe('Service Layer Transaction Handling', () => {
         it('should handle concurrent ride start attempts correctly', async () => {
-            const user = await User.create({
-                email: 'driver@test.com',
-                username: 'testdriver',
-                password: 'password123'
-            });
-
-            const shift = await Shift.create({
-                driver_id: user.id,
-                shift_start: new Date(),
-                shift_end: null,
-                shift_start_location_latitude: 53.349805,
-                shift_start_location_longitude: -6.260310
-            });
+            const { user } = await TestHelpers.createAuthenticatedUser();
+            const shift = await TestHelpers.createActiveShift(user.id);
 
             const coords = {
-                startLat: 53.349805,
-                startLng: -6.260310,
-                destLat: 53.359805,
-                destLng: -6.270310,
+                ...DEFAULT_COORDS,
                 address: "Service Integration Test 5"
             };
 
@@ -261,26 +190,12 @@ describe('Ride Service Integration Tests', () => {
 
 
         it('should handle ride end with proper data validation', async () => {
-            const user = await User.create({
-                email: 'driver@test.com',
-                username: 'testdriver',
-                password: 'password123'
-            });
-
-            const shift = await Shift.create({
-                driver_id: user.id,
-                shift_start: new Date(),
-                shift_end: null,
-                shift_start_location_latitude: 53.349805,
-                shift_start_location_longitude: -6.260310
-            });
+            const { user } = await TestHelpers.createAuthenticatedUser();
+            const shift = await TestHelpers.createActiveShift(user.id);
 
             // Start ride
             const coords = {
-                startLat: 53.349805,
-                startLng: -6.260310,
-                destLat: 53.359805,
-                destLng: -6.270310,
+                ...DEFAULT_COORDS,
                 address: "Service Integration Test 6"
             };
 
@@ -310,10 +225,7 @@ describe('Ride Service Integration Tests', () => {
     describe('Service Layer Edge Cases', () => {
         it('should handle malformed UUID inputs gracefully', async () => {
             const coords = {
-                startLat: 53.349805,
-                startLng: -6.260310,
-                destLat: 53.359805,
-                destLng: -6.270310,
+                ...DEFAULT_COORDS,
                 address: "Malformed UUID Test"
             };
 
@@ -332,19 +244,8 @@ describe('Ride Service Integration Tests', () => {
 
 
         it('should handle coordinate validation through service layer', async () => {
-            const user = await User.create({
-                email: 'driver@test.com',
-                username: 'testdriver',
-                password: 'password123'
-            });
-
-            const shift = await Shift.create({
-                driver_id: user.id,
-                shift_start: new Date(),
-                shift_end: null,
-                shift_start_location_latitude: 53.349805,
-                shift_start_location_longitude: -6.260310
-            });
+            const { user } = await TestHelpers.createAuthenticatedUser();
+            const shift = await TestHelpers.createActiveShift(user.id);
 
             // Test invalid latitude
             const invalidLatCoords = {
@@ -371,32 +272,13 @@ describe('Ride Service Integration Tests', () => {
 
 
         it('should handle expired rides cleanup correctly', async () => {
-            const user = await User.create({
-                email: 'driver@test.com',
-                username: 'testdriver',
-                password: 'password123'
-            });
-
-            const shift = await Shift.create({
-                driver_id: user.id,
-                shift_start: new Date(),
-                shift_end: null,
-                shift_start_location_latitude: 53.349805,
-                shift_start_location_longitude: -6.260310
-            });
+            const { user } = await TestHelpers.createAuthenticatedUser();
+            const shift = await TestHelpers.createActiveShift(user.id);
 
             // Create an old ride (simulate 5 hours ago)
-            const oldRide = await Ride.create({
-                shift_id: shift.id,
-                driver_id: user.id,
-                start_latitude: 53.349805,
-                start_longitude: -6.260310,
-                destination_latitude: 53.359805,
-                destination_longitude: -6.270310,
+            const oldRide = await TestHelpers.createActiveRide(shift.id, user.id, {
                 address: "Expired Ride Test Address",
-                start_time: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
-                predicted_score: 3,
-                end_time: null // Still active
+                start_time: new Date(Date.now() - 5 * 60 * 60 * 1000) // 5 hours ago
             });
 
             // Run expired rides cleanup
@@ -416,33 +298,17 @@ describe('Ride Service Integration Tests', () => {
             // Create multiple drivers with active shifts
             const drivers = [];
             for (let i = 0; i < 5; i++) {
-                const user = await User.create({
-                    email: `driver${i}@test.com`,
-                    username: `driver${i}`,
-                    password: 'password123'
-                });
-
-                const shift = await Shift.create({
-                    driver_id: user.id,
-                    shift_start: new Date(),
-                    shift_end: null,
-                    shift_start_location_latitude: 53.349805,
-                    shift_start_location_longitude: -6.260310
-                });
-
+                const { user } = await TestHelpers.createAuthenticatedUser(
+                    `driver${i}@test.com`,
+                    `driver${i}`
+                );
+                const shift = await TestHelpers.createActiveShift(user.id);
                 drivers.push({ user, shift });
             }
 
             // Start rides for all drivers concurrently
-            const coords = {
-                startLat: 53.349805,
-                startLng: -6.260310,
-                destLat: 53.359805,
-                destLng: -6.270310
-            };
-
             const ridePromises = drivers.map(({ user, shift }) =>
-                RideService.startRide(user.id, shift.id, coords)
+                RideService.startRide(user.id, shift.id, DEFAULT_COORDS)
             );
 
             const results = await Promise.all(ridePromises);

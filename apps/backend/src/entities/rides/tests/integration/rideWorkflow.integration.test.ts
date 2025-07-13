@@ -1,56 +1,44 @@
 import request from 'supertest';
-import { sequelize } from '../../../../shared/config/db';
 import { initializeAssociations } from '../../../../shared/config/associations';
 import app from '../../../../app';
-import User from '../../../users/user.model';
 import Ride from '../../ride.model';
-import Shift from '../../../shifts/shift.model';
-import ShiftSignal from '../../../shifts/shift-signal.model';
-import { generateAccessToken } from '../../../auth/utils/generateTokens';
+import { TestHelpers } from '../../../../shared/tests/utils/testHelpers';
 
-// Set up environment variables for testing
-process.env.ACCESS_TOKEN_SECRET = 'test-access-token-secret';
-process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
+TestHelpers.setupEnvironment();
 
-// Helper function to create authenticated user and get token
-async function createAuthenticatedUser(email: string = 'driver@test.com', username: string = 'testdriver') {
-    const user = await User.create({
-        email,
-        username,
-        password: 'password123'
-    });
-    const token = generateAccessToken(user.id);
-    return { user, token };
-}
-
-// Helper function to create active shift
-async function createActiveShift(driverId: string) {
-    return await Shift.create({
-        driver_id: driverId,
-        shift_start: new Date(),
-        shift_end: null,
-        shift_start_location_latitude: 53.349805,
-        shift_start_location_longitude: -6.260310
-    });
-}
+// Common ride request bodies
+const RIDE_COORDS = {
+    first: {
+        startLatitude: 53.349805,
+        startLongitude: -6.260310,
+        destinationLatitude: 53.359805,
+        destinationLongitude: -6.270310
+    },
+    second: {
+        startLatitude: 53.359805,
+        startLongitude: -6.270310,
+        destinationLatitude: 53.369805,
+        destinationLongitude: -6.280310
+    },
+    third: {
+        startLatitude: 53.369805,
+        startLongitude: -6.280310,
+        destinationLatitude: 53.379805,
+        destinationLongitude: -6.290310
+    }
+};
 
 beforeAll(async () => {
-    process.env.NODE_ENV = 'test';
     initializeAssociations();
-    await sequelize.sync({ force: true });
+    await TestHelpers.setupDatabase();
 });
 
 afterEach(async () => {
-    // Clean up in correct order due to foreign key constraints
-    // Use force: true to hard delete even with paranoid mode
-    await Ride.destroy({ where: {}, force: true });
-    await ShiftSignal.destroy({ where: {}, force: true });
-    await Shift.destroy({ where: {}, force: true });
-    await User.destroy({ where: {}, force: true });
+    await TestHelpers.cleanupDatabase();
 });
 
 afterAll(async () => {
-    await sequelize.close();
+    await TestHelpers.closeDatabase();
 });
 
 
@@ -58,19 +46,17 @@ describe('Ride Workflow Integration Tests', () => {
 
     describe('Complete Ride Lifecycle', () => {
         it('should handle full ride lifecycle: start → status → end', async () => {
-            const { user, token } = await createAuthenticatedUser();
-            const shift = await createActiveShift(user.id);
+            const { user, token } = await TestHelpers.createAuthenticatedUser();
+            const shift = await TestHelpers.createActiveShift(user.id);
 
             // 1. Start ride
             const startRideRes = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    startLatitude: 53.349805,
-                    startLongitude: -6.260310,
-                    destinationLatitude: 53.359805,
-                    destinationLongitude: -6.270310,
-                    address: "123 Test Street, Dublin"
+                    ...RIDE_COORDS.first,
+                    address: "123 Test Street, Dublin",
+                    predictedScore: 0.75
                 });
 
             expect(startRideRes.status).toBe(200);
@@ -110,19 +96,17 @@ describe('Ride Workflow Integration Tests', () => {
 
 
         it('should handle multiple sequential rides on same shift', async () => {
-            const { user, token } = await createAuthenticatedUser();
-            const shift = await createActiveShift(user.id);
+            const { user, token } = await TestHelpers.createAuthenticatedUser();
+            const shift = await TestHelpers.createActiveShift(user.id);
 
             // First ride
             const ride1Res = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    startLatitude: 53.349805,
-                    startLongitude: -6.260310,
-                    destinationLatitude: 53.359805,
-                    destinationLongitude: -6.270310,
-                    address: "123 Test Street, Dublin"
+                    ...RIDE_COORDS.first,
+                    address: "123 Test Street, Dublin",
+                    predictedScore: 0.8
                 });
 
             expect(ride1Res.status).toBe(200);
@@ -142,11 +126,9 @@ describe('Ride Workflow Integration Tests', () => {
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    startLatitude: 53.359805,
-                    startLongitude: -6.270310,
-                    destinationLatitude: 53.369805,
-                    destinationLongitude: -6.280310,
-                    address: "456 Second Street, Dublin"
+                    ...RIDE_COORDS.second,
+                    address: "456 Second Street, Dublin",
+                    predictedScore: 0.7
                 });
 
             expect(ride2Res.status).toBe(200);
@@ -162,19 +144,17 @@ describe('Ride Workflow Integration Tests', () => {
 
 
         it('should handle ride with override destination in status check', async () => {
-            const { user, token } = await createAuthenticatedUser();
-            await createActiveShift(user.id);
+            const { user, token } = await TestHelpers.createAuthenticatedUser();
+            await TestHelpers.createActiveShift(user.id);
 
             // Start ride
             await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    startLatitude: 53.349805,
-                    startLongitude: -6.260310,
-                    destinationLatitude: 53.359805,
-                    destinationLongitude: -6.270310,
-                    address: "789 Third Street, Dublin"
+                    ...RIDE_COORDS.first,
+                    address: "789 Third Street, Dublin",
+                    predictedScore: 0.85
                 });
 
             // Get status (override destination feature was removed)
@@ -191,19 +171,17 @@ describe('Ride Workflow Integration Tests', () => {
 
     describe('Multiple Shifts and Rides', () => {
         it('should handle rides across different shifts', async () => {
-            const { user, token } = await createAuthenticatedUser();
+            const { user, token } = await TestHelpers.createAuthenticatedUser();
             
             // First shift and ride
-            const shift1 = await createActiveShift(user.id);
+            const shift1 = await TestHelpers.createActiveShift(user.id);
             const ride1Res = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    startLatitude: 53.349805,
-                    startLongitude: -6.260310,
-                    destinationLatitude: 53.359805,
-                    destinationLongitude: -6.270310,
-                    address: "Cross-shift Ride 1 Address"
+                    ...RIDE_COORDS.first,
+                    address: "Cross-shift Ride 1 Address",
+                    predictedScore: 0.65
                 });
 
             expect(ride1Res.status).toBe(200);
@@ -221,16 +199,14 @@ describe('Ride Workflow Integration Tests', () => {
             await shift1.update({ shift_end: new Date() });
 
             // Second shift and ride
-            const shift2 = await createActiveShift(user.id);
+            const shift2 = await TestHelpers.createActiveShift(user.id);
             const ride2Res = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    startLatitude: 53.369805,
-                    startLongitude: -6.280310,
-                    destinationLatitude: 53.379805,
-                    destinationLongitude: -6.290310,
-                    address: "Cross-shift Ride 2 Address"
+                    ...RIDE_COORDS.third,
+                    address: "Cross-shift Ride 2 Address",
+                    predictedScore: 0.9
                 });
 
             expect(ride2Res.status).toBe(200);
@@ -249,19 +225,17 @@ describe('Ride Workflow Integration Tests', () => {
 
     describe('Error Recovery Scenarios', () => {
         it('should prevent second ride start while first is active', async () => {
-            const { user, token } = await createAuthenticatedUser();
-            await createActiveShift(user.id);
+            const { user, token } = await TestHelpers.createAuthenticatedUser();
+            await TestHelpers.createActiveShift(user.id);
 
             // Start first ride
             const ride1Res = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    startLatitude: 53.349805,
-                    startLongitude: -6.260310,
-                    destinationLatitude: 53.359805,
-                    destinationLongitude: -6.270310,
-                    address: "Error Recovery First Ride"
+                    ...RIDE_COORDS.first,
+                    address: "Error Recovery First Ride",
+                    predictedScore: 0.72
                 });
 
             expect(ride1Res.status).toBe(200);
@@ -271,11 +245,9 @@ describe('Ride Workflow Integration Tests', () => {
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    startLatitude: 53.359805,
-                    startLongitude: -6.270310,
-                    destinationLatitude: 53.369805,
-                    destinationLongitude: -6.280310,
-                    address: "Error Recovery Second Ride (Should Fail)"
+                    ...RIDE_COORDS.second,
+                    address: "Error Recovery Second Ride (Should Fail)",
+                    predictedScore: 0.68
                 });
 
             expect(ride2Res.status).toBe(400);
@@ -284,19 +256,17 @@ describe('Ride Workflow Integration Tests', () => {
 
 
         it('should handle ride start immediately after ending previous ride', async () => {
-            const { user, token } = await createAuthenticatedUser();
-            await createActiveShift(user.id);
+            const { user, token } = await TestHelpers.createAuthenticatedUser();
+            await TestHelpers.createActiveShift(user.id);
 
             // Start and end first ride
             const ride1Res = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    startLatitude: 53.349805,
-                    startLongitude: -6.260310,
-                    destinationLatitude: 53.359805,
-                    destinationLongitude: -6.270310,
-                    address: "Sequential First Ride"
+                    ...RIDE_COORDS.first,
+                    address: "Sequential First Ride",
+                    predictedScore: 0.78
                 });
 
             expect(ride1Res.status).toBe(200);
@@ -314,11 +284,9 @@ describe('Ride Workflow Integration Tests', () => {
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    startLatitude: 53.359805,
-                    startLongitude: -6.270310,
-                    destinationLatitude: 53.369805,
-                    destinationLongitude: -6.280310,
-                    address: "Sequential Second Ride"
+                    ...RIDE_COORDS.second,
+                    address: "Sequential Second Ride",
+                    predictedScore: 0.82
                 });
 
             expect(ride2Res.status).toBe(200);
