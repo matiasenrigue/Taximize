@@ -20,3 +20,6 @@ export const FARE_DISTANCE_RATE = 70;
 export const FARE_TIME_THRESHOLD = MINUTE_IN_MILLISECONDS; // in milliseconds
 export const FARE_DISTANCE_THRESHOLD = 321.9; // in meter
 export const FARE_SPEED_THRESHOLD = 19.3 * 1000 / HOUR_IN_MILLISECONDS; // in m/ms
+
+// design
+export const COLOR_PRIMARY = "#FBB93C";

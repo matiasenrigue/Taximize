@@ -11,6 +11,7 @@ import {UnknownLocationModal} from "../modals/UnknownLocationModal";
 import {RouteErrorModal} from "../modals/RouteErrorModal";
 import {useUserLocationContext} from "../../contexts/UserLocationContext/UserLocationContext";
 import {GoogleMapsRouteStatus} from "../../constants/types";
+import {TaxiZones} from "../TaxiZones/TaxiZones";
 
 export const Map = (props) => {
     const {className} = props;
@@ -123,6 +124,7 @@ export const Map = (props) => {
                 gestureHandling={'greedy'}
                 clickableIcons={false}
                 disableDefaultUI={true}>
+                <TaxiZones/>
                 {userLocation && <AdvancedMarker position={userLocation}>
                     <div className={styles.user_marker}/>
                 </AdvancedMarker>}
