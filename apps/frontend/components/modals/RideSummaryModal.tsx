@@ -6,6 +6,7 @@ import {ForwardedRef, forwardRef, useEffect, useState} from "react";
 import {useRide} from "../../contexts/RideContext/RideContext";
 import {MINUTE_IN_MILLISECONDS} from "../../constants/constants";
 import {NumberInput} from "../NumberInput/NumberInput";
+import {Label} from "../Label/Label";
 
 
 export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
@@ -37,7 +38,7 @@ export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle
                 align={"stretch"}>
                 <span>Distance: {distance / 1000} km</span>
                 <span>Duration: {Math.floor(duration / MINUTE_IN_MILLISECONDS)} min</span>
-                <span>Fare: {fare}</span>
+                <Label>Fare</Label>
                 <NumberInput
                     placeholder={"0.00"}
                     value={editedFare}

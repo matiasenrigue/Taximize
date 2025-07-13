@@ -39,10 +39,12 @@
     "signUpError": "Sign up failed"
   },
   "start-shift": {
+    "title": "Start Shift",
     "startShift": "Start Shift",
     "invalidDuration": "Please enter a duration."
   },
   "end-shift": {
+    "title": "Shift finished",
     "confirmButton": "Ok"
   },
   "RideEvaluationModal": {

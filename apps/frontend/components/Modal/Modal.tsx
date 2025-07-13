@@ -4,6 +4,7 @@ import styles from "./Modal.module.css";
 import React, {ForwardedRef, forwardRef, useCallback, useImperativeHandle, useRef} from "react";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Heading} from "../Heading/Heading";
 
 export type ModalHandle = {
     open: () => void;
@@ -59,7 +60,7 @@ export const Modal = forwardRef<ModalHandle, ModalProps>((props: ModalProps, ref
                 aria-label={"close"}>
                 <FontAwesomeIcon icon={faXmark}/>
             </button>
-            {title && <h4 className={styles.heading} style={titleStyle}>{title}</h4>}
+            {title && <Heading>{title}</Heading>}
             {children}
         </dialog>
     );

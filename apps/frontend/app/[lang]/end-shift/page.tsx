@@ -7,6 +7,7 @@ import {useTranslations} from "next-intl";
 import {useRouter} from "next/navigation";
 import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
 import {formatDuration} from "../../../lib/formatDuration/formatDuration";
+import {Heading} from "../../../components/Heading/Heading";
 
 export default function EndShift() {
     const t = useTranslations("end-shift");
@@ -15,6 +16,7 @@ export default function EndShift() {
 
     return (
         <div className={styles.page}>
+            <Heading>{t("title")}</Heading>
             <FlexGroup
                 direction={"column"}
                 align={"start"}>

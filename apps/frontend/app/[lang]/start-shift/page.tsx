@@ -11,6 +11,7 @@ import {useTranslations} from "next-intl";
 import {DEFAULT_SHIFT_DURATION} from "../../../constants/constants";
 import {ErrorMessage} from "../../../components/ErrorMessage/ErrorMessage";
 import {Label} from "../../../components/Label/Label";
+import {Heading} from "../../../components/Heading/Heading";
 
 export default function StartShift() {
     const router = useRouter();
@@ -28,6 +29,7 @@ export default function StartShift() {
 
     return (
         <div className={styles.page}>
+            <Heading>{t("title")}</Heading>
             <FlexGroup
                 direction={"column"}
                 align={"start"}>
