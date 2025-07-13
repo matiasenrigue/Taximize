@@ -6,6 +6,7 @@ import { RideService } from '../rides/ride.service';
 import { modelToResponse, requestToModel } from '../../shared/utils/caseTransformer';
 
 export class ShiftController {
+    
     // @desc    Handle general shift signal
     // @route   POST /api/shifts/signal
     // @access  Protected

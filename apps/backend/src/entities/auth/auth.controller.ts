@@ -3,6 +3,8 @@ import asyncHandler from 'express-async-handler';
 import User from '../users/user.model';
 import { generateAccessToken, generateRefreshToken } from './utils/generateTokens';
 import jwt from 'jsonwebtoken';
+import { ShiftService } from '../shifts/shift.service';
+import { RideService } from '../rides/ride.service';
 
 // @desc    Register a new user
 // @route   POST /api/auth/signup
@@ -57,7 +59,19 @@ export const signin = asyncHandler(async (req: Request, res: Response) => {
         const accessToken = generateAccessToken(user.id);
         const refreshToken = generateRefreshToken(user.id);
 
-        // 2) set refresh token as secure, HTTP-only cookie
+        // 2) Run cleanup tasks in background (don't block login)
+        // This ensures expired shifts and rides are cleaned up regularly
+        try {
+            await Promise.all([
+                ShiftService.manageExpiredShifts(),
+                RideService.manageExpiredRides()
+            ]);
+        } catch (error) {
+            // Log error but don't fail the login
+            console.error('Cleanup tasks failed during login:', error);
+        }
+
+        // 3) set refresh token as secure, HTTP-only cookie
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -66,7 +80,7 @@ export const signin = asyncHandler(async (req: Request, res: Response) => {
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
 
-        // 3) return access token in body
+        // 4) return access token in body
         res.status(200).json({
             success: true,
             message: 'User logged in successfully',
