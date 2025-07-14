@@ -1,7 +1,6 @@
 import {render, screen} from "@testing-library/react";
 import {ShiftContextProvider, useShift} from "./ShiftContext";
 import {expect} from "@jest/globals";
-import {UserLocationContextProvider} from "../UserLocationContext/UserLocationContext";
 
 const ShiftContextConsumerTest = () => {
     const context = useShift();

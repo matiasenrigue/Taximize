@@ -11,6 +11,10 @@
     border-color: var(--color-primary);
 }
 
+.container[data-invalid=true] {
+    border-color: var(--color-danger);
+}
+
 .segment {
     outline: none;
 }

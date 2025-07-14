@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 import  api  from "../lib/axios";
 import { MessageType } from "../components/Message/Message";
 import { clearAllTokens } from "../lib/token";
@@ -35,7 +35,7 @@ export const useUser = () => {
                 await refreshUser();
                 if (!user?.id) { throw new Error('User not found'); }
              }
-            const res = await api.delete(`/user/${user.id}`);
+            const res = await api.delete(`/auth/user/${user.id}`);
             setUser(null);
             return { type: 'success' as MessageType, message: res?.data?.message || 'User deleted successfully' };
         } catch (err: any) {
@@ -66,7 +66,7 @@ export const useUser = () => {
                 await refreshUser();
                 if (!user?.id) { throw new Error('User not found'); }
              }
-            const res = await api.put(`/user/${user.id}/username`, { username });
+            const res = await api.put(`/auth/user/${user.id}/username`, { username });
             return { type: 'success' as MessageType, message: res?.data?.message || 'User username updated successfully' };
         } catch (err: any) {
             const errorMessage = err?.response?.data?.error || 'Failed to update user username';
@@ -82,7 +82,7 @@ export const useUser = () => {
                 await refreshUser();
                 if (!user?.id) { throw new Error('User not found'); }
              }
-            const res = await api.put(`/user/${user.id}/password`, { password });
+            const res = await api.put(`/auth/user/${user.id}/password`, { password });
             return { type: 'success' as MessageType, message: res?.data?.message || 'User password updated successfully' };
         } catch (err: any) {
             const errorMessage = err?.response?.data?.error || 'Failed to update user password';

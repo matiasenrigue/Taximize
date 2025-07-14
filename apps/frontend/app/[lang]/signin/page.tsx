@@ -29,7 +29,7 @@ export default function Signin() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        api.post("/signin", {
+        api.post("/auth/signin", {
                 email,
                 password
             }).then((response) => {
@@ -42,7 +42,7 @@ export default function Signin() {
                 // Show success message
                 setMsg({ type: "success", text: response.data.message || t("signinSuccess") });
                 // Redirect to home page after successful signin
-                router.push("/map");
+                router.push("/start-shift");
                 } else {
                 // when the status is 200, but the response does not contain a token(e.g. invalid credentials)
                     setMsg({ type: "error", text: response.data.message || t("signinFailed") });
@@ -108,7 +108,7 @@ export default function Signin() {
                             theme="primary"
                             disabled={!canSubmit}
                         >
-                            {t("signUp")}
+                            {t("signIn")}
                         </Button>
                     </form>
                     <div className={styles.links_container}>

@@ -1,0 +1,19 @@
+.spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: solid 4px var(--color-primary);
+    border-top-color: transparent;
+    border-radius: 50%;
+    transform: rotate(45deg);
+    animation: spin 2s ease-in-out infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(45deg);
+    }
+    to {
+        transform: rotate(405deg);
+    }
+}

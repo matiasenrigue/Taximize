@@ -1,15 +1,17 @@
 
 import {useTranslations} from "next-intl";
-import {ForwardedRef, forwardRef, Ref} from "react";
+import {ForwardedRef, forwardRef, Ref, useState} from "react";
 import {Modal, ModalHandle} from "../../Modal/Modal";
 import {FlexGroup} from "../../FlexGroup/FlexGroup";
 import {Button} from "../../Button/Button";
 import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
+import {DEFAULT_BREAK_DURATION, MINUTE_IN_MILLISECONDS} from "../../../constants/constants";
+import {NumberInput} from "../../NumberInput/NumberInput";
 
 export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
-    const {} = props;
     const {pauseShift, skipBreak} = useShift();
     const t = useTranslations('BreakReminderModal');
+    const [durationInMinutes, setDurationInMinutes] = useState<number>(DEFAULT_BREAK_DURATION / MINUTE_IN_MILLISECONDS);
 
     function closeModal() {
         if (!ref || typeof ref === "function")
@@ -17,8 +19,9 @@ export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHand
         ref.current.close();
     }
 
-    function takeBreak() {
-        pauseShift();
+    function takeBreakAndCloseModal() {
+        const durationInMs = durationInMinutes * MINUTE_IN_MILLISECONDS;
+        pauseShift(durationInMs);
         closeModal();
     }
 
@@ -38,6 +41,16 @@ export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHand
                 <p>{t("text")}</p>
                 <FlexGroup
                     direction={"row"}
+                    align={"center"}
+                    justify={"start"}>
+                    <NumberInput
+                        value={durationInMinutes}
+                        onChange={(e) => setDurationInMinutes(e.target.value)}
+                    />
+                    <span>min</span>
+                </FlexGroup>
+                <FlexGroup
+                    direction={"row"}
                     align={"stretch"}>
                     <Button
                         theme={"secondary"}
@@ -45,7 +58,7 @@ export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHand
                         {t("cancelButton")}
                     </Button>
                     <Button
-                        onClick={takeBreak}>
+                        onClick={takeBreakAndCloseModal}>
                         {t("confirmButton")}
                     </Button>
                 </FlexGroup>

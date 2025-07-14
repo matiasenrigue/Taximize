@@ -1,0 +1,14 @@
+.input {
+    background-color: var(--color-surface);
+    border: solid 1px var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--padding-sm);
+    width: 100%;
+    max-width: 100px;
+    font-family: var(--font-roboto-mono);
+    outline: none;
+}
+
+.input:focus {
+    border-color: var(--color-primary);
+}

@@ -9,3 +9,11 @@
     background-color: var(--color-on-surface);
     transform: translateY(50%);
 }
+
+.destination_marker {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--color-on-surface);
+    transform: translateY(50%);
+}

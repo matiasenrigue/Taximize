@@ -6,6 +6,14 @@
     "endShift": "Schicht beenden",
     "locationSearchPlaceholder": "Adresse suchen..."
   },
+  "LocationUnavailable": {
+    "title": "Aktiviere deinen Standort",
+    "text": "Die App braucht Zugriff auf deinen Standort, um Routen anzuzeigen und Fahrpreise zu berechnen."
+  },
+  "LocationLoading": {
+    "title": "Standort wird geladen...",
+    "text": "Die App lädt deinen Standort. Das kann einen Moment dauern."
+  },
   "signin": {
     "email": "E-Mail",
     "password": "Passwort",
@@ -31,11 +39,21 @@
     "signUpError": "Signup fehlgeschlagen"
   },
   "start-shift": {
-    "startShift": "Schicht starten"
+    "title": "Schicht starten",
+    "startShift": "Schicht starten",
+    "invalidDuration": "Bitte geben Sie die Dauer ein."
+  },
+  "end-shift": {
+    "title": "Schicht beendet",
+    "confirmButton": "Ok"
   },
   "RideEvaluationModal": {
     "title": "Fahrt starten",
-    "text": "Diese Fahrt ist schlechter als der Durchschnitt. Es wird schwierig sein, am Ziel einen neuen Passagier zu finden.",
+    "text-rating-1": "Diese Fahrt ist nicht empfohlen. Es wird sehr schwierig sein, am Ziel einen neuen Passagier zu finden.",
+    "text-rating-2": "Diese Fahrt ist schlechter als der Durchschnitt. Es wird schwierig sein, am Ziel einen neuen Passagier zu finden.",
+    "text-rating-3": "Diese Fahrt ist durchschnittlich gut. Es wird einen Moment dauern, am Ziel einen neuen Passagier zu finden.",
+    "text-rating-4": "Diese Fahrt ist besser als der Durchschnitt. Es wird leicht sein, am Ziel einen neuen Passagier zu finden.",
+    "text-rating-5": "Diese Fahrt ist ideal! Es wird sehr leicht sein, am Ziel einen neuen Passagier zu finden.",
     "confirmButton": "Fahrt starten",
     "cancelButton": "Abbrechen"
   },
@@ -47,6 +65,12 @@
   "BreakReminderModal": {
     "title": "Zeit für eine Pause!",
     "text": "Du fährst seit über 3 Stunden ohne Pause! Wir empfehlen dir, eine kurze 15-Minuten Pause einzulegen.",
+    "confirmButton": "Pause machen",
+    "cancelButton": "Abbrechen"
+  },
+  "StartBreakModal": {
+    "title": "Pause machen",
+    "text": "Wie lange möchtest du Pause machen?",
     "confirmButton": "Pause machen",
     "cancelButton": "Abbrechen"
   },

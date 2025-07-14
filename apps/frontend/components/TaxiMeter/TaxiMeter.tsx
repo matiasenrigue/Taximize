@@ -2,26 +2,12 @@
 
 import styles from "./TaxiMeter.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faClock, faEuroSign} from "@fortawesome/free-solid-svg-icons";
-import {useEffect, useState} from "react";
+import {faClock, faDollarSign} from "@fortawesome/free-solid-svg-icons";
 import {useRide} from "../../contexts/RideContext/RideContext";
+import {formatDuration} from "../../lib/formatDuration/formatDuration";
 
 export const TaxiMeter = () => {
-    const {getRideTime, getRideFare} = useRide();
-    const [rideTime, setRideTime] = useState(() => getRideTime());
-    const [rideFare, setRideFare] = useState(() => getRideFare());
-
-    useEffect(() => {
-        setRideTime(getRideTime());
-        setRideFare(getRideFare())
-        const delay = 1000 * 10;
-        const intervalId = setInterval(() => {
-            setRideTime(getRideTime());
-            setRideFare(getRideFare());
-        }, delay);
-
-        return () => clearInterval(intervalId);
-    }, [getRideTime, getRideFare]);
+    const {fare, duration} = useRide();
 
     return (
         <div className={styles.container}>
@@ -29,13 +15,17 @@ export const TaxiMeter = () => {
                 <FontAwesomeIcon
                     className={styles.icon}
                     icon={faClock}/>
-                <span>{rideTime}</span>
+                <span>{formatDuration(duration, {
+                    hours: false,
+                    minutes: true,
+                    seconds: true
+                })}</span>
             </div>
             <div className={styles.group}>
                 <FontAwesomeIcon
                     className={styles.icon}
-                    icon={faEuroSign}/>
-                <span>{rideFare}</span>
+                    icon={faDollarSign}/>
+                <span>{(fare / 100).toFixed(2)}</span>
             </div>
         </div>
     );

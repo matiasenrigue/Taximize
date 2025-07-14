@@ -9,7 +9,7 @@ import {useRide} from "../../contexts/RideContext/RideContext";
 
 export const RideEvaluationModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('RideEvaluationModal');
-    const {startRide} = useRide();
+    const {rating, startRide} = useRide();
 
     function closeModal() {
         if (!ref || typeof ref === "function")
@@ -28,8 +28,8 @@ export const RideEvaluationModal = forwardRef((props, ref: ForwardedRef<ModalHan
             title={t("title")}>
             <FlexGroup
                 align={"stretch"}>
-                <Rating rating={3}/>
-                <p>{t("text")}</p>
+                <Rating rating={rating}/>
+                <p>{t(`text-rating-${rating}`)}</p>
                 <FlexGroup
                     direction={"row"}
                     align={"stretch"}>

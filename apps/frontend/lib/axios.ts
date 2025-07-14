@@ -5,7 +5,7 @@ import { getToken, setToken, deleteToken, clearAllTokens } from './token';
  * Create an Axios instance with default settings
  */
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/auth',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -63,10 +63,9 @@ api.interceptors.response.use(
             return api(originalRequest);
           }
         } catch (refreshError) {
-          // Refresh failed, redirect to login
-          console.error('Token refresh failed - redirecting to login');
+          // Refresh failed
+          console.error('Token refresh failed');
           clearAllTokens();
-          window.location.href = '/signin';
           return Promise.reject(refreshError);
         }
       } else if (error.response.status === 403) {

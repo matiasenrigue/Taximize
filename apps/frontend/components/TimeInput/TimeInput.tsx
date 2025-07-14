@@ -1,16 +1,21 @@
 import styles from "./TimeInput.module.css";
 import {ForwardedRef, forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
-import {moveCursorToEnd, removeAllSelections, selectContent} from "../../utility/selectContent";
+import {moveCursorToEnd, removeAllSelections, selectContent} from "../../lib/selectContent";
+import {HOUR_IN_MILLISECONDS, MINUTE_IN_MILLISECONDS} from "../../constants/constants";
 
 interface TimeInputProps {
     onChange?: (value: number) => void; // in milliseconds
     suffix?: string;
+    defaultValue?: number;
+    invalid?: boolean;
 }
 
 export const TimeInput = (props: TimeInputProps) => {
     const {
         onChange,
         suffix = "h",
+        defaultValue = 0,
+        invalid = false,
     } = props;
     const hourRef = useRef<SegmentHandle>(null!);
     const minuteRef = useRef<SegmentHandle>(null!);
@@ -33,11 +38,12 @@ export const TimeInput = (props: TimeInputProps) => {
         <div
             className={styles.container}
             data-testid={"time-input"}
+            data-invalid={invalid}
             onClick={handleClick}>
             <Segment
                 ref={hourRef}
                 testId={"segment-hour"}
-                defaultValue={0}
+                defaultValue={Math.floor(defaultValue / HOUR_IN_MILLISECONDS)}
                 minValue={0}
                 maxValue={23}
                 onConfirm={() => minuteRef?.current?.focus()}
@@ -46,7 +52,7 @@ export const TimeInput = (props: TimeInputProps) => {
             <Segment
                 ref={minuteRef}
                 testId={"segment-minute"}
-                defaultValue={0}
+                defaultValue={Math.floor((defaultValue % HOUR_IN_MILLISECONDS) / MINUTE_IN_MILLISECONDS)}
                 minValue={0}
                 maxValue={59}
                 onConfirm={() => minuteRef?.current?.blur()}
