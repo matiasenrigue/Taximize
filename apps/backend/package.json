@@ -14,7 +14,8 @@
     "create-db": "ts-node --transpile-only src/scripts/create-db.ts"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.2",
