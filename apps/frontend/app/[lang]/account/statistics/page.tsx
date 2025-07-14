@@ -15,6 +15,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useEarningStatistics } from "../../../../hooks/useEarningStatistics";
 import { useWorktimeStatistics } from "../../../../hooks/useWorktimeStatistics";
+import BackButton from "../../../../components/BackButton/BackButton";
 
 export default function StatisticsPage() {
     const t = useTranslations('statistics');
@@ -143,6 +144,9 @@ export default function StatisticsPage() {
   return (
     <div className="styles.page">
         <div className={styles.container}>
+            <div className={styles.backButtonContainer}>
+                <BackButton href="/account" pageName="Account" />
+            </div>
             <div className={styles.profileInfo}>
             <h2 className={styles.title}>{t('title')}</h2>
             <section className={styles.section}>

@@ -15,6 +15,13 @@
     border-radius: 8px;
 }
 
+.backButtonContainer {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-bottom: 1.5rem;
+}
+
 .title {
     font-size: 1.75rem;
     font-weight: 600;
@@ -23,7 +30,6 @@
 
 .preferenceList {
     display: grid;
-    /* ensure that all controls are left-aligned within the fixed column */
     grid-template-columns: 120px 1fr;
     align-items: center;
     row-gap: 1.75rem;
@@ -57,3 +63,4 @@
     padding: 0.5rem;
     font-size: 1rem;
 }
+
