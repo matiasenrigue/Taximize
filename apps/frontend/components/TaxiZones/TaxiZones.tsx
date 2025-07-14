@@ -13,7 +13,7 @@ export const TaxiZones = () => {
                     strokeOpacity={0}
                     strokeWeight={1}
                     fillColor={COLOR_PRIMARY}
-                    fillOpacity={Math.random() * .8}
+                    fillOpacity={(zone.random / 100) * .8}
                     paths={zone.geometry.map((path, i) => (
                         path.map((vertex, j) => ({
                             lat: vertex[1],
