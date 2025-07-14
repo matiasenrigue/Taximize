@@ -80,7 +80,8 @@
     "account": "Account",
     "shiftSettings": "Shift Settings",
     "preferences": "Preferences",
-    "statistics": "Statistics"
+    "statistics": "Statistics",
+    "manageRides": "Manage Rides"
   },
   "preferences": {
     "preferences": "Preferences",
