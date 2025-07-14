@@ -7,15 +7,12 @@
  * * @module Input
  */
 import styles from "./input.module.css";
-import { useRef } from "react";
+import React, { useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 
 export interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    placeholder?: string;
     width?: string | number;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const Input = ({ placeholder = '', width = '100%', value, onChange, ...props }: CustomInputProps) => {
@@ -26,12 +23,17 @@ export const Input = ({ placeholder = '', width = '100%', value, onChange, ...pr
     }
 
     function clearInput() {
-        onChange({ target: { value: '' } } as React.ChangeEvent<HTMLInputElement>);
+        if (onChange) {
+            onChange({ target: { value: '' } } as React.ChangeEvent<HTMLInputElement>);
+        }
         focusInput();
     }
 
     return (
-        <div className={styles.input_box} style={{ width, position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div 
+            className={styles.input_box} 
+            style={{ width }}
+        >
             <input
                 {...props}
                 ref={ref}

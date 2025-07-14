@@ -8,6 +8,8 @@ import { useUser } from "../../../../hooks/useUser";
 import { Modal, ModalHandle } from "../../../../components/Modal/Modal";
 import { Button } from "../../../../components/Button/Button";
 import { Message, MessageType } from "../../../../components/Message/Message";
+import BackButton from "../../../../components/BackButton/BackButton";
+
 
 export default function profile() {
     const { user, error, signOut, deleteUser } = useUser();
@@ -78,6 +80,9 @@ export default function profile() {
         }
         <div className={styles.page}>
              <div className={styles.container}>
+                <div className={styles.backButtonContainer}>
+                    <BackButton href="/account" pageName="Account" />
+                </div>
                  <h2 className={styles.title}>{t('profile')}</h2>
                     <div className={styles.profileInfo}>
                         {/* personal information */}

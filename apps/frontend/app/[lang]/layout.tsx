@@ -13,6 +13,7 @@ import {RideContextProvider} from "../../contexts/RideContext/RideContext";
 import React from "react";
 import {BreakModalHandler} from "../../components/modals/BreakModalHandler/BreakModalHandler";
 import {ShiftEndModalHandler} from "../../components/modals/ShiftEndModalHandler/ShiftEndModalHandler";
+import { UserContextProvider } from "../../contexts/UserContext/UserContext";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -66,7 +67,7 @@ export default async function RootLayout({
           <NextIntlClientProvider>
             <ShiftContextProvider>
               <RideContextProvider>
-
+                <UserContextProvider>
                 <BreakModalHandler/>
                 <ShiftEndModalHandler/>
 
@@ -76,7 +77,7 @@ export default async function RootLayout({
                     {children}
                   </main>
                 </div>
-
+                </UserContextProvider>
               </RideContextProvider>
             </ShiftContextProvider>
           </NextIntlClientProvider>

@@ -3,3 +3,5 @@ export const MAP_CENTER = {lat: 40.7831, lng: -73.9712};
 
 export const BREAK_MODAL_TIMEOUT = 3 * 60 * 60 * 1000;
 export const DEFAULT_BREAK_DURATION = 15 * 60 * 1000;
+
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

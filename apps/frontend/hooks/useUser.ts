@@ -1,31 +1,14 @@
 import { SetStateAction, useEffect, useState } from "react";
 import  api  from "../lib/axios";
 import { MessageType } from "../components/Message/Message";
-import { User } from "lucide-react";
 import { clearAllTokens } from "../lib/token";
+import { useUserContext } from "../contexts/UserContext/UserContext";
 
-export interface User {
-    id: string;
-    username: string;
-    email: string;
-    createdAt?: string;
-    updatedAt?: string;
-}
 
 export const useUser = () => {
-    const [user, setUser] = useState<User | null>(null);
+    const { user, setUser, refreshUser } = useUserContext();
     const [error, setError] = useState(null);
 
-    // get the user data
-    useEffect(() => {
-        api.get('/user').then((res: { data: User }) => {
-            setUser(res.data);
-        }).catch((err: any) => {
-            console.error(err);
-            const errorMessage = err?.response?.data?.message || 'Failed to fetch user data';
-            setError({ ...err, message: errorMessage });
-        });
-    }, []);
 
     // sign out the user
     const signOut = async () => {
@@ -48,7 +31,11 @@ export const useUser = () => {
     // delete the user
     const deleteUser = async () => {
         try {
-            const res = await api.delete('/user');
+            if (!user?.id) { 
+                await refreshUser();
+                if (!user?.id) { throw new Error('User not found'); }
+             }
+            const res = await api.delete(`/user/${user.id}`);
             setUser(null);
             return { type: 'success' as MessageType, message: res?.data?.message || 'User deleted successfully' };
         } catch (err: any) {
@@ -61,21 +48,25 @@ export const useUser = () => {
     
 
     // update the user email
-    const updateUserEmail = async (email :string) => {
-        try {
-            const res = await api.put('/user/email', { email });
-            return { type: 'success' as MessageType, message: res?.data?.message || 'User email updated successfully' };
-        } catch (err: any) {
-            const errorMessage = err?.response?.data?.error || 'Failed to update user email';
-            setError({ ...err, message: errorMessage });
-            return { type: 'error' as MessageType, message: errorMessage || 'Failed to update user email' };
-        }
-    }
+    // const updateUserEmail = async (email :string) => {
+    //     try {
+    //         const res = await api.put('/user/email', { email });
+    //         return { type: 'success' as MessageType, message: res?.data?.message || 'User email updated successfully' };
+    //     } catch (err: any) {
+    //         const errorMessage = err?.response?.data?.error || 'Failed to update user email';
+    //         setError({ ...err, message: errorMessage });
+    //         return { type: 'error' as MessageType, message: errorMessage || 'Failed to update user email' };
+    //     }
+    // }
 
     // update the username
     const updateUsername = async (username: string) => {
         try {
-            const res = await api.put('/user/username', { username });
+            if (!user?.id) { 
+                await refreshUser();
+                if (!user?.id) { throw new Error('User not found'); }
+             }
+            const res = await api.put(`/user/${user.id}/username`, { username });
             return { type: 'success' as MessageType, message: res?.data?.message || 'User username updated successfully' };
         } catch (err: any) {
             const errorMessage = err?.response?.data?.error || 'Failed to update user username';
@@ -87,7 +78,11 @@ export const useUser = () => {
     // update the user password
     const updateUserPassword = async(password: string) => {
         try {
-            const res = await api.put('/user/password', { password });
+            if (!user?.id) { 
+                await refreshUser();
+                if (!user?.id) { throw new Error('User not found'); }
+             }
+            const res = await api.put(`/user/${user.id}/password`, { password });
             return { type: 'success' as MessageType, message: res?.data?.message || 'User password updated successfully' };
         } catch (err: any) {
             const errorMessage = err?.response?.data?.error || 'Failed to update user password';
@@ -96,5 +91,5 @@ export const useUser = () => {
         }
     }   
 
-    return { user, error, signOut, deleteUser, updateUserEmail, updateUsername, updateUserPassword };
+    return { user, error, signOut, deleteUser, updateUsername, updateUserPassword, refreshUser };
 }

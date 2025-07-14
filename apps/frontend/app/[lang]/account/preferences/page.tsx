@@ -8,6 +8,7 @@ import { Switch } from "../../../../components/Switch/Switch";
 import { useRouter, usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useTheme } from "next-themes";  
+import BackButton from "../../../../components/BackButton/BackButton";
 
 export default function Preferences() {
     const t = useTranslations('preferences');
@@ -24,6 +25,9 @@ export default function Preferences() {
     return (
         <div className={styles.page}>
             <div className={styles.container}>
+                <div className={styles.backButtonContainer}>
+                    <BackButton href="/account" pageName="Account" />
+                </div>
                 <h2 className={styles.title}>Preferences</h2>
                 <div className={styles.preferenceList}>
                     <div className={styles.label}>
