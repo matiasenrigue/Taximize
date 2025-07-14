@@ -18,6 +18,8 @@
 # next.js
 /.next/
 /out/
+apps/frontend/.next/
+
 
 # backend js code
 /apps/backend/dist
