@@ -53,21 +53,25 @@ python test_score.py
   "dropoff_zone": "Upper West Side North",
   "pickup_datetime": "07/14/2025 10:00:00 AM"
 }
-
+```
+``` text
 pickup_zone: TLC zone name
 dropoff_zone: TLC zone name 
 pickup_datetime: String in MM/DD/YYYY HH:MM:SS AM/PM format
-
+```
 
 # Output Format
 
+```json
 {
   "predicted_score": 1.31,
   "final_score": 0.013
 }
-
+```
+```text
 predicted_score: raw model predicitions (proxy for profitability per minute)
 final_score: Normalized value between 0-1 (safe to display in UI)
+```
 
 # Final Notes 
 
