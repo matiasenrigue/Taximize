@@ -42,8 +42,9 @@ Each month (e.g., `july/`) contains:
 Ensure your Flask server is running
 Run the API with: 
 
-bash
+```bash
 python test_score.py
+```
 
 # Required Input 
 
