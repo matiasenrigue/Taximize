@@ -25,10 +25,11 @@ Model and utility files are stored in sibling folders:
 
 Make sure you're in the root project directory. Then run:
 
-bash
+```bash
 cd data/data_models_api/combined_flask_app
 pip install -r requirements.txt
 python flask_app.py
+```
 
 ---
 
