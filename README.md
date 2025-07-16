@@ -25,6 +25,13 @@
 │       ├── next.env.d.ts
 │       ├── package.json
 │       └── tsconfig.json       # frontend typescript configuration
+├── Data/
+│   ├── cleaning_exploration/       # EDA, notebooks, exploratory analysis
+│   │   └── zone_coordinates.csv    # Load zone → borough map (used for encoding)
+│   └── data_models_api/
+│       ├── combined_flask/         # Used for Integration
+│       ├── scoring_model/          # Scoring logic and model assets
+│       └── hotspot_model/          # Hotspot logic and model assets
 ├── node_modules/               # shared modules, do not commit!
 ├── packages/
 │   └── shared/                 # shared code
