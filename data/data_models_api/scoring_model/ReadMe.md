@@ -8,6 +8,7 @@ Please note in the readme I will only be adding the structure for the month of J
 
 Scoring_model/
 
+```
 ├── scoring_utils.py         # Core feature engineering + model scoring
 ├── test_score.py            # Simple script to test scoring via API
 ├── models/
@@ -22,6 +23,7 @@ Scoring_model/
 │ │ ├── scoring_weights_july.json
 │ │ └── scaler_july.pkl
 
+```
 ## What Each File In a Monthly Model Folder Does
 Each month (e.g., `july/`) contains:
 
