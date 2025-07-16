@@ -2,8 +2,9 @@
 
 This folder contains all components related to data preparation, modeling, and backend API integration for the NYC Taxi Trip Prediction Project.
 
-## Folder Structure 
+## Folder Structure
 
+```
 Data/
 ├── cleaning_exploration/         #EDA, notebooks, exploratory analysis
 │
@@ -14,7 +15,9 @@ Data/
     │         
     ├── scoring_model/            # Scoring logic and model assets
     │
-    └── hotspot_model/             # Hotspot logic and model assets 
+    └── hotspot_model/             # Hotspot logic and model assets
+
+```
 
 ## Folder Explanition
 
