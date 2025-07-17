@@ -1,8 +1,0 @@
-.hotspot_marker {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: var(--color-primary);
-    opacity: .5;
-    transform: translateY(50%);
-}

@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import styles from './MenuItem.module.css';
 import Link from 'next/link';
+import React from "react";
 
 export const MenuItem = ({ href, children, icon }: { href: string; children: React.ReactNode; icon?: React.ReactNode }) => {
   return (

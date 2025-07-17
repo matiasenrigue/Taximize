@@ -19,7 +19,7 @@ export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle
     }, [fare]);
 
     function closeModal() {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function"  || !ref.current)
             return;
         ref.current.close();
     }
@@ -66,3 +66,5 @@ export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle
         </Modal>
     );
 });
+
+RideSummaryModal.displayName = "RideSummaryModal";

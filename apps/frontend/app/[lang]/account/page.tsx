@@ -20,7 +20,7 @@ export default function Account() {
 
     return (
          <div className={styles.page}>
-            <div className={styles.backButtonContainer}>
+            <div>
                 <BackButton href="/account" pageName="Account" />
             </div>
             <div className={styles.profile}>

@@ -1,3 +1,6 @@
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+export const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'no-api-key';
+
 // units
 export const MINUTE_IN_MILLISECONDS = 60 * 1000;
 export const HOUR_IN_MILLISECONDS = 60 * MINUTE_IN_MILLISECONDS;
@@ -7,6 +10,7 @@ export const MAP_ID = "f1310920ec56c7b65c64dec9";
 export const MAP_CENTER = {lat: 40.7831, lng: -73.9712};
 
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const FLOAT_REGEX = /^-?(?:\d+|\d*\.\d*)?$/;
 
 // default config
 export const DEFAULT_SHIFT_DURATION = 8 * HOUR_IN_MILLISECONDS;

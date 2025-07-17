@@ -8,7 +8,7 @@ export const NoRouteFoundModal = forwardRef((props, ref: ForwardedRef<ModalHandl
     const t = useTranslations('NoRouteFoundModal');
 
     function closeModal() {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function"  || !ref.current)
             return;
         ref.current.close();
     }
@@ -33,3 +33,5 @@ export const NoRouteFoundModal = forwardRef((props, ref: ForwardedRef<ModalHandl
         </Modal>
     );
 });
+
+NoRouteFoundModal.displayName = "NoRouteFoundModal";

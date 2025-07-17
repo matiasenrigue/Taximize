@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import styles from "./page.module.css";
 import { useUser } from "../../../../../hooks/useUser";
 import { Input } from "../../../../../components/Input/Input";
@@ -9,8 +9,8 @@ import { useTranslations } from "next-intl";
 import { Message, MessageType } from "../../../../../components/Message/Message";
 import { useRouter } from "next/navigation";
 
-export default function changeUsername() {
-    const { user, error, updateUsername } = useUser();
+export default function ChangeUsername() {
+    const { user, updateUsername } = useUser();
     const [msg, setMsg] = useState<{ type: MessageType ; message: string } | null>(null);
     const t = useTranslations('changeUsername');
     const router = useRouter();
@@ -39,12 +39,11 @@ export default function changeUsername() {
                 <div className={styles.profileInfo}>
                 <h2 className={styles.title}>{t('changeUsername')}</h2>
                         <section className={styles.section}>
-                            <div className={styles.menu}>
+                            <div>
                                 <Input
                                     type="text"
                                     value={newUsername}
                                     placeholder={t('newUsernamePlaceholder')}
-                                    className={styles.input}
                                     onChange={(e) => setNewUsername(e.target.value)}
                                 />
                                 <div className={styles.modalActions}>

@@ -24,7 +24,7 @@ export default function ManageRidesDay() {
 
     useEffect(() => {
         setLoading(true);
-        api.get(`/api/rides/by-day`, { params: { day } })
+        api.get(`/rides/by-day`, { params: { day } })
             .then(res => setRides(res.data.data))
             .finally(() => setLoading(false));
     }, [day]);
@@ -39,15 +39,15 @@ export default function ManageRidesDay() {
                 {loading ? (
                     <div>Loading...</div>
                 ) : (
-                    <div className={styles.ridesList}>
+                    <div>
                         {rides.map((ride) => (
-                            <div key={ride.id} className={styles.rideCard}>
-                                <div className={styles.ridePreview} onClick={() => setExpanded(expanded === ride.id ? null : ride.id)}>
+                            <div key={ride.id}>
+                                <div onClick={() => setExpanded(expanded === ride.id ? null : ride.id)}>
                                     <span>To {ride.to}</span>
-                                    <span className={styles.arrow}>{expanded === ride.id ? "▼" : "▶"}</span>
+                                    <span>{expanded === ride.id ? "▼" : "▶"}</span>
                                 </div>
                                 {expanded === ride.id && (
-                                    <div className={styles.rideDetails}>
+                                    <div>
                                         <div><strong>From:</strong> {ride.from}</div>
                                         <div><strong>To:</strong> {ride.to}</div>
                                         <div><strong>Duration:</strong> {ride.duration}</div>

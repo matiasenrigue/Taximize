@@ -10,14 +10,14 @@ export const ShiftEndModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) 
     const {endShift, startOvertime} = useShift();
 
     function closeModalAndEndShift() {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function"  || !ref.current)
             return;
         ref?.current?.close();
         endShift();
     }
 
     function closeModalAndStartOvertime() {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function"  || !ref.current)
             return;
         ref?.current?.close();
         startOvertime();
@@ -51,3 +51,5 @@ export const ShiftEndModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) 
         </Modal>
     );
 });
+
+ShiftEndModal.displayName = "ShiftEndModal";

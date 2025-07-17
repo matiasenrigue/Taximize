@@ -11,11 +11,10 @@ describe("Input", () => {
         onChange={() => {}}
         placeholder="Test Input"
         type="text"
-        width="100%"
       />
     );
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("textbox", {});
     expect(input).toBeInTheDocument();
   });
 
@@ -23,7 +22,7 @@ describe("Input", () => {
     const placeholderText = "Enter text here";
     render(<Input placeholder={placeholderText} />);
 
-    const input = screen.getByPlaceholderText(placeholderText);
+    const input = screen.getByPlaceholderText(placeholderText, {});
     expect(input).toBeInTheDocument();
     expect(input).toHaveAttribute("placeholder", placeholderText);
   });
@@ -38,11 +37,10 @@ describe("Input", () => {
         onChange={handleChange}
         placeholder="Clearable Input"
         type="text"
-        width="100%"
       />
     );
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("textbox", {});
     expect(input).toBeInTheDocument();
     expect(input).toHaveValue("Test");
 

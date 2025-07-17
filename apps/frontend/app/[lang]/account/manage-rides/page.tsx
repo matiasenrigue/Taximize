@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { MenuItem } from "../../../../components/MenuItem/MenuItem";
 import styles from "./page.module.css";
-import { useTranslations } from "next-intl";
 import BackButton from "../../../../components/BackButton/BackButton";
 import api from "../../../../lib/axios";
 
@@ -13,10 +12,9 @@ function formatDay(dateString: string) {
 }
 
 export default function ManageRides() {
-    const t = useTranslations('manageRides');
     const [days, setDays] = useState<{ day: string, hasRide: boolean }[]>([]);
     useEffect(() => {
-        api.get('/api/rides/last-7-days').then(res => {
+        api.get('/rides/last-7-days').then(res => {
             setDays(res.data.data.filter((d: { hasRide: boolean }) => d.hasRide));
         });
     }, []);

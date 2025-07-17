@@ -12,7 +12,7 @@ export const LocationSearchbar = (props: SearchbarProps) => {
     const placesLibrary = useMapsLibrary('places') as typeof google.maps.places;
     const [placesService, setPlacesService] = useState<google.maps.places.PlacesService>();
     const [searchResults, setSearchResults] = useState<google.maps.places.PlaceResult[]>([]);
-    const [isInvalidAddress, setIsInvalidAddress] =useState<boolean>(false);
+    const [, setIsInvalidAddress] = useState<boolean>(false);
 
     const locale = useLocale();
     const map = useMap();
@@ -41,7 +41,7 @@ export const LocationSearchbar = (props: SearchbarProps) => {
             };
             placesService.textSearch(request, (results, status) => {
                 if (status === placesLibrary.PlacesServiceStatus.OK)
-                    resolve(results);
+                    resolve(results ?? []);
                 else
                     reject(status);
             });
@@ -52,7 +52,10 @@ export const LocationSearchbar = (props: SearchbarProps) => {
     const searchAddress = useCallback((query: string) => {
         textSearch(query)
             .then((result) => {
-                setSearchResults(result.slice(0, 5));
+                const validResults = result
+                    .filter(place => (place.name && place.place_id && place.geometry))
+                    .slice(0, 5);
+                setSearchResults(validResults);
             })
             .catch(() => {
                 setSearchResults([])
@@ -64,17 +67,23 @@ export const LocationSearchbar = (props: SearchbarProps) => {
 
     const selectPlace = (place: google.maps.places.PlaceResult) => {
         const {place_id, name, geometry} = place;
-        const lat = geometry.location.lat();
-        const lng = geometry.location.lng();
+        if (!geometry || !place_id || !name)
+            return;
+        const lat = geometry?.location?.lat() ?? 0;
+        const lng = geometry?.location?.lng() ?? 0;
         setSearchResults([]);
-        searchbarRef.current.setValue(name);
+        searchbarRef.current.setValue(name ?? "");
         updateDestination({name, placeId: place_id, lat, lng});
     };
 
     const confirmInput = (query: string) => {
         textSearch(query)
             .then((result) => {
-                selectPlace(result[0]);
+                const validResults = result
+                    .filter(place => (place.name && place.place_id && place.geometry));
+                if (!validResults)
+                    return;
+                selectPlace(validResults[0]);
             })
             .catch(() => {
                 setSearchResults([]);
@@ -101,7 +110,7 @@ export const LocationSearchbar = (props: SearchbarProps) => {
                 {searchResults.map((result, i) => (
                     <SearchResult
                         key={i}
-                        value={result.name}
+                        value={result.name!}
                         onClick={() => {
                             selectPlace(result);
                         }}/>

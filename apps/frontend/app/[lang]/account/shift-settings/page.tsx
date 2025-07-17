@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { TimeInput } from "../../../../components/TimeInput/TimeInput";
 import BackButton from "../../../../components/BackButton/BackButton";
 
-export default function shiftSettings() {
+export default function ShiftSettings() {
     const t = useTranslations('shiftSettings');
     const labelList = [
         "Monday",

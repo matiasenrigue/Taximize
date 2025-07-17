@@ -1,11 +1,7 @@
 import React, {useId} from "react";
 import styles from "./Switch.module.css";
 
-interface SwitchProps extends React.InputHTMLAttributes<HTMLInputElement> {
-
-}
-
-export const Switch = (props: SwitchProps) => {
+export const Switch = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
     const defaultId = useId();
     const {
         id = defaultId

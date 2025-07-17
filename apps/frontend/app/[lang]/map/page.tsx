@@ -10,7 +10,6 @@ import {RideSummaryModal} from "../../../components/modals/RideSummaryModal";
 import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
 import {Map} from "../../../components/Map/Map";
 import {
-    UserLocationContextProvider,
     useUserLocationContext
 } from "../../../contexts/UserLocationContext/UserLocationContext";
 import {APIProvider} from "@vis.gl/react-google-maps";
@@ -19,24 +18,21 @@ import {TaxiMeter} from "../../../components/TaxiMeter/TaxiMeter";
 import {FlexGroup} from "../../../components/FlexGroup/FlexGroup";
 import {useRide} from "../../../contexts/RideContext/RideContext";
 import {MenuOption, OptionsMenu} from "../../../components/OptionsMenu/OptionsMenu";
-import {useRouter} from "next/navigation";
 import {StartBreakModal} from "../../../components/modals/BreakModalHandler/StartBreakModal";
 import {LocationUnavailable} from "./LocationUnavailable";
-import {LocationLoading} from "./LocationLoading";
-
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+import {GOOGLE_MAPS_API_KEY} from "../../../constants/constants";
 
 export default function MapPage() {
     const startModalRef = useRef<ModalHandle>(null!);
     const endModalRef = useRef<ModalHandle>(null!);
     const startBreakModalRef = useRef<ModalHandle>(null!);
 
-    const {pauseShift, endShift} = useShift();
+    const {endShift} = useShift();
     const {isOnRide, destination, isRouteAvailable} = useRide();
     const t = useTranslations('map');
 
-    const {location, isAvailable, setIsWatching} = useUserLocationContext();
-    useEffect(() => setIsWatching(true), []);
+    const {isAvailable, setIsWatching} = useUserLocationContext();
+    useEffect(() => setIsWatching(true), [setIsWatching]);
 
     function openPauseModal() {
         if (!startBreakModalRef || typeof startBreakModalRef === "function")
@@ -46,11 +42,9 @@ export default function MapPage() {
 
     if (!isAvailable)
         return <LocationUnavailable/>;
-    // if (!location)
-    //     return <LocationLoading/>;
 
     return (
-        <APIProvider apiKey={API_KEY}>
+        <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
             <RideEvaluationModal
                 ref={startModalRef}/>
             <RideSummaryModal

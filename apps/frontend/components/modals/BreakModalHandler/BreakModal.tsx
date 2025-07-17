@@ -14,16 +14,16 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
     const [remainingDuration, setRemainingDuration] = useState(() => getRemainingBreakDuration());
 
     const safeOpenModal = useCallback(() => {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function" || !ref.current)
             return;
         ref.current.open();
-    }, []);
+    }, [ref]);
 
     const safeCloseModal = useCallback(() => {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function" || !ref.current)
             return;
         ref.current.close();
-    }, []);
+    }, [ref]);
 
     function endBreak() {
         safeCloseModal();
@@ -75,3 +75,5 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
         </Modal>
     );
 });
+
+BreakModal.displayName = "BreakModal";

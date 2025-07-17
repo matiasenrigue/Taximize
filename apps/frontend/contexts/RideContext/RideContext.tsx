@@ -7,7 +7,7 @@ import {
     SetStateAction,
     useCallback,
     useContext,
-    useEffect,
+    useEffect, useRef,
     useState
 } from "react";
 import moment from "moment";
@@ -15,7 +15,6 @@ import api from "../../lib/axios";
 import {useUserLocationContext} from "../UserLocationContext/UserLocationContext";
 import {useTaximeter} from "../../hooks/useTaximeter";
 import {useShift} from "../ShiftContext/ShiftContext";
-import {GoogleMapsRouteStatus} from "../../constants/types";
 
 interface Place {
     placeId: string | null;
@@ -36,8 +35,8 @@ interface RideContextType {
     duration: number;
     isRouteAvailable: boolean;
     setIsRouteAvailable: Dispatch<SetStateAction<boolean>>;
-    routeStatus: GoogleMapsRouteStatus;
-    setRouteStatus: Dispatch<SetStateAction<GoogleMapsRouteStatus>>;
+    routeStatus: google.maps.DirectionsStatus;
+    setRouteStatus: Dispatch<SetStateAction<google.maps.DirectionsStatus>>;
 }
 
 const RideContext = createContext<RideContextType|null>(null);
@@ -62,7 +61,12 @@ export const RideContextProvider = (props: PropsWithChildren) => {
 
     // routing
     const [isRouteAvailable, setIsRouteAvailable] = useState<boolean>(false);
-    const [routeStatus, setRouteStatus] = useState<GoogleMapsRouteStatus>("OK");
+    const [routeStatus, setRouteStatus] = useState<google.maps.DirectionsStatus>(null!);
+    useEffect(() => {
+        if (typeof google === "undefined" || !google?.maps?.DirectionsStatus)
+            return;
+        setRouteStatus(google.maps.DirectionsStatus.OK);
+    }, []);
 
     // initialize shift
     useEffect(() => {
@@ -139,7 +143,7 @@ export const RideContextProvider = (props: PropsWithChildren) => {
 
     // set a new destination to navigate to (may not be a ride)
     const updateDestination = useCallback((place: Place | null) => {
-        setRouteStatus("OK");
+        setRouteStatus(google.maps.DirectionsStatus.OK);
         setDestination(place);
         setIsRouteAvailable(false);
     }, [userLocation]);

@@ -2,7 +2,7 @@
 
 import styles from "./page.module.css";
 import { Button } from "../../../components/Button/Button";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Input } from "../../../components/Input/Input"; 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -16,12 +16,11 @@ import clsx from "clsx";
 export default function Signin() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    // const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [msg, setMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
+    const { setUser } = useUserContext();
 
-    const emailRegex = EMAIL_REGEX;
-    const isEmailValid = emailRegex.test(email);
+    const isEmailValid = EMAIL_REGEX.test(email);
     const isPasswordValid = password.length >= 8;
     const canSubmit = email && isEmailValid && isPasswordValid
 
@@ -37,7 +36,6 @@ export default function Signin() {
                 if (response.data.success === true) {
                 setToken(response.data.data.token);
                 // Update user context with the new user data
-                const { setUser } = useUserContext();
                 setUser(response.data.data.user);
                 // Show success message
                 setMsg({ type: "success", text: response.data.message || t("signinSuccess") });
@@ -70,7 +68,7 @@ export default function Signin() {
             <div className={styles.page}>
                 <div className={styles.container}>
                     <form className={styles.form_container} onSubmit={handleSubmit} autoComplete="off">
-                        <label className={styles.label} htmlFor="email" style={{ color: !isEmailValid && email ? 'var(--color-danger)' : undefined }}>{t("email")}</label>
+                        <label className={styles.label} htmlFor="email" style={{ color: !isEmailValid && email ? 'var(--color-danger)' : 'unset' }}>{t("email")}</label>
                         <Input
                             id="email"
                             className={clsx(styles.input, !isEmailValid && email && 'error')}
@@ -86,7 +84,7 @@ export default function Signin() {
                             </div>
                         )}
 
-                        <label className={styles.label} htmlFor="password" style={{ color: password && !isPasswordValid ? 'var(--color-danger)' : undefined }}>{t("password")}</label>
+                        <label className={styles.label} htmlFor="password" style={{ color: password && !isPasswordValid ? 'var(--color-danger)' : 'unset' }}>{t("password")}</label>
                         <Input
                             id="password"
                             className={clsx(styles.input, !isPasswordValid && password && 'error')}

@@ -22,13 +22,12 @@ jest.mock('../../lib/token', () => ({
 
 // test component
 const TestComponent = () => {
-  const { user, signOut, deleteUser, updateUserEmail } = useUser();
+  const { user, signOut, deleteUser } = useUser();
   return (
     <div>
       <div data-testid="username">{user?.username || 'no-user'}</div>
       <button onClick={signOut} data-testid="signout">Sign Out</button>
       <button onClick={deleteUser} data-testid="delete">Delete User</button>
-      <button onClick={() => updateUserEmail('new@example.com')} data-testid="update-email">Update Email</button>
     </div>
   );
 };
@@ -69,16 +68,5 @@ describe('UserContext & useUser', () => {
     fireEvent.click(screen.getByTestId('delete'));
     // user 被清空后，username 显示 no-user
     await waitFor(() => expect(screen.getByTestId('username').textContent).toBe('no-user'));
-  });
-
-  it('updateUserEmail works', async () => {
-    render(
-      <UserContextProvider>
-        <TestComponent />
-      </UserContextProvider>
-    );
-    await waitFor(() => expect(screen.getByTestId('username').textContent).toBe('testuser'));
-    fireEvent.click(screen.getByTestId('update-email'));
-    // 这里只测试调用，不验证 UI 变化
   });
 });

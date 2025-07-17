@@ -2,7 +2,7 @@
  * withAuth is a higher-order component (HOC) that checks if the user is authenticated.
  * If not, it redirects them to the sign-in page.
  */
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getToken } from "./token";
 

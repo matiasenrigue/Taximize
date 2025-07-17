@@ -3,7 +3,6 @@
  * Custom Input Component 
  * This component is a styled input field with a clear button.
  * It allows users to enter text and clear the input easily.
- * It is designed to be flexible and the width can be customized.
  * * @module Input
  */
 import styles from "./input.module.css";
@@ -11,11 +10,7 @@ import React, { useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 
-export interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    width?: string | number;
-}
-
-export const Input = ({ placeholder = '', width = '100%', value, onChange, ...props }: CustomInputProps) => {
+export const Input = ({ placeholder = '', value, onChange, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => {
     const ref = useRef<HTMLInputElement>(null!);
 
     function focusInput() {
@@ -30,10 +25,7 @@ export const Input = ({ placeholder = '', width = '100%', value, onChange, ...pr
     }
 
     return (
-        <div 
-            className={styles.input_box} 
-            style={{ width }}
-        >
+        <div className={styles.input_box}>
             <input
                 {...props}
                 ref={ref}
@@ -43,7 +35,7 @@ export const Input = ({ placeholder = '', width = '100%', value, onChange, ...pr
                 aria-label={placeholder}
                 value={value}
                 onChange={onChange}
-                style={{ flex: 1, paddingRight: value ? 40 : undefined }}
+                style={{ paddingRight: value ? 40 : 'unset' }}
             />
             {value && (
                 <button

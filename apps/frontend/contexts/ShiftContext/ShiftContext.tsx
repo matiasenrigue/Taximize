@@ -10,6 +10,7 @@ import api from "../../lib/axios";
 import {usePathname, useRouter} from "next/navigation";
 
 interface ShiftContextType {
+    duration: number;
     isLoaded: boolean;
     isShift: boolean;
     isPaused: boolean;
@@ -135,7 +136,6 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     }, [isShift]);
 
     const endShift = useCallback(() => {
-        console.log("end shift");
         if (!isShift)
             return;
 
@@ -222,7 +222,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
                 return;
             }
 
-            const breakDuration = timestamp - lastBreakTime;
+            const breakDuration = timestamp - (lastBreakTime ?? 0);
             setTotalBreakDuration(prev => prev + breakDuration);
             setLastBreakTime(timestamp);
             setIsPaused(false);
@@ -259,6 +259,8 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     // returns the remaining shift duration, formatted "h:mm"
     const getRemainingTime = useCallback((): string => {
+        if (!startTime)
+            return formatDuration(0);
         const passedTime = moment.now() - startTime - totalBreakDuration;
         const remainingTime = Math.max(0, duration - passedTime);
         return formatDuration(remainingTime);
@@ -266,13 +268,15 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     // returns the remaining break duration in milliseconds
     const getRemainingBreakDuration = useCallback((): number => {
+        if (!lastBreakTime)
+            return 0;
         const passedTime = moment.now() - lastBreakTime;
         return Math.max(0, breakDuration - passedTime)
     }, [lastBreakTime, breakDuration]);
 
     // returns true, if it is time for a break
     const checkBreakTime = useCallback((): boolean => {
-        if (!isLoaded || !isShift || isPaused)
+        if (!isLoaded || !isShift || isPaused || !lastBreakTime)
             return false;
         const time = moment.now() - lastBreakTime;
         return (time >= BREAK_MODAL_TIMEOUT);
@@ -280,7 +284,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     // returns true, if the shift time is over
     const checkIsShiftOver = useCallback((): boolean => {
-        if (!isLoaded || !isShift || isPaused)
+        if (!isLoaded || !isShift || isPaused || !startTime)
             return false;
         const passedTime = moment.now() - startTime - totalBreakDuration;
         return passedTime >= duration;

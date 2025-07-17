@@ -1,4 +1,3 @@
-/* eslint-disable complexity */
 import {
     forwardRef,
     useContext,
@@ -94,7 +93,7 @@ function usePolygon(props: PolygonProps) {
         return () => {
             polygon.setMap(null);
         };
-    }, [map]);
+    }, [map, polygon]);
 
     // attach and re-attach event-handlers when any of the properties change
     useEffect(() => {
@@ -130,7 +129,9 @@ function usePolygon(props: PolygonProps) {
 export const Polygon = forwardRef((props: PolygonProps, ref: PolygonRef) => {
     const polygon = usePolygon(props);
 
-    useImperativeHandle(ref, () => polygon, []);
+    useImperativeHandle(ref, () => polygon, [polygon]);
 
     return null;
 });
+
+Polygon.displayName = "Polygon";

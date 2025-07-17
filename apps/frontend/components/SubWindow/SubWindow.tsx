@@ -2,25 +2,19 @@
 
 import Image from 'next/image';
 import styles from './SubWindow.module.css';
+import {faXmark} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import React from "react";
 
-
-const CloseIcon = (props) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="18" y1="6" x2="6" y2="18"></line>
-    <line x1="6" y1="6" x2="18" y2="18"></line>
-  </svg>
-);
+interface SubWindowProps {
+  isOpen: boolean,
+  onClose: () => void,
+  title: string,
+  summary: string,
+  imageUrl: string,
+  imageAlt: string,
+  description: string,
+}
 
 const SubWindow = ({
   isOpen,
@@ -30,7 +24,8 @@ const SubWindow = ({
   imageUrl,
   imageAlt,
   description,
-}) => {
+}: SubWindowProps) => {
+
   if (!isOpen) {
     return null;
   }
@@ -45,11 +40,11 @@ const SubWindow = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* The small grey handle bar at the top */}
-        <div className={styles.handleBar}></div>
+        <div className={styles.handleBar}/>
 
         {/* Close button */}
         <button onClick={onClose} className={styles.closeButton}>
-          <CloseIcon />
+          <FontAwesomeIcon icon={faXmark}/>
         </button>
 
         {/* Customizable Content */}

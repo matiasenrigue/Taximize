@@ -11,15 +11,15 @@ import { Message, MessageType } from "../../../../components/Message/Message";
 import BackButton from "../../../../components/BackButton/BackButton";
 
 
-export default function profile() {
+export default function Profile() {
     const { user, error, signOut, deleteUser } = useUser();
     const email = user?.email || "example@gmail.com";
     const username = user?.username || "John Doe";
     const t = useTranslations('profile');
-    const [msg, setMsg] = useState<{ type: MessageType; message: any } | null>(null);
+    const [msg, setMsg] = useState<{ type: MessageType; message: string } | null>(null);
 
     // manage the delete modal visibility
-    const deleteModalRef = useRef<ModalHandle>(null);
+    const deleteModalRef = useRef<ModalHandle>(null!);
     // function to open the modal
     const handleOpenDeleteModal = () => {
         deleteModalRef.current?.open();
@@ -43,11 +43,11 @@ export default function profile() {
     }
      if (error) {
         const errorMessage = error || 'Failed to fetch user data';
-        console.error(error);    
+        console.error(errorMessage);
     }
 
     // manage the sign out modal visibility
-    const signOutModalRef = useRef<ModalHandle>(null);
+    const signOutModalRef = useRef<ModalHandle>(null!);
     // function to open the modal
     const handleOpenSignOutModal = () => {
         signOutModalRef.current?.open();
@@ -88,17 +88,17 @@ export default function profile() {
                         {/* personal information */}
                         <section className={styles.section}>
                             <h3 className={styles.sectionTitle}>{t('personalInformation')}</h3>
-                            <div className={styles.menu}>
+                            <div>
                                 <MenuItem href="/account/profile/change-username">
-                                    <span className={styles.label}>{t('username')}</span>
+                                    <span>{t('username')}</span>
                                     <div className={styles.itemValue}>
                                         <span>{username}</span>
                                     </div>
                                 </MenuItem>
                             </div>
-                            <div className={styles.menu}>
+                            <div>
                                 <MenuItem href="/account/profile/change-email">
-                                    <span className={styles.label}>{t('email')}</span>
+                                    <span>{t('email')}</span>
                                     <div className={styles.itemValue}>
                                         <span>{email}</span>
                                     </div>
@@ -107,28 +107,26 @@ export default function profile() {
                         </section>
                         <section className={styles.section}>
                             <h3 className={styles.sectionTitle}>{t('manageAccount')}</h3>
-                            <div className={styles.menu}>
+                            <div>
                                 <MenuItem href="/account/profile/change-password">
-                                    <span className={styles.label}>{t('changePassword')}</span>
+                                    <span>{t('changePassword')}</span>
                                 </MenuItem>
                             </div>
-                            <div className={styles.menu} onClick={handleOpenDeleteModal}>
+                            <div onClick={handleOpenDeleteModal}>
                                 <MenuItem href="#">
-                                    <span className={styles.label}>{t('deleteAccount')}</span>
+                                    <span>{t('deleteAccount')}</span>
                                 </MenuItem>
                             </div>
-                            <div className={styles.menu} onClick={handleOpenSignOutModal}>
+                            <div onClick={handleOpenSignOutModal}>
                                 <MenuItem href="#">
-                                    <span className={styles.label}>{t('signout')}</span>
+                                    <span>{t('signout')}</span>
                                 </MenuItem>
                             </div>
                         </section>
                         {/* modal for sign out  */}
                         <Modal 
                             ref={signOutModalRef} 
-                            title={t('signout')} 
-                            className={styles.modal}
-                            titleStyle={{ color: "var(--color-on-surface)" }} 
+                            title={t('signout')}
                         >
                             <div className={styles.modalContent}>
                                 <p className={styles.warning}>{t('signOutWarning')}</p>
@@ -141,9 +139,7 @@ export default function profile() {
                         {/* modal for delete account */}
                         <Modal 
                             ref={deleteModalRef} 
-                            title={t('deleteAccount')} 
-                            className={styles.modal}
-                            titleStyle={{ color: "var(--color-on-surface)" }} 
+                            title={t('deleteAccount')}
                         >
                             <div className={styles.modalContent}>
                                 <p className={styles.warning}>{t('deleteAccountWarning')}</p>

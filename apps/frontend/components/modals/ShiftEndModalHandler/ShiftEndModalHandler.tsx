@@ -17,7 +17,7 @@ export const ShiftEndModalHandler = () => {
             return;
         if (checkIsShiftOver())
             shiftEndModalRef.current.open();
-    }, [isOnRide, checkIsShiftOver, shiftEndModalRef.current]);
+    }, [isOnRide, checkIsShiftOver]);
 
     useEffect(() => {
         if (isOvertime)

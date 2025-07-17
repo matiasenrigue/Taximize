@@ -14,7 +14,7 @@ export const StartBreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>
     const [durationInMinutes, setDurationInMinutes] = useState<number>(DEFAULT_BREAK_DURATION / MINUTE_IN_MILLISECONDS);
 
     function closeModal() {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function"  || !ref.current)
             return;
         ref.current.close();
     }
@@ -40,7 +40,7 @@ export const StartBreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>
                     justify={"start"}>
                     <NumberInput
                         value={durationInMinutes}
-                        onChange={(e) => setDurationInMinutes(e.target.value)}
+                        onChange={(e) => setDurationInMinutes(Number(e.target.value))}
                     />
                     <span>min</span>
                 </FlexGroup>
@@ -61,3 +61,5 @@ export const StartBreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>
         </Modal>
     );
 });
+
+StartBreakModal.displayName = "StartBreakModal";

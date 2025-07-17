@@ -9,8 +9,8 @@ import { useTranslations } from "next-intl";
 import { Message, MessageType } from "../../../../../components/Message/Message";
 import { useRouter } from "next/navigation";
 
-export default function changeEmail() {
-    const { user, error, updateUserEmail } = useUser();
+export default function ChangeEmail() {
+    const { user } = useUser();
     const [msg, setMsg] = useState<{ type: MessageType; message: string } | null>(null);
     const t = useTranslations('changeEmail');
     const router = useRouter();
@@ -19,11 +19,12 @@ export default function changeEmail() {
     const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         if (newEmail && newEmail !== user?.email) {
-            const result = await updateUserEmail(newEmail);
-            if (result) {
-                setMsg(result);
-                router.push('/account/profile');
-            }
+            // update user email does not exist
+            // const result = await updateUserEmail(newEmail);
+            // if (result) {
+            //     setMsg(result);
+            //     router.push('/account/profile');
+            // }
         }
     };
 
@@ -39,12 +40,11 @@ export default function changeEmail() {
                 <div className={styles.profileInfo}>
                 <h2 className={styles.title}>{t('changeEmail')}</h2>
                         <section className={styles.section}>
-                            <div className={styles.menu}>
+                            <div>
                                 <Input
                                     type="email"
                                     value={newEmail}
                                     placeholder={t('newEmailPlaceholder')}
-                                    className={styles.input}
                                     onChange={(e) => setNewEmail(e.target.value)}
                                 />
                                 <div className={styles.modalActions}>

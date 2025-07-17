@@ -1,6 +1,6 @@
 
 import {useTranslations} from "next-intl";
-import {ForwardedRef, forwardRef, Ref, useState} from "react";
+import {ForwardedRef, forwardRef, useState} from "react";
 import {Modal, ModalHandle} from "../../Modal/Modal";
 import {FlexGroup} from "../../FlexGroup/FlexGroup";
 import {Button} from "../../Button/Button";
@@ -14,7 +14,7 @@ export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHand
     const [durationInMinutes, setDurationInMinutes] = useState<number>(DEFAULT_BREAK_DURATION / MINUTE_IN_MILLISECONDS);
 
     function closeModal() {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function" || !ref.current)
             return;
         ref.current.close();
     }
@@ -45,7 +45,7 @@ export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHand
                     justify={"start"}>
                     <NumberInput
                         value={durationInMinutes}
-                        onChange={(e) => setDurationInMinutes(e.target.value)}
+                        onChange={(e) => setDurationInMinutes(Number(e.target.value))}
                     />
                     <span>min</span>
                 </FlexGroup>
@@ -66,3 +66,5 @@ export const BreakReminderModal = forwardRef((props, ref: ForwardedRef<ModalHand
         </Modal>
     );
 });
+
+BreakReminderModal.displayName = "BreakReminderModal";

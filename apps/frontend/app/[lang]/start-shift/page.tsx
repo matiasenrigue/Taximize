@@ -25,7 +25,7 @@ export default function StartShift() {
         if (!isLoaded || !isShift)
             return;
         router.push("/map");
-    }, [isLoaded, isShift]);
+    }, [isLoaded, isShift, router]);
 
     return (
         <div className={styles.page}>
