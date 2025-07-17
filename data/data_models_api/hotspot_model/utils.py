@@ -1,11 +1,17 @@
+import os
 import pandas as pd
 from datetime import datetime
 from feature_engineering import build_feature_row, load_poi_dict
 
-# Load zone lookup and POI data once
-zone_lookup_df = pd.read_csv("zone_coordinates.csv")  # columns: OBJECTID, zone
+# Get path to current file (i.e. hotspot_model/)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Load zone lookup and POI data once using absolute paths
+ZONE_CSV_PATH = os.path.join(BASE_DIR, "zone_coordinates.csv")
+zone_lookup_df = pd.read_csv(ZONE_CSV_PATH)
 zone_name_to_id = dict(zip(zone_lookup_df["zone"], zone_lookup_df["OBJECTID"]))
-POI_CSV_PATH = "/Users/elliekavanagh/TaxiApp/Notebooks/Hotspot Prediction Model/zones_stats_with_all_densities.csv"
+
+POI_CSV_PATH = os.path.join(BASE_DIR, "zone_stats_with_all_densities.csv")
 poi_dict = load_poi_dict(POI_CSV_PATH)
 
 def generate_features_for_time(pickup_datetime):
