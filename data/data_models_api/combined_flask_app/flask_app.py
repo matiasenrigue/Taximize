@@ -6,12 +6,17 @@ from datetime import datetime
 import os
 import sys
 import traceback
+from pytz import timezone
+import pytz
 
 # ==== trip scoring imports ====
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "scoring_model")))
 from scoring_utils import load_reference_files, score_trip
 
 # ==== hotspot imports ====
+CURRENT_DIR = os.path.dirname(__file__)
+HOTSPOT_UTILS_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "..", "hotspot_model"))
+sys.path.insert(0, HOTSPOT_UTILS_PATH)
 from utils import generate_features_for_time, zone_name_to_id
 import feature_engineering
 
@@ -119,21 +124,40 @@ def load_model_for_month(month):
     model_file = MONTH_MODEL_MAP.get(month)
     if not model_file:
         raise ValueError(f"No model for month {month}")
-    path = os.path.join("models", model_file)
+    path = os.path.join(HOTSPOT_UTILS_PATH, "models", model_file)
     if not os.path.exists(path):
         raise FileNotFoundError(f"Model not found: {path}")
     return joblib.load(path)
 
 @app.route("/hotspots", methods=["GET"])
 def predict_hotspots():
+    NYC = timezone("America/New_York")
     try:
         time_str = request.args.get("time")
-        pickup_time = datetime.strptime(time_str, "%m/%d/%Y %I:%M:%S %p") if time_str else datetime.now().replace(minute=0, second=0)
+
+        if time_str:
+            try:
+                # Accept ISO 8601 UTC format: "YYYY-MM-DDTHH:MM:SSZ"
+                dt_utc = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%SZ")
+                dt_utc = dt_utc.replace(tzinfo=pytz.utc)
+                pickup_time = dt_utc.astimezone(NYC)
+            except ValueError:
+                return jsonify({
+                    "error": "Invalid time format. Use ISO format: YYYY-MM-DDTHH:MM:SSZ"
+                }), 400
+        else:
+            # Use current system time in UTC, convert to NYC
+            now_utc = datetime.now(pytz.utc).replace(minute=0, second=0, microsecond=0)
+            pickup_time = now_utc.astimezone(NYC)
+
         month = pickup_time.month
 
+        print("DEBUG - pickup_time (NYC):", pickup_time)
+        print("DEBUG - pickup_time.month:", month)
         if month == 1:
             return jsonify({"error": "January predictions not supported."}), 400
 
+        
         model = load_model_for_month(month)
         df = generate_features_for_time(pickup_time)
 
