@@ -21,13 +21,15 @@ import {MenuOption, OptionsMenu} from "../../../components/OptionsMenu/OptionsMe
 import {StartBreakModal} from "../../../components/modals/BreakModalHandler/StartBreakModal";
 import {LocationUnavailable} from "./LocationUnavailable";
 import {GOOGLE_MAPS_API_KEY} from "../../../constants/constants";
+import {useRouter} from "next/navigation";
 
 export default function MapPage() {
     const startModalRef = useRef<ModalHandle>(null!);
     const endModalRef = useRef<ModalHandle>(null!);
     const startBreakModalRef = useRef<ModalHandle>(null!);
 
-    const {endShift} = useShift();
+    const router = useRouter();
+    const {endShift, isLoaded, isShift} = useShift();
     const {isOnRide, destination, isRouteAvailable} = useRide();
     const t = useTranslations('map');
 
@@ -39,6 +41,13 @@ export default function MapPage() {
             return;
         startBreakModalRef.current.open();
     }
+
+    // if not on shift, reroute to /start-shift
+    useEffect(() => {
+        if (!isLoaded || isShift)
+            return;
+        router.push("/start-shift");
+    }, [isLoaded, isShift, router]);
 
     if (!isAvailable)
         return <LocationUnavailable/>;

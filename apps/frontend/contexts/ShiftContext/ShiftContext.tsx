@@ -86,11 +86,8 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
             setIsLoaded(true);
 
-            const isShiftRoute =  pathname.includes("/start-shift") || pathname.includes("/end-shift")
-            if (!isOnShift && isShiftRoute) {
-                router.push("/start-shift");
+            if (!isOnShift)
                 return;
-            }
 
             setIsShift(isOnShift);
             setLoadRide(isOnRide);
