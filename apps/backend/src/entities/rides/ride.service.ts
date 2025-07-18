@@ -4,6 +4,7 @@ import { ShiftSignal } from '../shifts/shift-signal.model';
 import { ShiftService } from '../shifts/shift.service';
 import { Op } from 'sequelize';
 import { getZonesForRide } from './utils/zoneDetector';
+import { scoreTripXGB, formatDateTimeForScoring } from '../../shared/utils/dataApiClient';
 
 interface RideCoordinates {
     startLat: number;
@@ -77,28 +78,40 @@ export class RideService {
         
         // Get zones for origin and destination
         const zones = getZonesForRide(startLat, startLng, destLat, destLng);
-        
-        console.log('Ride evaluation:', {
-            origin: { lat: startLat, lng: startLng, zone: zones.originZone },
-            destination: { lat: destLat, lng: destLng, zone: zones.destinationZone }
-        });
-        
-        // TODO: Replace this with actual API call
-        // For now, using placeholder prediction value
-        const prediction = 0.73; // Placeholder API response (0-1 scale)
-        
-        // Validate prediction is in valid range
-        if (prediction < 0 || prediction > 1) {
-            throw new Error('Invalid prediction value from API');
+    
+        if (!zones.originZone || !zones.destinationZone) {
+            throw new Error('Could not determine zones for the provided coordinates');
         }
         
-        // Convert prediction from 0-1 scale to 1-5 rating scale
-        // Formula: rating = 1 + (prediction * 4)
-        // This maps: 0 -> 1, 0.25 -> 2, 0.5 -> 3, 0.75 -> 4, 1 -> 5
-        const rating = Math.round(1 + (prediction * 4));
-        
-        // Ensure rating is within valid bounds (1-5)
-        return Math.max(1, Math.min(5, rating));
+        try {
+            // Call Flask scoring API
+            const scoreResult = await scoreTripXGB({
+                pickup_zone: zones.originZone,
+                dropoff_zone: zones.destinationZone,
+                pickup_datetime: formatDateTimeForScoring(new Date())
+            });
+            
+            // Use the percentile value (0-100) and convert to 0-1 scale
+            const prediction = scoreResult.percentile / 100;
+            
+            // Validate prediction is in valid range
+            if (prediction < 0 || prediction > 1) {
+                throw new Error('Invalid prediction value from API');
+            }
+            
+            // Convert prediction from 0-1 scale to 1-5 rating scale
+            // Formula: rating = 1 + (prediction * 4)
+            // This maps: 0 -> 1, 0.25 -> 2, 0.5 -> 3, 0.75 -> 4, 1 -> 5
+            const rating = Math.round(1 + (prediction * 4));
+            
+            // Ensure rating is within valid bounds (1-5)
+            return Math.max(1, Math.min(5, rating));
+            
+        } catch (error) {
+            console.error('Error calling scoring API:', error);
+            // Fall back to a default middle rating if API fails
+            return 3;
+        }
     }
 
     static async startRide(driverId: string, shiftId: string, coords: RideCoordinates): Promise<any> {

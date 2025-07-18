@@ -1,4 +1,6 @@
 import { Hotspots } from './hotspots.model';
+import { getHotspotPredictions, formatDateTimeForHotspot } from '../../shared/utils/dataApiClient';
+import moment from 'moment';
 
 export class HotspotsService {
         
@@ -24,10 +26,28 @@ export class HotspotsService {
 
 
         static async hotspotsApiCall(): Promise<any | null> { 
-                // Placeholder for actual data fetching logic from Data Team
-                // This should be replaced with the actual API call or data retrieval logic
-                // Expected format: { zones: [{ name: "Zone1", count: 10 }, { name: "Zone2", count: 15 }] }
-                return null; // Replace with actual data fetching logic
+                try {
+                        // Get current time in UTC (Flask API will convert to NYC time)
+                        // Code: https://stackoverflow.com/questions/33599768/what-is-the-yyyy-mm-ddthhmmss-sssz-date-timezone-formatting-and-how-can-i-rep
+                        const formattedTime = moment.utc().toISOString();                        
+                        
+                        // Get hotspot predictions from Flask API
+                        const predictions = await getHotspotPredictions(formattedTime);
+                        
+                        // Transform the data to match expected format
+                        const transformedData = {
+                                zones: predictions.map(pred => ({
+                                        name: pred.pickup_zone,
+                                        locationId: pred.location_id,
+                                        count: Math.round(pred.predicted_trip_count)
+                                }))
+                        };
+                        
+                        return transformedData;
+                } catch (error) {
+                        console.error('Error fetching hotspot predictions:', error);
+                        return null;
+                }
         };
 
 
@@ -38,7 +58,6 @@ export class HotspotsService {
                 let hotspotsData: any | null = null;
 
                 while (attempts < maxAttempts) {
-                        // Replace the following line with actual data fetching logic
                         hotspotsData = await this.hotspotsApiCall(); 
 
                         if (hotspotsData) {
