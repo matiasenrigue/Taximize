@@ -74,6 +74,13 @@ All models and required reference files are stored inside scoring_model and hots
 
 The frontend can call the backend endpoints without needing access to training logic.
 
+Only a few months for the models will be pushed on here in order to not overwhelm GitHub with data. To access the rest of the remaining months please follow this link to download the data and models needed for the predictions
+
+For the Scoring Model:
+https://drive.google.com/drive/folders/1OqawUIecsM4yhQDphoMm26Tem7bxy-Dy?usp=sharing 
+
+Ellie Will add her link here: 
+
 # Versioning & Contributions
 
 This folder is organized for reproducibility and API integration.
