@@ -12,13 +12,7 @@ export class ShiftController {
     // @access  Protected
     static emitSignal = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { signal, timestamp } = req.body;
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         // Validate required fields
         if (!signal) {
@@ -62,13 +56,7 @@ export class ShiftController {
     // @access  Protected
     static startShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { timestamp, duration } = req.body || {};
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         // Use provided timestamp or current time
         const signalTimestamp = timestamp || Date.now();
@@ -95,13 +83,7 @@ export class ShiftController {
     // @access  Protected
     static pauseShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { timestamp, pauseDuration } = req.body || {};
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         // Use provided timestamp or current time
         const signalTimestamp = timestamp || Date.now();
@@ -128,13 +110,7 @@ export class ShiftController {
     // @access  Protected
     static continueShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { timestamp } = req.body || {};
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         // Use provided timestamp or current time
         const signalTimestamp = timestamp || Date.now();
@@ -161,13 +137,7 @@ export class ShiftController {
     // @access  Protected
     static endShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { timestamp } = req.body || {};
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         // Use provided timestamp or current time
         const signalTimestamp = timestamp || Date.now();
@@ -224,13 +194,7 @@ export class ShiftController {
     // @route   GET /api/shifts/current
     // @access  Protected
     static getCurrentShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         try {
             const shiftStatus = await ShiftService.getCurrentShiftStatus(driverId);
@@ -296,12 +260,7 @@ export class ShiftController {
     // @route   GET /api/shifts/debug
     // @access  Protected
     static debugShiftStatus = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const driverId = req.user?.id;
-
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         try {
             // Get all relevant data for debugging
@@ -354,13 +313,7 @@ export class ShiftController {
     // @access  Protected
     static skipPause = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { timestamp } = req.body || {};
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         // Use provided timestamp or current time
         const signalTimestamp = timestamp || Date.now();
@@ -392,14 +345,8 @@ export class ShiftController {
     // @access  Protected
     static editShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { shiftId } = req.params;
-        const driverId = req.user?.id;
+        const driverId = req.driverId!; 
         const updateData = req.body;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
 
         try {
             const updatedShift = await ShiftService.editShift(shiftId, driverId, updateData);
@@ -419,13 +366,7 @@ export class ShiftController {
     // @access  Protected
     static deleteShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { shiftId } = req.params;
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         try {
             await ShiftService.deleteShift(shiftId, driverId);
@@ -445,13 +386,7 @@ export class ShiftController {
     // @access  Protected
     static restoreShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { shiftId } = req.params;
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         try {
             await ShiftService.restoreShift(shiftId, driverId);
@@ -470,13 +405,7 @@ export class ShiftController {
     // @route   GET /api/shifts
     // @access  Protected
     static getShifts = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         try {
             const shifts = await ShiftService.getShiftsByDriver(driverId);
@@ -492,13 +421,7 @@ export class ShiftController {
     // @access  Protected
     static getShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { shiftId } = req.params;
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         try {
             const shift = await ShiftService.getShiftById(shiftId, driverId);
@@ -518,13 +441,7 @@ export class ShiftController {
     // @access  Protected
     static endShiftById = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { shiftId } = req.params;
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; // Already validated by middleware
 
         try {
             const result = await ShiftService.endShiftById(shiftId, driverId);
