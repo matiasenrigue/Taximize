@@ -1,0 +1,12 @@
+train_month,test_month,rmse,mae,r2,params,model_file
+1,2,14.19694950409941,6.704954231176948,0.9636834836005633,"{'learning_rate': 0.05, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_1_to_2.pkl
+2,3,14.723956144657075,6.717573832446589,0.9636699480590923,"{'learning_rate': 0.05, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_2_to_3.pkl
+3,4,14.074206848396877,6.7050344705398555,0.9659364188117138,"{'learning_rate': 0.05, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_3_to_4.pkl
+4,5,15.431925823309637,7.111311239375156,0.9620767311660088,"{'learning_rate': 0.05, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_4_to_5.pkl
+5,6,14.547871023650172,6.802060281624954,0.9635516609553517,"{'learning_rate': 0.05, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_5_to_6.pkl
+6,7,14.181019126241765,7.043467043148188,0.9534191866609313,"{'learning_rate': 0.05, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_6_to_7.pkl
+7,8,11.975053521437331,5.6818718692985986,0.963344640007284,"{'learning_rate': 0.05, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_7_to_8.pkl
+8,9,23.48457253813804,10.770138039159214,0.8909966837895228,"{'learning_rate': 0.05, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_8_to_9.pkl
+9,10,15.094792083890397,7.004508778671211,0.9625731419531539,"{'learning_rate': 0.1, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_9_to_10.pkl
+10,11,16.637281074927593,7.73971814292531,0.9560685082480257,"{'learning_rate': 0.05, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_10_to_11.pkl
+11,12,16.450317250703353,7.567746783337768,0.9532636627216731,"{'learning_rate': 0.05, 'max_depth': 7, 'n_estimators': 200}",models/hotspot_model_11_to_12.pkl

@@ -1,4 +1,4 @@
-import {ForwardedRef, forwardRef, useEffect, useState} from "react";
+import {ForwardedRef, forwardRef, useCallback, useEffect, useState} from "react";
 import {Modal, ModalHandle} from "../../Modal/Modal";
 import {useTranslations} from "next-intl";
 import {FlexGroup} from "../../FlexGroup/FlexGroup";
@@ -6,31 +6,43 @@ import {Button} from "../../Button/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faClock} from "@fortawesome/free-solid-svg-icons";
 import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
-import {formatDuration} from "../../../utility/formatDuration/formatDuration";
+import {formatDuration} from "../../../lib/formatDuration/formatDuration";
 
 export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('BreakModal');
     const {isPaused, continueShift, getRemainingBreakDuration} = useShift();
     const [remainingDuration, setRemainingDuration] = useState(() => getRemainingBreakDuration());
 
-    function endBreak() {
-        if (!ref || typeof ref === "function")
+    const safeOpenModal = useCallback(() => {
+        if (!ref || typeof ref === "function" || !ref.current)
+            return;
+        ref.current.open();
+    }, [ref]);
+
+    const safeCloseModal = useCallback(() => {
+        if (!ref || typeof ref === "function" || !ref.current)
             return;
         ref.current.close();
+    }, [ref]);
+
+    function endBreak() {
+        safeCloseModal();
         continueShift();
     }
 
     useEffect(() => {
-        if (!isPaused)
+        if (!isPaused) {
+            safeCloseModal();
             return;
+        }
+        safeOpenModal();
         setRemainingDuration(getRemainingBreakDuration());
-        const delay = 1000 * 10;
         const intervalId = setInterval(() => {
             setRemainingDuration(getRemainingBreakDuration());
-        }, delay);
+        }, 1000);
 
         return () => clearInterval(intervalId);
-    }, [isPaused, getRemainingBreakDuration]);
+    }, [isPaused, getRemainingBreakDuration, safeCloseModal, safeOpenModal]);
 
     return (
         <Modal
@@ -42,7 +54,13 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
                 align={"stretch"}>
                 <FlexGroup direction={"row"}>
                     <FontAwesomeIcon icon={faClock}/>
-                    <span>{formatDuration(remainingDuration)}</span>
+                    <span>
+                        {formatDuration(remainingDuration, {
+                            hours: false,
+                            minutes: true,
+                            seconds: true
+                        })}
+                    </span>
                 </FlexGroup>
                 <FlexGroup
                     direction={"row"}
@@ -57,3 +75,5 @@ export const BreakModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => 
         </Modal>
     );
 });
+
+BreakModal.displayName = "BreakModal";

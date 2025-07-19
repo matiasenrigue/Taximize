@@ -3,18 +3,20 @@ import styles from "./page.module.css";
 import { Select, Option } from "../../../../components/Select/Select";
 import { useTranslations } from "next-intl";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+    DefaultLegendContentProps,
 } from 'recharts';
-import { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import { useEarningStatistics } from "../../../../hooks/useEarningStatistics";
 import { useWorktimeStatistics } from "../../../../hooks/useWorktimeStatistics";
+import BackButton from "../../../../components/BackButton/BackButton";
 
 export default function StatisticsPage() {
     const t = useTranslations('statistics');
@@ -61,7 +63,7 @@ export default function StatisticsPage() {
     // Fetch earnings statistics when component mounts or view changes
     useEffect(() => {
         const { startDate, endDate } = getDateRange(earningsView);
-        fetchEarningsStatistics({ 
+        fetchEarningsStatistics({
             view: earningsView,
             startDate,
             endDate
@@ -104,45 +106,15 @@ export default function StatisticsPage() {
         }));
     }
 
-    // --- Custom Legend for Worktime Chart ---
-    const renderLegend = (props: any) => {
-    const { payload } = props;
-    const legendStyle = {
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: '20px',
-    };
-    const itemStyle = {
-        display: 'flex',
-        alignItems: 'center',
-        marginRight: '20px',
-        fontSize: '14px',
-        color: 'var(--color-on-surface)'
-    };
-    const colorBoxStyle = {
-        width: '12px',
-        height: '12px',
-        marginRight: '8px',
-    };
-
-    return (
-        <div style={legendStyle}>
-            {payload.map((entry: any, index: number) => (
-                <div key={`item-${index}`} style={itemStyle}>
-                <div style={{...colorBoxStyle, backgroundColor: entry.color }} />
-                <span>{entry.value}</span>
-                </div>
-            ))}
-        </div>
-        );
-    };
-
     const earningsData = getEarningsData();
     const worktimeData = getWorktimeData();
 
   return (
     <div className="styles.page">
         <div className={styles.container}>
+            <div className={styles.backButtonContainer}>
+                <BackButton href="/account" pageName="Account" />
+            </div>
             <div className={styles.profileInfo}>
             <h2 className={styles.title}>{t('title')}</h2>
             <section className={styles.section}>
@@ -171,7 +143,7 @@ export default function StatisticsPage() {
                                 <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
                                 <YAxis ticks={[0, 2, 4, 6, 8]} domain={[0, 8]} tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
                                 <Tooltip cursor={{fill: 'rgba(238, 238, 238, 0.5)'}}/>
-                                <Legend content={renderLegend} verticalAlign="top" align="left"
+                                <Legend content={CustomLegend} verticalAlign="top" align="left"
                                     wrapperStyle={{
                                         paddingBottom: '20px', 
                                         marginLeft: '10px'      
@@ -208,7 +180,7 @@ export default function StatisticsPage() {
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                 <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
                                 <YAxis 
-                                    ticks={earningsData.length > 0 ? undefined : [0, 50, 100, 150, 200]} 
+                                    ticks={earningsData.length > 0 ? [0] : [0, 50, 100, 150, 200]}
                                     domain={earningsData.length > 0 ? [0, 'dataMax + 50'] : [0, 200]} 
                                     tickLine={false} 
                                     axisLine={false} 
@@ -227,3 +199,39 @@ export default function StatisticsPage() {
     
   );
 }
+
+// --- Custom Legend for Worktime Chart ---
+const CustomLegend = (props: DefaultLegendContentProps) => {
+    const { payload } = props;
+    const legendStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: '20px',
+    };
+    const itemStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        marginRight: '20px',
+        fontSize: '14px',
+        color: 'var(--color-on-surface)'
+    };
+    const colorBoxStyle = {
+        width: '12px',
+        height: '12px',
+        marginRight: '8px',
+    };
+
+    if (!payload)
+        return null;
+
+    return (
+        <div style={legendStyle}>
+            {payload.map((entry, index: number) => (
+                <div key={`item-${index}`} style={itemStyle}>
+                    <div style={{...colorBoxStyle, backgroundColor: entry.color }} />
+                    <span>{entry.value}</span>
+                </div>
+            ))}
+        </div>
+    );
+};

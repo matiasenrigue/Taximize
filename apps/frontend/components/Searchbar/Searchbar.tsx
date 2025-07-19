@@ -14,7 +14,7 @@ export interface SearchbarHandle {
     focus: () => void;
     blur: () => void;
     clear: () => void;
-    setValue: (value) => void;
+    setValue: (value: string) => void;
 }
 
 export const Searchbar = forwardRef((props: SearchbarProps, ref: ForwardedRef<SearchbarHandle>) => {
@@ -42,7 +42,7 @@ export const Searchbar = forwardRef((props: SearchbarProps, ref: ForwardedRef<Se
         if (onClear) onClear();
     }
 
-    function setValue(value) {
+    function setValue(value: string) {
         inputRef.current.value = value;
     }
 
@@ -73,7 +73,8 @@ export const Searchbar = forwardRef((props: SearchbarProps, ref: ForwardedRef<Se
                 }}
                 onKeyDown={(e) => {
                     if (onKeyDown) onKeyDown(e);
-                    if (onConfirm && e.key === "Enter") onConfirm(e.target.value);
+                    const target = e.target as HTMLInputElement;
+                    if (onConfirm && e.key === "Enter") onConfirm(target.value);
                 }}/>
             <button
                 className={styles.button_clear}
@@ -84,3 +85,5 @@ export const Searchbar = forwardRef((props: SearchbarProps, ref: ForwardedRef<Se
         </div>
     );
 });
+
+Searchbar.displayName = "Searchbar";

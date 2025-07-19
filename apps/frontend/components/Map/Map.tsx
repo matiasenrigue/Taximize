@@ -9,11 +9,35 @@ import {NoRouteFoundModal} from "../modals/NoRouteFoundModal";
 import {ModalHandle} from "../Modal/Modal";
 import {UnknownLocationModal} from "../modals/UnknownLocationModal";
 import {RouteErrorModal} from "../modals/RouteErrorModal";
+import {useUserLocationContext} from "../../contexts/UserLocationContext/UserLocationContext";
+import {TaxiZones} from "../TaxiZones/TaxiZones";
 
-export const Map = (props) => {
+interface MapProps {
+    className?: string;
+}
+
+export const Map = (props: MapProps) => {
     const {className} = props;
-    const origin = MAP_CENTER;
-    const {destination} = useRide();
+    const {
+        destination,
+        setIsRouteAvailable,
+        routeStatus,
+        setRouteStatus,
+    } = useRide();
+
+    const previousRouteStatus = useRef<google.maps.DirectionsStatus>(null!);
+
+    useEffect(() => {
+        if (typeof google === "undefined" || !google?.maps?.DirectionsStatus)
+            return;
+        previousRouteStatus.current = google.maps.DirectionsStatus.OK;
+    }, []);
+
+    const {
+        location: userLocation,
+        setIsWatching,
+    } = useUserLocationContext()
+    useEffect(() => setIsWatching(true), [setIsWatching]);
 
     const map = useMap();
     const routesLibrary = useMapsLibrary('routes');
@@ -52,40 +76,46 @@ export const Map = (props) => {
 
     // Use directions service
     useEffect(() => {
-        if (!directionsService || !directionsRenderer || !destination)
+        if (!directionsService || !directionsRenderer || !userLocation || !destination)
             return;
         directionsService
             .route({
-                origin,
-                destination: (!!destination.placeId
-                    ? {placeId: destination.placeId}
-                    : {query: destination.name}),
+                origin: userLocation,
+                destination: {lat: destination.lat, lng: destination.lng},
                 travelMode: google.maps.TravelMode.DRIVING,
                 provideRouteAlternatives: false
-            }, (result, status) => {
-                switch (status) {
-                    case "OK":
-                        directionsRenderer.setMap(map);
-                        directionsRenderer.setDirections(result);
-                        return;
-                    case "NOT_FOUND":
-                        // at least one of the locations specified in the request's origin, destination, or waypoints could not be geocoded.
-                        openUnknownLocationModal();
-                        return;
-                    case "ZERO_RESULTS":
-                        // no route could be found between the origin and destination.
-                        openNoRouteModal();
-                        return;
-                    case "MAX_ROUTE_LENGTH_EXCEEDED":
-                        // the requested route is too long and cannot be processed
-                    default:
-                        openRouteErrorModal();
-                        console.warn(`Error finding route: ${status}`);
-                }
+            }, (result, status: google.maps.DirectionsStatus) => {
+                setRouteStatus(status);
+                if (status !== google.maps.DirectionsStatus.OK)
+                    return;
+                directionsRenderer.setMap(map);
+                directionsRenderer.setDirections(result);
+                setIsRouteAvailable(true);
             });
         return () => directionsRenderer.setMap(null);
-    }, [directionsService, directionsRenderer, origin, destination, map, openNoRouteModal,
-        openUnknownLocationModal, openRouteErrorModal]);
+    }, [directionsService, directionsRenderer, userLocation, destination, map, setIsRouteAvailable, setRouteStatus]);
+
+    useEffect(() => {
+        // only show modal if there is an error and routeStatus was previously ok.
+        if (previousRouteStatus.current !== "OK" || routeStatus == "OK")
+            return;
+
+        switch (routeStatus) {
+            case google.maps.DirectionsStatus.NOT_FOUND:
+                // at least one of the locations specified in the request's origin, destination, or waypoints could not be geocoded.
+                openUnknownLocationModal();
+                return;
+            case google.maps.DirectionsStatus.ZERO_RESULTS:
+                // no route could be found between the origin and destination.
+                openNoRouteModal();
+                return;
+            case google.maps.DirectionsStatus.MAX_WAYPOINTS_EXCEEDED:
+                // the requested route is too long and cannot be processed
+            default:
+                openRouteErrorModal();
+                console.warn(`Error finding route: ${routeStatus}`);
+        }
+    }, [routeStatus, openUnknownLocationModal, openNoRouteModal, openRouteErrorModal])
 
     return (
         <>
@@ -103,12 +133,13 @@ export const Map = (props) => {
                 gestureHandling={'greedy'}
                 clickableIcons={false}
                 disableDefaultUI={true}>
-                {/*{origin && <AdvancedMarker position={origin}>*/}
-                {/*    <div className={styles.user_marker}/>*/}
-                {/*</AdvancedMarker>}*/}
-                {/*{destination && <AdvancedMarker position={destination}>*/}
-                {/*    <div className={styles.user_marker}/>*/}
-                {/*</AdvancedMarker>}*/}
+                <TaxiZones/>
+                {userLocation && <AdvancedMarker position={userLocation}>
+                    <div className={styles.user_marker}/>
+                </AdvancedMarker>}
+                {destination?.lat && destination?.lng && <AdvancedMarker position={destination}>
+                    <div className={styles.destination_marker}/>
+                </AdvancedMarker>}
             </GoogleMap>
         </>
     );

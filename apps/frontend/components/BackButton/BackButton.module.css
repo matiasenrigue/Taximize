@@ -1,0 +1,17 @@
+.backButton {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--color-on-surface-low-contrast);
+    font-size: 1.15rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+  
+.backButton:hover {
+    opacity: 0.8;
+}
+
+.pageName {
+    margin-left: 0.7rem;
+}

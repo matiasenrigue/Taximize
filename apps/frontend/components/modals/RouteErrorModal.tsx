@@ -8,7 +8,7 @@ export const RouteErrorModal = forwardRef((props, ref: ForwardedRef<ModalHandle>
     const t = useTranslations('RouteErrorModal');
 
     function closeModal() {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function"  || !ref.current)
             return;
         ref.current.close();
     }
@@ -33,3 +33,5 @@ export const RouteErrorModal = forwardRef((props, ref: ForwardedRef<ModalHandle>
         </Modal>
     );
 });
+
+RouteErrorModal.displayName = "RouteErrorModal";

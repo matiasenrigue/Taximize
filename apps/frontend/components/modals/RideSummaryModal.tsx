@@ -2,23 +2,31 @@ import {Modal, ModalHandle} from "../Modal/Modal";
 import {FlexGroup} from "../FlexGroup/FlexGroup";
 import {Button} from "../Button/Button";
 import {useTranslations} from "next-intl";
-import {ForwardedRef, forwardRef} from "react";
-import {CostInput} from "../CostInput/CostInput";
+import {ForwardedRef, forwardRef, useEffect, useState} from "react";
 import {useRide} from "../../contexts/RideContext/RideContext";
+import {MINUTE_IN_MILLISECONDS} from "../../constants/constants";
+import {NumberInput} from "../NumberInput/NumberInput";
+import {Label} from "../Label/Label";
 
 
 export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle>) => {
     const t = useTranslations('RideSummaryModal');
-    const {endRide} = useRide();
+    const {endRide, fare, distance, duration} = useRide();
+    const [editedFare, setEditedFare] = useState<string>((fare / 100).toFixed(2));
+
+    useEffect(() => {
+        setEditedFare((fare / 100).toFixed(2));
+    }, [fare]);
 
     function closeModal() {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function"  || !ref.current)
             return;
         ref.current.close();
     }
 
     function endRideAndCloseModal() {
-        endRide();
+        const fare = Math.round(parseFloat(editedFare) * 100);
+        endRide(fare);
         closeModal();
     }
 
@@ -28,7 +36,19 @@ export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle
             title={t("title")}>
             <FlexGroup
                 align={"stretch"}>
-                <CostInput/>
+                <span>Distance: {distance / 1000} km</span>
+                <span>Duration: {Math.floor(duration / MINUTE_IN_MILLISECONDS)} min</span>
+                <Label>Fare</Label>
+                <NumberInput
+                    placeholder={"0.00"}
+                    value={editedFare}
+                    onChange={(e) => {
+                        setEditedFare(e.target.value);
+                    }}
+                    onBlur={(e) => {
+                        setEditedFare(parseFloat(e.target.value).toFixed(2));
+                    }}
+                />
                 <FlexGroup
                     direction={"row"}
                     align={"stretch"}>
@@ -46,3 +66,5 @@ export const RideSummaryModal = forwardRef((props, ref: ForwardedRef<ModalHandle
         </Modal>
     );
 });
+
+RideSummaryModal.displayName = "RideSummaryModal";

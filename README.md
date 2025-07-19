@@ -63,6 +63,13 @@ A comprehensive full-stack application designed for taxi drivers to efficiently 
 │       ├── next.env.d.ts
 │       ├── package.json
 │       └── tsconfig.json       # frontend typescript configuration
+├── Data/
+│   ├── cleaning_exploration/       # EDA, notebooks, exploratory analysis
+│   │   └── zone_coordinates.csv    # Load zone → borough map (used for encoding)
+│   └── data_models_api/
+│       ├── combined_flask/         # Used for Integration
+│       ├── scoring_model/          # Scoring logic and model assets
+│       └── hotspot_model/          # Hotspot logic and model assets
 ├── node_modules/               # shared modules, do not commit!
 ├── packages/
 │   └── shared/                 # shared code
@@ -266,3 +273,4 @@ NODE_ENV=production npm run migrate --workspace=apps/backend
 - **shift_signals** - State transitions
 - **shift_pauses** - Break time tracking
 - **hotspots** - Zone data storage
+

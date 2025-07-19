@@ -2,13 +2,15 @@
 
 import styles from "./page.module.css";
 import { Button } from "../../../components/Button/Button";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Input } from "../../../components/Input/Input"; 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { setToken } from "../../../lib/token";
 import Message from "../../../components/Message/Message";
 import api from "../../../lib/axios";
+import { EMAIL_REGEX } from "../../../constants/constants";
+import clsx from "clsx";
 
 
 export default function Signup() {
@@ -19,8 +21,7 @@ export default function Signup() {
     const [msg, setMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
     const router = useRouter();
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const isEmailValid = emailRegex.test(email);
+    const isEmailValid = EMAIL_REGEX.test(email);
     const isPasswordValid = password.length >= 8;
     const isPasswordMatch = password === confirmPassword;
     const canSubmit = email && username && isEmailValid && isPasswordValid && isPasswordMatch;
@@ -29,7 +30,7 @@ export default function Signup() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        api.post("/signup", {
+        api.post("/auth/signup", {
             email,
             username,
             password
@@ -42,7 +43,7 @@ export default function Signup() {
         ).catch((err) => {
             // when the status is not 200, the response will contain an error message
             console.error("Signup error:", err);
-            if (err.response && err.response.data && err.response.data.error) {
+            if (err.response?.data?.error) {
                 setMsg({type: "error", text: err.response.data.error});
             } else {
                 setMsg({type: "error", text: t("signUpError")});
@@ -62,10 +63,10 @@ export default function Signup() {
         <div className={styles.page}>
             <div className={styles.container}>
                 <form className={styles.form_container} onSubmit={handleSubmit} autoComplete="off">
-                    <label className={styles.label} htmlFor="email" style={{ color: !isEmailValid && email ? 'var(--color-danger)' : undefined }}>{t("email")}</label>
+                    <label className={styles.label} htmlFor="email" style={{ color: !isEmailValid && email ? 'var(--color-danger)' : 'unset' }}>{t("email")}</label>
                     <Input
                         id="email"
-                        className={`${styles.input} ${!isEmailValid && email ? 'error' : ''}`}
+                        className={clsx(styles.input, !isEmailValid && email && 'error')}
                         type="email"
                         placeholder="example@gmail.com"
                         value={email}
@@ -88,10 +89,10 @@ export default function Signup() {
                         required
                     />
 
-                    <label className={styles.label} htmlFor="password" style={{ color: !isPasswordValid && password ? 'var(--color-danger)' : undefined }}>{t("password")}</label>
+                    <label className={styles.label} htmlFor="password" style={{ color: !isPasswordValid && password ? 'var(--color-danger)' : 'unset' }}>{t("password")}</label>
                     <Input
                         id="password"
-                        className={`${styles.input} ${!isPasswordValid && password ? 'error' : ''}`}
+                        className={clsx(styles.input, !isPasswordValid && password && 'error')}
                         type="password"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
@@ -104,10 +105,10 @@ export default function Signup() {
                         </div>
                     )}
 
-                    <label className={styles.label} htmlFor="confirmPassword" style={{ color: !isPasswordMatch && confirmPassword ? 'var(--color-danger)' : undefined }}>{t("confirmPassword")}</label>
+                    <label className={styles.label} htmlFor="confirmPassword" style={{ color: !isPasswordMatch && confirmPassword ? 'var(--color-danger)' : 'unset' }}>{t("confirmPassword")}</label>
                     <Input
                         id="confirmPassword"
-                        className={`${styles.input} ${!isPasswordMatch && confirmPassword ? 'error' : ''}`}
+                        className={clsx(styles.input, !isPasswordMatch && confirmPassword && 'error')}
                         type="password"
                         value={confirmPassword}
                         onChange={e => setConfirmPassword(e.target.value)}
@@ -118,9 +119,6 @@ export default function Signup() {
                             {t("passwordMatchError")}
                         </div>
                     )}
-                    {/* {error && (
-                        <div className={styles.error_text}>{error}</div>
-                    )} */}
                     <Button
                         className={styles.button}
                         type="submit"
@@ -131,13 +129,11 @@ export default function Signup() {
                     </Button>
                 </form>
                 <div className={styles.links_container}>
-                    <div className={styles.link}
-                    onClick ={() => router.push('/signin')}
-                    style={{ cursor: 'pointer' }}
-                    >
+                    <Link href="/signin" className={styles.link}>
                         {t("alreadyHaveAccount")}
-                    </div>
+                    </Link>
                 </div>
+                
             </div>
         </div>
     </>

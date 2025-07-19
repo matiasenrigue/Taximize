@@ -4,7 +4,7 @@ import React, {PropsWithChildren} from "react";
 export const SearchResults = (props: PropsWithChildren) => {
     const {children} = props;
 
-    if (!children || children.length === 0)
+    if (!children || React.Children.count(children) === 0)
         return null;
     return (
         <div className={styles.container}>
