@@ -1,4 +1,3 @@
-// Placeholder file for TDD Red phase - routes will be implemented in Green phase
 import { Router } from 'express';
 import { RideController } from './ride.controller';
 import { protect } from '../../shared/middleware/auth.middleware';
