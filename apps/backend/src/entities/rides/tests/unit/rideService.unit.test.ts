@@ -1,6 +1,21 @@
 import { RideService } from '../../ride.service';
 import { sequelize } from '../../../../shared/config/db';
 
+// Mock external dependencies
+jest.mock('../../utils/zoneDetector', () => ({
+    getZonesForRide: jest.fn().mockReturnValue({
+        originZone: 'zone1',
+        destinationZone: 'zone2'
+    })
+}));
+
+jest.mock('../../../../shared/utils/dataApiClient', () => ({
+    scoreTripXGB: jest.fn().mockResolvedValue({
+        percentile: 73
+    }),
+    formatDateTimeForScoring: jest.fn().mockReturnValue('2024-01-01 12:00:00')
+}));
+
 // Set up test database before running tests
 beforeAll(async () => {
     process.env.NODE_ENV = 'test';

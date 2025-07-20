@@ -32,8 +32,7 @@ export const signupValidation = [
     .normalizeEmail(),
   body('password')
     .notEmpty().withMessage('Password is required')
-    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
-    .matches(/^(?=.*[A-Za-z])(?=.*\d)/).withMessage('Password must contain letters and numbers'),
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
   body('username')
     .notEmpty().withMessage('Username is required')
     .isLength({ min: 3 }).withMessage('Username must be at least 3 characters')

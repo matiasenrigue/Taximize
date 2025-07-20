@@ -1,11 +1,11 @@
 import { SignalValidation, Signal } from '../../utils/signalValidation';
+import { SignalValidationTestUtils } from '../utils/signalValidation.testUtils';
 
 
 describe('SignalValidation Unit Tests', () => {
     beforeEach(() => {
         // Reset driver states before each test
-        SignalValidation.resetDriverState('test-driver-1');
-        SignalValidation.resetDriverState('test-driver-2');
+        SignalValidationTestUtils.clearAllDriverStates();
     });
 
 
@@ -125,7 +125,8 @@ describe('SignalValidation Unit Tests', () => {
             const driverId = 'test-driver-1';
             const newSignal: Signal = 'start';
             
-            const result = SignalValidation.canReceiveSignal(driverId, newSignal);
+            const currentState = SignalValidationTestUtils.getDriverState(driverId);
+            const result = SignalValidation.isValidTransition(currentState, newSignal);
             expect(result).toBe(true);
         });
 
@@ -135,7 +136,8 @@ describe('SignalValidation Unit Tests', () => {
             const driverId = 'test-driver-2';
             const newSignal: Signal = 'continue';
             
-            const result = SignalValidation.canReceiveSignal(driverId, newSignal);
+            const currentState = SignalValidationTestUtils.getDriverState(driverId);
+            const result = SignalValidation.isValidTransition(currentState, newSignal);
             expect(result).toBe(false);
         });
     });

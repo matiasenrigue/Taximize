@@ -252,7 +252,8 @@ describe('Ride Service Integration Tests', () => {
                 startLat: 95, // Invalid: > 90
                 startLng: -6.260310,
                 destLat: 53.359805,
-                destLng: -6.270310
+                destLng: -6.270310,
+                predictedScore: 0
             };
 
             await expect(RideService.startRide(user.id, shift.id, invalidLatCoords))
@@ -263,7 +264,8 @@ describe('Ride Service Integration Tests', () => {
                 startLat: 53.349805,
                 startLng: -185, // Invalid: < -180
                 destLat: 53.359805,
-                destLng: -6.270310
+                destLng: -6.270310,
+                predictedScore: 0
             };
 
             await expect(RideService.startRide(user.id, shift.id, invalidLngCoords))
