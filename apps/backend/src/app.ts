@@ -11,14 +11,15 @@ import authRoutes from './entities/auth/auth.routes';
 import rideRoutes from './entities/rides/ride.routes';
 import shiftRoutes from './entities/shifts/shift.routes';
 import userRoutes from './entities/users/user.routes';
+import hostpotsRoutes from './entities/hotspots/hotspots.routes';
 import { errorHandler } from './shared/middleware/error.middleware';
 
 const app = express();
 
 // Debugging middleware
 app.use((req, res, next) => {
-  console.log(`→ ${req.method} ${req.originalUrl}`);
-  next();
+    console.log(`→ ${req.method} ${req.originalUrl}`);
+    next();
 });
 
 // Security HTTP headers
@@ -26,19 +27,19 @@ app.use(helmet());
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true,
-  optionsSuccessStatus: 200
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    credentials: true,
+    optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 app.use('/api/', limiter);
 
@@ -51,6 +52,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/rides', rideRoutes);
 app.use('/api/shifts', shiftRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/hotspots', hostpotsRoutes);
 
 app.use(errorHandler);
 
