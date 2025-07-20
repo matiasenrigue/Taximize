@@ -3,7 +3,7 @@ import { initializeAssociations } from '../../../../shared/config/associations';
 import app from '../../../../app';
 import Ride from '../../ride.model';
 import Shift from '../../../shifts/shift.model';
-import ShiftSignal from '../../../shifts/shift-signal.model';
+import ShiftSignal from '../../../shifts/shiftSignal.model';
 import { TestHelpers } from '../../../../shared/tests/utils/testHelpers';
 
 TestHelpers.setupEnvironment();

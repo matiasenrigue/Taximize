@@ -1,6 +1,6 @@
 import { Ride } from './ride.model';
 import { Shift } from '../shifts/shift.model';
-import { ShiftSignal } from '../shifts/shift-signal.model';
+import { ShiftSignal } from '../shifts/shiftSignal.model';
 import { ShiftService } from '../shifts/shift.service';
 import { Op } from 'sequelize';
 import { getZonesForRide } from './utils/zoneDetector';

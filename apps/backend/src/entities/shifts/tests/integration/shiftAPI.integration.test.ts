@@ -4,8 +4,8 @@ import { initializeAssociations } from '../../../../shared/config/associations';
 import app from '../../../../app';
 import User from '../../../users/user.model';
 import Shift from '../../shift.model';
-import ShiftSignal from '../../shift-signal.model';
-import ShiftPause from '../../shift-pause.model';
+import ShiftSignal from '../../shiftSignal.model';
+import { Pause } from '../../../pauses/pause.model';
 import { generateAccessToken } from '../../../auth/utils/generateTokens';
 
 // Set up environment variables for testing
@@ -33,7 +33,7 @@ afterEach(async () => {
     // Clean up in correct order due to foreign key constraints
     // Use force: true to hard delete even with paranoid mode
     await ShiftSignal.destroy({ where: {}, force: true });
-    await ShiftPause.destroy({ where: {}, force: true });
+    await Pause.destroy({ where: {}, force: true });
     await Shift.destroy({ where: {}, force: true });
     await User.destroy({ where: {}, force: true });
 });

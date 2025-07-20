@@ -4,8 +4,8 @@ import app from '../../../../app';
 import User from '../../../users/user.model';
 import Ride from '../../../rides/ride.model';
 import Shift from '../../shift.model';
-import ShiftSignal from '../../shift-signal.model';
-import ShiftPause from '../../shift-pause.model';
+import ShiftSignal from '../../shiftSignal.model';
+import { Pause } from '../../../pauses/pause.model';
 import { generateAccessToken } from '../../../auth/utils/generateTokens';
 
 // Set up environment variables for testing
@@ -97,7 +97,7 @@ beforeAll(async () => {
 afterEach(async () => {
     await User.destroy({ where: {} });
     await Ride.destroy({ where: {} });
-    await ShiftPause.destroy({ where: {} });
+    await Pause.destroy({ where: {} });
     await Shift.destroy({ where: {} });
     await ShiftSignal.destroy({ where: {} });
 });
@@ -333,7 +333,7 @@ describe('Edit Shift Operations', () => {
             const shift = await createCompletedShift(user.id);
 
             // Add pause records to affect work time calculation
-            await ShiftPause.create({
+            await Pause.create({
                 shift_id: shift.id,
                 pause_start: new Date(shift.shift_start.getTime() + 3600000), // 1 hour after start
                 pause_end: new Date(shift.shift_start.getTime() + 5400000), // 1.5 hours after start

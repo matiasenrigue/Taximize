@@ -1,4 +1,3 @@
-// Placeholder file for TDD Red phase - methods will be implemented in Green phase
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { ShiftService } from './shift.service';
@@ -6,50 +5,6 @@ import { RideService } from '../rides/ride.service';
 import { modelToResponse, requestToModel } from '../../shared/utils/caseTransformer';
 
 export class ShiftController {
-    
-    // @desc    Handle general shift signal
-    // @route   POST /api/shifts/signal
-    // @access  Protected
-    static emitSignal = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { signal, timestamp } = req.body;
-        const driverId = req.driverId!; 
-
-        // Validate required fields
-        if (!signal) {
-            res.status(400);
-            throw new Error('Signal is required');
-        }
-
-        // Validate signal type
-        const validSignals = ['start', 'pause', 'continue', 'stop'];
-        if (!validSignals.includes(signal)) {
-            res.status(400);
-            throw new Error('Invalid signal type');
-        }
-
-        // Use provided timestamp or current time
-        const signalTimestamp = timestamp || Date.now();
-
-        try {
-            await ShiftService.handleSignal(driverId, signalTimestamp, signal);
-            
-            // Get updated shift status
-            const shiftStatus = await ShiftService.getCurrentShiftStatus(driverId);
-            
-            res.status(200).json({
-                success: true,
-                message: 'Signal accepted',
-                data: shiftStatus
-            });
-        } catch (error: any) {
-            if (error.message.includes('Invalid signal transition')) {
-                res.status(400);
-                throw new Error('Cannot receive shift signal: driver has an active ride');
-            }
-            res.status(400);
-            throw new Error(error.message || 'Failed to process signal');
-        }
-    });
 
     // @desc    Start shift (convenience wrapper)
     // @route   POST /api/shifts/start-shift
@@ -190,6 +145,49 @@ export class ShiftController {
         }
     });
 
+
+
+
+    // @desc    Skip pause (register a 0-minute pause)
+    // @route   POST /api/shifts/skip-pause
+    // @access  Protected
+    static skipPause = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        const { timestamp } = req.body || {};
+        const driverId = req.driverId!; 
+
+        // Use provided timestamp or current time
+        const signalTimestamp = timestamp || Date.now();
+
+        try {
+            // Check if driver has an active shift
+            const shiftStatus = await ShiftService.getCurrentShiftStatus(driverId);
+            if (!shiftStatus || !shiftStatus.isOnShift) {
+                res.status(400);
+                throw new Error('No active shift to skip pause');
+            }
+
+            // Register a fake pause of 0 minutes by emitting pause and continue signals
+            await ShiftService.handleSignal(driverId, signalTimestamp, 'pause');
+            await ShiftService.handleSignal(driverId, signalTimestamp, 'continue');
+            
+            res.status(200).json({
+                success: true,
+                message: 'Pause skipped successfully'
+            });
+        } catch (error: any) {
+            res.status(400);
+            throw new Error(error.message || 'Failed to skip pause');
+        }
+    });
+
+
+
+
+
+
+
+
+
     // @desc    Get current shift status
     // @route   GET /api/shifts/current
     // @access  Protected
@@ -308,37 +306,7 @@ export class ShiftController {
         }
     });
 
-    // @desc    Skip pause (register a 0-minute pause)
-    // @route   POST /api/shifts/skip-pause
-    // @access  Protected
-    static skipPause = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { timestamp } = req.body || {};
-        const driverId = req.driverId!; 
 
-        // Use provided timestamp or current time
-        const signalTimestamp = timestamp || Date.now();
-
-        try {
-            // Check if driver has an active shift
-            const shiftStatus = await ShiftService.getCurrentShiftStatus(driverId);
-            if (!shiftStatus || !shiftStatus.isOnShift) {
-                res.status(400);
-                throw new Error('No active shift to skip pause');
-            }
-
-            // Register a fake pause of 0 minutes by emitting pause and continue signals
-            await ShiftService.handleSignal(driverId, signalTimestamp, 'pause');
-            await ShiftService.handleSignal(driverId, signalTimestamp, 'continue');
-            
-            res.status(200).json({
-                success: true,
-                message: 'Pause skipped successfully'
-            });
-        } catch (error: any) {
-            res.status(400);
-            throw new Error(error.message || 'Failed to skip pause');
-        }
-    });
 
     // @desc    Edit shift details
     // @route   PUT /api/shifts/:shiftId

@@ -1,7 +1,7 @@
 import User from '../../../entities/users/user.model';
 import Ride from '../../../entities/rides/ride.model';
 import Shift from '../../../entities/shifts/shift.model';
-import ShiftSignal from '../../../entities/shifts/shift-signal.model';
+import ShiftSignal from '../../../entities/shifts/shiftSignal.model';
 import { generateAccessToken } from '../../../entities/auth/utils/generateTokens';
 import { sequelize } from '../../config/db';
 

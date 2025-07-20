@@ -3,7 +3,7 @@ export const initializeAssociations = () => {
     // Use dynamic imports to avoid circular dependencies
     const { Shift } = require('../../entities/shifts/shift.model');
     const { ShiftSignal } = require('../../entities/shifts/shift-signal.model');
-    const { ShiftPause } = require('../../entities/shifts/shift-pause.model');
+    const { Pause } = require('../../entities/pauses/pause.model');
     const { Ride } = require('../../entities/rides/ride.model');
     const User = require('../../entities/users/user.model').default;
 
@@ -15,7 +15,7 @@ export const initializeAssociations = () => {
     });
 
     // Shift has many pauses
-    Shift.hasMany(ShiftPause, { 
+    Shift.hasMany(Pause, { 
         foreignKey: 'shift_id',
         as: 'pauses'
     });
@@ -32,8 +32,8 @@ export const initializeAssociations = () => {
         as: 'shift'
     });
 
-    // ShiftPause belongs to shift
-    ShiftPause.belongsTo(Shift, { 
+    // Pause belongs to shift
+    Pause.belongsTo(Shift, { 
         foreignKey: 'shift_id',
         as: 'shift'
     });

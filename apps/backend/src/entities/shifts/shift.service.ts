@@ -1,6 +1,7 @@
 import { Shift } from './shift.model';
-import { ShiftSignal } from './shift-signal.model';
-import { ShiftPause } from './shift-pause.model';
+import { ShiftSignal } from './shiftSignal.model';
+import { Pause } from '../pauses/pause.model';
+import { PauseService } from '../pauses/pause.service';
 import { Ride } from '../rides/ride.model';
 import { RideService } from '../rides/ride.service';
 import { SignalValidation, Signal } from './utils/signalValidation';
@@ -18,53 +19,6 @@ interface ShiftStatus {
 }
 
 export class ShiftService {
-    static async isValidSignal(driverId: string, newSignal: string): Promise<boolean> {
-        // Check if driver has active ride - if so, no signals can be received
-        const hasActiveRide = await this.hasActiveRide(driverId);
-        if (hasActiveRide) {
-            return false;
-        }
-
-        // Get last signal for the driver
-        const lastSignal = await this.getLastSignal(driverId);
-        
-        // Use utility to validate transition
-        return SignalValidation.isValidTransition(lastSignal, newSignal as Signal);
-    }
-
-    static async handleSignal(driverId: string, timestamp: number, signal: string, additionalData?: number): Promise<any> {
-        // Validate the signal
-        const isValid = await this.isValidSignal(driverId, signal);
-        if (!isValid) {
-            throw new Error(`Invalid signal transition: ${signal}`);
-        }
-
-        let result = null;
-
-        // Handle different signal types
-        if (signal === 'start') {
-            await this.handleStartSignal(driverId, timestamp, additionalData); // additionalData is duration
-        } else if (signal === 'stop') {
-            result = await this.handleStopSignal(driverId, timestamp);
-        } else if (signal === 'continue') {
-            await this.handleContinueSignal(driverId, timestamp);
-        }
-
-        // Insert signal record (for all signal types except stop - stop signals are handled in saveShift)
-        if (signal !== 'stop') {
-            const activeShift = await this.getActiveShift(driverId);
-            if (activeShift) {
-                await ShiftSignal.create({
-                    timestamp: new Date(timestamp),
-                    shift_id: activeShift.id,
-                    signal: signal as Signal,
-                    planned_duration_ms: (signal === 'pause' && additionalData) ? additionalData : null
-                });
-            }
-        }
-
-        return result;
-    }
 
     static async getCurrentShiftStatus(driverId: string): Promise<ShiftStatus | null> {
         const lastSignal = await this.getLastSignalWithDetails(driverId);
@@ -82,7 +36,7 @@ export class ShiftService {
         const shiftStartSignal = await this.getShiftStartSignal(driverId);
         
         // Find pause times
-        const pauseInfo = await this.getPauseInfo(driverId);
+        const pauseInfo = await PauseService.getPauseInfo(driverId);
         
         // Get active shift to retrieve planned durations
         const activeShift = await this.getActiveShift(driverId);
@@ -98,11 +52,12 @@ export class ShiftService {
             shiftStart: shiftStartSignal ? shiftStartSignal.timestamp.getTime() : null,
             isPaused: lastSignal.signal === 'pause',
             pauseStart: lastSignal.signal === 'pause' ? lastSignal.timestamp.getTime() : null,
-            lastPauseEnd: pauseInfo.lastContinue ? pauseInfo.lastContinue.getTime() : null,
+            lastPauseEnd: pauseInfo.lastPauseEnd ? pauseInfo.lastPauseEnd.getTime() : null,
             duration: activeShift ? activeShift.planned_duration_ms : null,
             pauseDuration: plannedPauseDuration
         };
     }
+
 
     static async driverIsAvailable(driverId: string): Promise<boolean> {
         // First check if driver has an active shift
@@ -122,6 +77,30 @@ export class ShiftService {
         // Driver is available if last signal is 'start' or 'continue'
         return lastSignal === 'start' || lastSignal === 'continue';
     }
+
+
+    static async createShift(driverId: string, timestamp: number, duration?: number): Promise<void> {
+        
+        // To create a new shift, first check if the driver has an active shift
+        const activeShift = await this.getActiveShift(driverId);
+        if (activeShift) {
+            throw new Error('Driver already has an active shift');
+        }
+        
+        // Shift get created with default values
+        await Shift.create({
+            driver_id: driverId,
+            shift_start: new Date(timestamp),
+            shift_end: null,
+            total_duration_ms: null,
+            work_time_ms: null,
+            break_time_ms: null,
+            num_breaks: null,
+            avg_break_ms: null,
+            planned_duration_ms: duration || null
+        });
+    }
+
 
     static async saveShift(driverId: string): Promise<any> {
         const activeShift = await this.getActiveShift(driverId);
@@ -166,35 +145,14 @@ export class ShiftService {
         return activeShift;
     }
 
-    static async saveShiftPause(driverId: string): Promise<void> {
-        const activeShift = await this.getActiveShift(driverId);
-        if (!activeShift) {
-            throw new Error('No active shift found');
+
+    static async deleteShiftSignals(driverId: string): Promise<void> {
+        const activeShift = await ShiftService.getActiveShift(driverId);
+        if (activeShift) {
+            await ShiftSignal.destroy({
+                where: { shift_id: activeShift.id }
+            });
         }
-
-        // Find the last 'pause' signal and current 'continue' signal
-        const pauseSignal = await ShiftSignal.findOne({
-            where: { 
-                shift_id: activeShift.id,
-                signal: 'pause'
-            },
-            order: [['timestamp', 'DESC']]
-        });
-
-        if (!pauseSignal) {
-            throw new Error('No pause signal found');
-        }
-
-        const continueTime = new Date();
-        const durationMs = continueTime.getTime() - pauseSignal.timestamp.getTime();
-
-        // Save the pause period
-        await ShiftPause.create({
-            shift_id: activeShift.id,
-            pause_start: pauseSignal.timestamp,
-            pause_end: continueTime,
-            duration_ms: durationMs
-        });
     }
 
     static async manageExpiredShifts(): Promise<void> {
@@ -245,9 +203,7 @@ export class ShiftService {
                 }
             } else {
                 // Delete stale shift signals (no rides recorded)
-                await ShiftSignal.destroy({
-                    where: { shift_id: shift.id }
-                });
+                this.deleteShiftSignals(shift.driver_id);
                 
                 await Shift.destroy({
                     where: { id: shift.id }
@@ -270,7 +226,7 @@ export class ShiftService {
         }
 
         // Get all pause periods for this shift
-        const pauses = await ShiftPause.findAll({
+        const pauses = await Pause.findAll({
             where: { 
                 shift_id: activeShift.id,
                 pause_start: { [Op.gte]: shiftStart },
@@ -294,12 +250,8 @@ export class ShiftService {
         return ShiftCalculator.computeWorkTime(totalDurationMs, breakStats.totalBreakTimeMs);
     }
 
-    // Helper methods
-    private static async hasActiveRide(driverId: string): Promise<boolean> {
-        return await RideService.hasActiveRide(driverId);
-    }
 
-    private static async getLastSignal(driverId: string): Promise<Signal | null> {
+    static async getLastSignal(driverId: string): Promise<Signal | null> {
         // Get active shift for driver first
         const activeShift = await this.getActiveShift(driverId);
         if (!activeShift) return null;
@@ -323,7 +275,7 @@ export class ShiftService {
         });
     }
 
-    private static async getActiveShift(driverId: string): Promise<Shift | null> {
+    static async getActiveShift(driverId: string): Promise<Shift | null> {
         return await Shift.findOne({
             where: { 
                 driver_id: driverId,
@@ -365,63 +317,6 @@ export class ShiftService {
         });
     }
 
-    private static async getPauseInfo(driverId: string): Promise<{ lastContinue: Date | null }> {
-        // Get active shift for driver first
-        const activeShift = await this.getActiveShift(driverId);
-        if (!activeShift) {
-            return { lastContinue: null };
-        }
-
-        const lastContinue = await ShiftSignal.findOne({
-            where: { 
-                shift_id: activeShift.id,
-                signal: 'continue' 
-            },
-            order: [['timestamp', 'DESC']]
-        });
-
-        return {
-            lastContinue: lastContinue ? lastContinue.timestamp : null
-        };
-    }
-
-    private static async handleStartSignal(driverId: string, timestamp: number, duration?: number): Promise<void> {
-        // Check for existing active shift
-        const existingShift = await Shift.findOne({
-            where: { 
-                driver_id: driverId,
-                shift_end: null
-            }
-        });
-
-        if (existingShift) {
-            throw new Error('Driver already has an active shift');
-        }
-
-        // Create new shift
-        await Shift.create({
-            driver_id: driverId,
-            shift_start: new Date(timestamp),
-            shift_end: null,
-            total_duration_ms: null,
-            work_time_ms: null,
-            break_time_ms: null,
-            num_breaks: null,
-            avg_break_ms: null,
-            planned_duration_ms: duration || null
-        });
-    }
-
-    private static async handleStopSignal(driverId: string, timestamp: number): Promise<any> {
-        // Save the shift with all computed statistics
-        return await this.saveShift(driverId);
-    }
-
-    private static async handleContinueSignal(driverId: string, timestamp: number): Promise<void> {
-        // Save the pause period
-        await this.saveShiftPause(driverId);
-    }
-
     private static async saveShiftByShiftId(shiftId: string): Promise<void> {
         const shift = await Shift.findByPk(shiftId);
         if (!shift) return;
@@ -430,7 +325,7 @@ export class ShiftService {
         const totalDurationMs = shiftEnd.getTime() - shift.shift_start.getTime();
 
         // Get pause data for this shift
-        const pauses = await ShiftPause.findAll({
+        const pauses = await Pause.findAll({
             where: { shift_id: shiftId }
         });
 
@@ -687,7 +582,7 @@ export class ShiftService {
         const totalDurationMs = shift.shift_end.getTime() - shift.shift_start.getTime();
 
         // Get pause data for this shift
-        const pauses = await ShiftPause.findAll({
+        const pauses = await Pause.findAll({
             where: { shift_id: shiftId }
         });
 
