@@ -1,68 +1,247 @@
 "use client";
 
-import {createContext, PropsWithChildren, useCallback, useContext, useState} from "react";
+import {
+    createContext,
+    Dispatch,
+    PropsWithChildren,
+    SetStateAction,
+    useCallback,
+    useContext,
+    useEffect, useRef,
+    useState
+} from "react";
 import moment from "moment";
-import {formatDuration} from "../../utility/formatDuration/formatDuration";
+import api from "../../lib/axios";
+import {useUserLocationContext} from "../UserLocationContext/UserLocationContext";
+import {useTaximeter} from "../../hooks/useTaximeter";
+import {useShift} from "../ShiftContext/ShiftContext";
 
-interface Location {
+interface Place {
     placeId: string | null;
     name: string;
+    lat: number;
+    lng: number;
 }
 
 interface RideContextType {
     isOnRide: boolean;
-    destination: Location | null;
-    updateDestination: (location: Location | null) => void;
+    destination: Place | null;
+    updateDestination: (place: Place | null) => void;
     startRide: () => void;
-    endRide: () => void;
-    getRideTime: () => string | null;
-    getRideFare: () => string | null;
+    endRide: (fare: number) => void;
+    rating: number;
+    fare: number;
+    distance: number;
+    duration: number;
+    isRouteAvailable: boolean;
+    setIsRouteAvailable: Dispatch<SetStateAction<boolean>>;
+    routeStatus: google.maps.DirectionsStatus;
+    setRouteStatus: Dispatch<SetStateAction<google.maps.DirectionsStatus>>;
 }
 
 const RideContext = createContext<RideContextType|null>(null);
 
 export const RideContextProvider = (props: PropsWithChildren) => {
     const {children} = props;
+    const {location: userLocation} = useUserLocationContext();
+    const {
+        fare,
+        distance,
+        start: startTaximeter,
+        stop: stopTaximeter
+    } = useTaximeter(userLocation);
+
+    const {loadRide} = useShift();
 
     const [isOnRide, setIsOnRide] = useState(false);
-    const [destination, setDestination] = useState<Location|null>(null);
+    const [destination, setDestination] = useState<Place|null>(null);
     const [rideStartTime, setRideStartTime] = useState<number|null>(null);
+    const [rating, setRating] = useState<number>(3);
+    const [duration, setDuration] = useState<number>(0);
+
+    // routing
+    const [isRouteAvailable, setIsRouteAvailable] = useState<boolean>(false);
+    const [routeStatus, setRouteStatus] = useState<google.maps.DirectionsStatus>(null!);
+    useEffect(() => {
+        if (typeof google === "undefined" || !google?.maps?.DirectionsStatus)
+            return;
+        setRouteStatus(google.maps.DirectionsStatus.OK);
+    }, []);
+
+    // initialize shift
+    useEffect(() => {
+        if (!loadRide)
+            return;
+        api.get("/rides/current").then((response) => {
+            const {
+                success,
+                error,
+                data
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed getting current ride.", error);
+                return;
+            }
+
+            const {
+                rideId,
+                startLatitude,
+                startLongitude,
+                currentDestinationLatitude,
+                currentDestinationLongitude,
+                elapsedTimeMs,
+                distanceKm,
+                estimatedFareCents,
+            } = data;
+
+            const startTime = moment.now(); // missing from backend
+            const startLocation = {lat: startLatitude, lng: startLongitude};
+
+            setIsOnRide(true);
+            setRideStartTime(startTime);
+            setDestination({
+                placeId: null,
+                name: "Unknown",
+                lat: currentDestinationLatitude,
+                lng: currentDestinationLongitude
+            });
+            startTaximeter(startLocation, startTime);
+        }).catch((error) => {
+            console.warn(error);
+        });
+    }, [loadRide]);
+
+    const evaluateRide = useCallback(() => {
+        if (!destination || !userLocation)
+            return;
+        api.post("/rides/evaluate-ride", {
+            "startLatitude": userLocation.lat,
+            "startLongitude": userLocation.lng,
+            "destinationLatitude": destination.lat,
+            "destinationLongitude": destination.lng
+        }).then((response) => {
+            const {
+                success,
+                error,
+                rating
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed evaluating ride.", error);
+                return;
+            }
+
+            const clampedRating = Math.max(1, Math.min(5, rating));
+            setRating(clampedRating);
+        }).catch((error) => {
+            console.warn(error)
+        });
+    }, [destination, userLocation]);
+
+    useEffect(evaluateRide, [evaluateRide]);
 
     // set a new destination to navigate to (may not be a ride)
-    const updateDestination = useCallback((location: Location) => {
-        setDestination(location);
-    }, []);
+    const updateDestination = useCallback((place: Place | null) => {
+        setRouteStatus(google.maps.DirectionsStatus.OK);
+        setDestination(place);
+        setIsRouteAvailable(false);
+    }, [userLocation]);
 
     // start a ride to the current destination
     const startRide = useCallback(() => {
-        setIsOnRide(true);
-        setRideStartTime(moment.now());
-    }, []);
+        if (isOnRide || !destination || !userLocation)
+            return;
+
+        const timestamp = moment.now();
+
+        api.post("/rides/start-ride", {
+            timestamp,
+            "startLatitude": userLocation.lat,
+            "startLongitude": userLocation.lng,
+            "destinationLatitude": destination.lat,
+            "destinationLongitude": destination.lng
+        }).then((response) => {
+            const {
+                success,
+                error,
+                data
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed starting ride.", error);
+                return;
+            }
+
+            const {
+                rideId,
+                startTime,
+                predicted_score
+            } = data;
+
+            setIsOnRide(true);
+            setRideStartTime(timestamp);
+            startTaximeter();
+        }).catch((error) => {
+            console.warn(error)
+        });
+    }, [startTaximeter, destination, userLocation, isOnRide]);
 
     // end the current ride
-    const endRide = useCallback(() => {
-        setIsOnRide(false);
-        setRideStartTime(null);
-        setDestination(null);
-    }, []);
-
-    // return the duration of the current ride, formatted "h:mm"
-    const getRideTime = useCallback(() => {
+    const endRide = useCallback((editedFare: number = fare) => {
         if (!isOnRide)
-            return null;
-        const passedTime = moment.now() - rideStartTime;
-        return formatDuration(passedTime);
-    }, [isOnRide, rideStartTime]);
+            return;
 
-    // return the cost of the ride, formatted with 2 fraction digits
-    // todo: implement proper algorithm
-    const getRideFare = useCallback(() => {
+        const timestamp = moment.now();
+
+        api.post("/rides/end-ride", {
+            timestamp,
+            fareCents: editedFare,
+            actualDistanceKm: distance / 1000,
+        }).then((response) => {
+            const {
+                success,
+                error,
+                data
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed ending ride.", error);
+                return;
+            }
+
+            const {
+                rideId,
+                total_time_ms,
+                distance_km,
+                earning_cents,
+                earning_per_min
+            } = data;
+
+            setIsOnRide(false);
+            setRideStartTime(null);
+            setDestination(null);
+            stopTaximeter();
+        }).catch((error) => {
+            console.warn(error)
+        });
+    }, [stopTaximeter, fare, distance, isOnRide]);
+
+    const updateDuration = useCallback(() => {
+        if (!rideStartTime)
+            return;
+        const duration = moment.now() - rideStartTime;
+        setDuration(duration);
+    }, [rideStartTime]);
+
+    // update ride duration
+    useEffect(() => {
         if (!isOnRide)
-            return null;
-        const passedTime = moment.now() - rideStartTime;
-        const fare = passedTime * .0001;
-        return fare.toFixed(2);
-    }, [isOnRide, rideStartTime]);
+            return;
+        updateDuration();
+        const intervalId = setInterval(updateDuration, 1000);
+        return () => clearInterval(intervalId);
+    }, [isOnRide, updateDuration]);
 
     return (
         <RideContext.Provider value={{
@@ -71,8 +250,14 @@ export const RideContextProvider = (props: PropsWithChildren) => {
             updateDestination,
             startRide,
             endRide,
-            getRideTime,
-            getRideFare
+            rating,
+            fare,
+            distance,
+            duration,
+            isRouteAvailable,
+            setIsRouteAvailable,
+            routeStatus,
+            setRouteStatus
         }}>
             {children}
         </RideContext.Provider>

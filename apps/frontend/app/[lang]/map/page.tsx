@@ -1,89 +1,103 @@
-"use client"
+"use client";
 
 import styles from "./page.module.css";
 import {Button} from "../../../components/Button/Button";
 import {ModalHandle} from "../../../components/Modal/Modal";
-import {useEffect, useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {useTranslations} from "next-intl";
 import {RideEvaluationModal} from "../../../components/modals/RideEvaluationModal";
 import {RideSummaryModal} from "../../../components/modals/RideSummaryModal";
 import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
 import {Map} from "../../../components/Map/Map";
-import {UserLocationContextProvider} from "../../../contexts/UserLocationContext/UserLocationContext";
+import {
+    useUserLocationContext
+} from "../../../contexts/UserLocationContext/UserLocationContext";
 import {APIProvider} from "@vis.gl/react-google-maps";
 import {LocationSearchbar} from "../../../components/LocationSearchbar";
-import {useRouter} from "next/navigation";
 import {TaxiMeter} from "../../../components/TaxiMeter/TaxiMeter";
 import {FlexGroup} from "../../../components/FlexGroup/FlexGroup";
 import {useRide} from "../../../contexts/RideContext/RideContext";
 import {MenuOption, OptionsMenu} from "../../../components/OptionsMenu/OptionsMenu";
-
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+import {StartBreakModal} from "../../../components/modals/BreakModalHandler/StartBreakModal";
+import {LocationUnavailable} from "./LocationUnavailable";
+import {GOOGLE_MAPS_API_KEY} from "../../../constants/constants";
+import {useRouter} from "next/navigation";
 
 export default function MapPage() {
-    const router = useRouter();
     const startModalRef = useRef<ModalHandle>(null!);
     const endModalRef = useRef<ModalHandle>(null!);
-    const {isShift, pauseShift, endShift} = useShift();
-    const {isOnRide, destination} = useRide();
+    const startBreakModalRef = useRef<ModalHandle>(null!);
+
+    const router = useRouter();
+    const {endShift, isLoaded, isShift} = useShift();
+    const {isOnRide, destination, isRouteAvailable} = useRide();
     const t = useTranslations('map');
+
+    const {isAvailable, setIsWatching} = useUserLocationContext();
+    useEffect(() => setIsWatching(true), [setIsWatching]);
+
+    function openPauseModal() {
+        if (!startBreakModalRef || typeof startBreakModalRef === "function")
+            return;
+        startBreakModalRef.current.open();
+    }
 
     // if not on shift, reroute to /start-shift
     useEffect(() => {
-        if (isShift) return;
+        if (!isLoaded || isShift)
+            return;
         router.push("/start-shift");
-    }, [isShift]);
+    }, [isLoaded, isShift, router]);
+
+    if (!isAvailable)
+        return <LocationUnavailable/>;
 
     return (
-        <UserLocationContextProvider>
-            <APIProvider apiKey={API_KEY}>
-                <RideEvaluationModal
-                    ref={startModalRef}/>
-                <RideSummaryModal
-                    ref={endModalRef}/>
+        <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
+            <RideEvaluationModal
+                ref={startModalRef}/>
+            <RideSummaryModal
+                ref={endModalRef}/>
+            <StartBreakModal
+                ref={startBreakModalRef}/>
 
-                <div className={styles.page}>
-                    <Map className={styles.map}/>
+            <div className={styles.page}>
+                <Map className={styles.map}/>
 
-                    <div className={styles.search_container}>
-                        <LocationSearchbar
-                            placeholder={t("locationSearchPlaceholder")}/>
-                    </div>
+                <div className={styles.search_container}>
+                    <LocationSearchbar
+                        placeholder={t("locationSearchPlaceholder")}/>
+                </div>
 
-                    <div className={styles.button_container}>
+                <div className={styles.button_container}>
                         {isOnRide && <TaxiMeter/>}
                         <FlexGroup
                             direction={"row"}
                             align={"center"}
                             justify={"end"}>
                             {isOnRide
-                                ? <FlexGroup
-                                    direction={"column"}
-                                    align={"start"}>
-                                    <Button
+                                ? <Button
                                         elevated={true}
                                         onClick={() => endModalRef.current?.open()}>
                                         {t("endRide")}
-                                    </Button>
-                                </FlexGroup>
-                                : (destination && <Button
+                            </Button>
+                                : (destination && isRouteAvailable && <Button
                                     elevated={true}
                                     onClick={() => startModalRef.current?.open()}>
                                     {t("startRide")}
                                 </Button>)}
-                            <OptionsMenu>
-                                <MenuOption onClick={pauseShift}>
+                            {!isOnRide && <OptionsMenu>
+                                <MenuOption onClick={openPauseModal}>
                                     {t("pauseShift")}
                                 </MenuOption>
                                 <MenuOption onClick={endShift}>
                                     {t("endShift")}
                                 </MenuOption>
-                            </OptionsMenu>
+                            </OptionsMenu>}
                         </FlexGroup>
-                    </div>
                 </div>
-            </APIProvider>
-        </UserLocationContextProvider>
+            </div>
+        </APIProvider>
     );
 }
 

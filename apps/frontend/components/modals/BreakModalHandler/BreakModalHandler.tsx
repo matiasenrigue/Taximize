@@ -1,6 +1,5 @@
 "use client"
 
-import {BreakModal} from "./BreakModal";
 import {BreakReminderModal} from "./BreakReminderModal";
 import {useCallback, useEffect, useRef} from "react";
 import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
@@ -17,7 +16,7 @@ export const BreakModalHandler = () => {
             return;
         if (checkBreakTime())
             breakReminderModalRef.current.open();
-    }, [checkBreakTime, breakReminderModalRef.current, isOnRide]);
+    }, [checkBreakTime, isOnRide]);
 
     useEffect(() => {
         const delay = 1000 * 10;

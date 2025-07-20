@@ -6,6 +6,14 @@
     "endShift": "End Shift",
     "locationSearchPlaceholder": "Search Address..."
   },
+  "LocationUnavailable": {
+    "title": "Enable your Location",
+    "text": "The app requires access to your location to recommend routes and calculate fares."
+  },
+  "LocationLoading": {
+    "title": "Location loading...",
+    "text": "The app is retrieving your location from the browser. This might take a moment."
+  },
   "introduction": {
     "title": "Taxi Assistant",
     "subtitle": "The app helps taxi drivers in maximising revenue and minimising downtime",
@@ -59,11 +67,21 @@
     "signUpError": "Sign up failed"
   },
   "start-shift": {
-    "startShift": "Start Shift"
+    "title": "Start Shift",
+    "startShift": "Start Shift",
+    "invalidDuration": "Please enter a duration."
+  },
+  "end-shift": {
+    "title": "Shift finished",
+    "confirmButton": "Ok"
   },
   "RideEvaluationModal": {
     "title": "Evaluate Ride",
-    "text": "This ride is below average. It will be difficult to find a new passenger near the target location.",
+    "text-rating-1": "This ride is not recommended. It will be very difficult to find a new passenger near the destination.",
+    "text-rating-2": "This ride is below average. It will be difficult to find a new passenger near the destination.",
+    "text-rating-3": "This ride is average. It will take a bit of time to find a new passenger near the destination.",
+    "text-rating-4": "This ride is above average. It will be easy to find a new passenger near the destination.",
+    "text-rating-5": "This ride is ideal! It will be very easy to find a new passenger near the destination.",
     "confirmButton": "Start Ride",
     "cancelButton": "Cancel"
   },
@@ -75,6 +93,12 @@
   "BreakReminderModal": {
     "title": "Take a break!",
     "text": "You’ve been driving for more than 3 hours without a break! We recommend that you take a short 15 minute break.",
+    "confirmButton": "Take a break",
+    "cancelButton": "Cancel"
+  },
+  "StartBreakModal": {
+    "title": "Take a break!",
+    "text": "How long would you like to take a break for?",
     "confirmButton": "Take a break",
     "cancelButton": "Cancel"
   },

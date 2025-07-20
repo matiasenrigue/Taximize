@@ -1,0 +1,5 @@
+.label {
+    display: inline-block;
+    color: var(--color-on-surface-low-contrast);
+    margin: 4px 0;
+}

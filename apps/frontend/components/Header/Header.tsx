@@ -12,7 +12,7 @@ export const Header = () => {
             <Link
                 className={styles.logo}
                 href={"/"}>
-                TaxiApp
+                Taximize
             </Link>
             <FlexGroup direction={"row"}>
                 <ShiftTimer/>

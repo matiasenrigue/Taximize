@@ -98,13 +98,14 @@ export const Option = (props: OptionProps) => {
     useEffect(() => {
         if (selected)
             context!.onClick!(value, children);
-    }, []);
+    }, [children, context, selected, value]);
 
     return (
         <button
             className={styles.option}
             onClick={() => context!.onClick!(value, children)}
-            role={"option"}>
+            role={"option"}
+            aria-selected={selected}>
             {children}
         </button>
     );

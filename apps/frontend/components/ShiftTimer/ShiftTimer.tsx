@@ -10,9 +10,9 @@ export const ShiftTimer = () => {
     const [remainingTime, setRemainingTime] = useState(() => getRemainingTime());
 
     useEffect(() => {
+        setRemainingTime(getRemainingTime());
         if (isPaused)
             return;
-        setRemainingTime(getRemainingTime());
         const delay = 1000 * 10;
         const intervalId = setInterval(() => {
             setRemainingTime(getRemainingTime());

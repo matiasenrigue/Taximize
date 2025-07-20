@@ -35,12 +35,10 @@ export default function Preferences() {
                     </div>
                     <div className={styles.select}>
                         <Select
-                            value={theme}
-                            onChange={(value) => setTheme(value as string)}
-                        >
-                            <Option value="light">{t('light')}</Option>
-                            <Option value="dark">{t('dark')}</Option>
-                            <Option value="system">{t('system')}</Option>
+                            onChange={(value) => setTheme(value as string)}>
+                            <Option value="light" selected={"light" === theme}>{t('light')}</Option>
+                            <Option value="dark" selected={"dark" === theme}>{t('dark')}</Option>
+                            <Option value="system" selected={"system" === theme}>{t('system')}</Option>
                         </Select>
                     </div>
                     

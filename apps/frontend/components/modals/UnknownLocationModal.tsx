@@ -8,7 +8,7 @@ export const UnknownLocationModal = forwardRef((props, ref: ForwardedRef<ModalHa
     const t = useTranslations('UnknownLocationModal');
 
     function closeModal() {
-        if (!ref || typeof ref === "function")
+        if (!ref || typeof ref === "function"  || !ref.current)
             return;
         ref.current.close();
     }
@@ -33,3 +33,5 @@ export const UnknownLocationModal = forwardRef((props, ref: ForwardedRef<ModalHa
         </Modal>
     );
 });
+
+UnknownLocationModal.displayName = "UnknownLocationModal";

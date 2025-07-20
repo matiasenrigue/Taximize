@@ -1,8 +1,8 @@
 .input_box {
     display: flex;
     position: relative;
-    display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .button_clear {
@@ -24,6 +24,7 @@
 }
 
 .input {
+    flex: 1;
     width: 100%;
     padding: 12px;
     border: 1.5px solid var(--color-border);

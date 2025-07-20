@@ -14,6 +14,7 @@ import React from "react";
 import {BreakModalHandler} from "../../components/modals/BreakModalHandler/BreakModalHandler";
 import {ShiftEndModalHandler} from "../../components/modals/ShiftEndModalHandler/ShiftEndModalHandler";
 import { UserContextProvider } from "../../contexts/UserContext/UserContext";
+import {UserLocationContextProvider} from "../../contexts/UserLocationContext/UserLocationContext";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -50,39 +51,47 @@ export const viewport: Viewport = {
 }
 
 export default async function RootLayout({
-  children,
-  params
+    children,
+    params
 }: Readonly<{
-  children: React.ReactNode;
-  params: Promise<{lang: string}>;
+    children: React.ReactNode;
+    params: Promise<{lang: string}>;
 }>) {
-  const {lang} = await params;
-  if (!hasLocale(routing.locales, lang))
-    notFound();
+    const {lang} = await params;
+    if (!hasLocale(routing.locales, lang))
+      notFound();
 
-  return (
-    <html lang={lang} prefix="og: https://ogp.me/ns#">
-      <body className={clsx(roboto.variable, roboto_mono.variable)}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <NextIntlClientProvider>
-            <ShiftContextProvider>
-              <RideContextProvider>
-                <UserContextProvider>
-                <BreakModalHandler/>
-                <ShiftEndModalHandler/>
+    return (
+        <html
+            lang={lang}
+            prefix="og: https://ogp.me/ns#"
+            // suppress the warning that occurs because the theme changes html's class
+            suppressHydrationWarning>
+            <body className={clsx(roboto.variable, roboto_mono.variable)}>
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                    <NextIntlClientProvider>
+                        <UserContextProvider>
+                              <UserLocationContextProvider>
+                                  <ShiftContextProvider>
+                                      <RideContextProvider>
 
-                <div className={styles.container}>
-                  <Header/>
-                  <main className={styles.main}>
-                    {children}
-                  </main>
-                </div>
-                </UserContextProvider>
-              </RideContextProvider>
-            </ShiftContextProvider>
-          </NextIntlClientProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+                                          <BreakModalHandler/>
+                                          <ShiftEndModalHandler/>
+
+                                          <div className={styles.container}>
+                                              <Header/>
+                                              <main className={styles.main}>
+                                                  {children}
+                                              </main>
+                                          </div>
+
+                                      </RideContextProvider>
+                                  </ShiftContextProvider>
+                              </UserLocationContextProvider>
+                          </UserContextProvider>
+                    </NextIntlClientProvider>
+                </ThemeProvider>
+            </body>
+      </html>
+    );
 }

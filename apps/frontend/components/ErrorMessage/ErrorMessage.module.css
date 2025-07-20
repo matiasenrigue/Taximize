@@ -1,0 +1,6 @@
+
+.message {
+    display: inline-block;
+    color: var(--color-danger);
+    margin: 4px 0 0;
+}

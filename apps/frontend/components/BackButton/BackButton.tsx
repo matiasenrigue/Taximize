@@ -12,7 +12,7 @@ interface BackButtonProps {
 const BackButton: React.FC<BackButtonProps> = ({ href, pageName }) => {
   return (
     <Link href={href} className={styles.backButton}>
-      <FontAwesomeIcon icon={faChevronLeft} className="back-icon" />
+      <FontAwesomeIcon icon={faChevronLeft} />
       <span className={styles.pageName}>{pageName}</span>
     </Link>
   );

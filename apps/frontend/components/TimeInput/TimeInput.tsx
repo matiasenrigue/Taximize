@@ -1,21 +1,27 @@
 import styles from "./TimeInput.module.css";
-import {ForwardedRef, forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
-import {moveCursorToEnd, removeAllSelections, selectContent} from "../../utility/selectContent";
+import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
+import {moveCursorToEnd, removeAllSelections, selectContent} from "../../lib/selectContent";
+import {HOUR_IN_MILLISECONDS, MINUTE_IN_MILLISECONDS} from "../../constants/constants";
+import {isNumberKey} from "../../lib/isCharacterKey";
 
 interface TimeInputProps {
     onChange?: (value: number) => void; // in milliseconds
     suffix?: string;
+    defaultValue?: number;
+    invalid?: boolean;
 }
 
 export const TimeInput = (props: TimeInputProps) => {
     const {
         onChange,
         suffix = "h",
+        defaultValue = 0,
+        invalid = false,
     } = props;
     const hourRef = useRef<SegmentHandle>(null!);
     const minuteRef = useRef<SegmentHandle>(null!);
 
-    const handleClick = (e) => {
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target !== e.currentTarget)
             return;
         hourRef?.current?.focus();
@@ -33,11 +39,12 @@ export const TimeInput = (props: TimeInputProps) => {
         <div
             className={styles.container}
             data-testid={"time-input"}
+            data-invalid={invalid}
             onClick={handleClick}>
             <Segment
                 ref={hourRef}
                 testId={"segment-hour"}
-                defaultValue={0}
+                defaultValue={Math.floor(defaultValue / HOUR_IN_MILLISECONDS)}
                 minValue={0}
                 maxValue={23}
                 onConfirm={() => minuteRef?.current?.focus()}
@@ -46,7 +53,7 @@ export const TimeInput = (props: TimeInputProps) => {
             <Segment
                 ref={minuteRef}
                 testId={"segment-minute"}
-                defaultValue={0}
+                defaultValue={Math.floor((defaultValue % HOUR_IN_MILLISECONDS) / MINUTE_IN_MILLISECONDS)}
                 minValue={0}
                 maxValue={59}
                 onConfirm={() => minuteRef?.current?.blur()}
@@ -72,7 +79,7 @@ interface SegmentProps {
     testId?: string | undefined;
 }
 
-const Segment = forwardRef<SegmentHandle>((props: SegmentProps, ref: ForwardedRef<any>) => {
+const Segment = forwardRef<SegmentHandle, SegmentProps>((props, ref) => {
     const {
         defaultValue = 0,
         minValue = 0,
@@ -89,18 +96,19 @@ const Segment = forwardRef<SegmentHandle>((props: SegmentProps, ref: ForwardedRe
     const focus = () => elementRef.current.focus();
     const blur = () => elementRef.current.blur();
 
-    const handleInput = (e) => {
-        let newValue = parseInt(e.target.textContent) || 0;
+    const handleInput = (e: React.FormEvent<HTMLSpanElement>) => {
+        const target = e.target as HTMLSpanElement;
+        let newValue = parseInt(target.textContent ?? "") ?? 0;
         newValue = Math.max(Math.min(newValue, maxValue), minValue);
-        e.target.textContent = newValue.toLocaleString([], {minimumIntegerDigits: 2});
-        moveCursorToEnd(e.target);
+        target.textContent = newValue.toLocaleString([], {minimumIntegerDigits: 2});
+        moveCursorToEnd(target);
         setValue(newValue);
         if (newValue.toString().length === maxValue.toString().length)
             if (onConfirm) onConfirm();
     };
 
-    const handleKeyDown = (e) => {
-        if (isNaN(e.key) && e.key.length === 1)
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+        if (!isNumberKey(e))
             e.preventDefault();
         if (["Enter", ":", " "].includes(e.key))
             if (onConfirm) onConfirm();
@@ -113,8 +121,9 @@ const Segment = forwardRef<SegmentHandle>((props: SegmentProps, ref: ForwardedRe
     }));
 
     useEffect(() => {
-        if (onChange) onChange(value);
-    }, [value]);
+        if (onChange)
+            onChange(value);
+    }, [value, onChange]);
 
     return (
         <span
@@ -143,3 +152,5 @@ const Segment = forwardRef<SegmentHandle>((props: SegmentProps, ref: ForwardedRe
         </span>
     )
 });
+
+Segment.displayName = "Segment";

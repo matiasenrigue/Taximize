@@ -43,6 +43,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/google.maps": "^3.58.1",
     "@types/lodash": "^4.17.19",
+    "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

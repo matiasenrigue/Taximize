@@ -4,6 +4,7 @@ import styles from "./Modal.module.css";
 import React, {ForwardedRef, forwardRef, useCallback, useImperativeHandle, useRef} from "react";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Heading} from "../Heading/Heading";
 
 export type ModalHandle = {
     open: () => void;
@@ -13,7 +14,6 @@ export type ModalHandle = {
 interface ModalProps extends React.PropsWithChildren {
     title?: string;
     className?: string;
-    titleStyle?: React.CSSProperties;
     onClose?: () => void;
 }
 
@@ -23,20 +23,22 @@ export const Modal = forwardRef<ModalHandle, ModalProps>((props: ModalProps, ref
         onClose,
         children,
         className,
-        titleStyle
     } = props;
     const dialogRef = useRef<HTMLDialogElement>(null!);
 
     const open = useCallback(() => {
-        dialogRef.current?.showModal();
+        if (!dialogRef || typeof dialogRef === "function")
+            return;
+        dialogRef.current.showModal();
     }, []);
 
     const close = useCallback(() => {
-        dialogRef.current?.close();
+        if (!dialogRef || typeof dialogRef === "function")
+            return;
+        dialogRef.current.close();
     }, []);
 
     useImperativeHandle(ref, () => ({
-        test: "hello world",
         open,
         close
     }));
@@ -56,8 +58,10 @@ export const Modal = forwardRef<ModalHandle, ModalProps>((props: ModalProps, ref
                 aria-label={"close"}>
                 <FontAwesomeIcon icon={faXmark}/>
             </button>
-            {title && <h4 className={styles.heading} style={titleStyle}>{title}</h4>}
+            {title && <Heading>{title}</Heading>}
             {children}
         </dialog>
     );
 });
+
+Modal.displayName = "Modal";

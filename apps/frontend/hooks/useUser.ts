@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 import  api  from "../lib/axios";
 import { MessageType } from "../components/Message/Message";
 import { clearAllTokens } from "../lib/token";
@@ -33,7 +33,8 @@ export const useUser = () => {
         try {
             if (!user?.id) { 
                 await refreshUser();
-                if (!user?.id) { throw new Error('User not found'); }
+                if (!user?.id)
+                    throw new Error('User not found');
              }
             const res = await api.delete(`/user/${user.id}`);
             setUser(null);
