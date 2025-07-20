@@ -1,5 +1,7 @@
 import { Ride } from './ride.model';
 import { Shift } from '../shifts/shift.model';
+import { ShiftCalculationUtils } from '../shifts/utils/ShiftCalculationUtils';
+import { Pause } from '../shifts/pause.model';
 import { ShiftSignal } from '../shifts/shiftSignal.model';
 import { ShiftService } from '../shifts/shift.service';
 import { Op } from 'sequelize';
@@ -179,6 +181,15 @@ export class RideService {
             distance_km: actualDistanceKm
         });
 
+        // Recalculate shift statistics for ride data only
+        const shift = await Shift.findByPk(ride.shift_id);
+        if (shift) {
+            const rides = await Ride.findAll({
+                where: { shift_id: shift.id }
+            });
+            await ShiftCalculationUtils.updateShiftCalculations(shift, 'onlyRideData', undefined, rides);
+        }
+
         return {
             rideId: ride.id,
             total_time_ms: totalTimeMs,
@@ -320,6 +331,16 @@ export class RideService {
         // Update the ride
         await ride.update(updateData);
 
+        // If earnings or distance were updated, recalculate shift statistics
+        if ('earning_cents' in updateData || 'distance_km' in updateData) {
+            const shift = await Shift.findByPk(ride.shift_id);
+            if (shift) {
+                const rides = await Ride.findAll({
+                    where: { shift_id: shift.id }
+                });
+                await ShiftCalculationUtils.updateShiftCalculations(shift, 'onlyRideData', undefined, rides);
+            }
+        }
 
         return ride;
     }

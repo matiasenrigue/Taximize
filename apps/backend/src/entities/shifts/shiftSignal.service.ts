@@ -1,6 +1,6 @@
 // Other services
 import { RideService } from '../rides/ride.service';
-import { PauseService } from '../pauses/pause.service';
+import { PauseService } from './pause.service';
 import { ShiftService } from './shift.service';
 
 // Models
@@ -75,11 +75,18 @@ abstract class ShiftSignalService {
         // Validate the signal
         await this.isValidSignal(driverId, 'stop');
 
+        // Get the shift ID before ending it
+        const activeShift = await ShiftService.getActiveShift(driverId);
+        if (!activeShift) {
+            throw new Error('No active shift to end');
+        }
+        const shiftId = activeShift.id;
+
         // Save the shift with all computed statistics
         const data = await ShiftService.saveShift(driverId);    
 
         // DON'T register stop signal, we will delete all the shift signals
-        await ShiftService.deleteShiftSignals(driverId);
+        await ShiftService.deleteShiftSignals(driverId, shiftId);
 
         return data;
 

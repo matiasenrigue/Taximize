@@ -5,7 +5,7 @@ import User from '../../../users/user.model';
 import Ride from '../../../rides/ride.model';
 import Shift from '../../shift.model';
 import ShiftSignal from '../../shiftSignal.model';
-import { Pause } from '../../../pauses/pause.model';
+import { Pause } from '../../pause.model';
 import { generateAccessToken } from '../../../auth/utils/generateTokens';
 
 // Set up environment variables for testing

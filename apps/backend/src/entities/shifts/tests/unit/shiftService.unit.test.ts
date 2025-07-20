@@ -1,4 +1,7 @@
 import { ShiftService } from '../../shift.service';
+import ShiftSignalService from '../../shiftSignal.service';
+import { PauseService } from '../../pause.service';
+import { ShiftCalculator } from '../../utils/shiftCalculator';
 import { sequelize } from '../../../../shared/config/db';
 
 // Set up test database before running tests
@@ -19,34 +22,33 @@ describe('ShiftService Unit Tests', () => {
             const driverId = 'test-driver-1';
             const newSignal = 'start';
             
-            const result = await ShiftService.isValidSignal(driverId, newSignal);
+            const result = await ShiftSignalService.isValidSignal(driverId, newSignal);
             expect(typeof result).toBe('boolean');
             // For a new driver, 'start' should be valid
             expect(result).toBe(true);
         });
 
 
-        it('should return false when signal transition is invalid', async () => {
-            // Test that isValidSignal returns false when signal transition is invalid
+        it('should throw error when signal transition is invalid', async () => {
+            // Test that isValidSignal throws error when signal transition is invalid
             const driverId = 'test-driver-2';
             const newSignal = 'continue';
             
-            const result = await ShiftService.isValidSignal(driverId, newSignal);
-            expect(typeof result).toBe('boolean');
             // For a new driver, 'continue' should be invalid (must start first)
-            expect(result).toBe(false);
+            await expect(ShiftSignalService.isValidSignal(driverId, newSignal))
+                .rejects.toThrow('Invalid signal transition: continue');
         });
     });
 
 
-    describe('handleSignal', () => {
+    describe('handleSignal - replaced with individual signal handlers', () => {
         it('should throw error when signal is invalid', async () => {
             // Test that handleSignal throws error when signal is invalid
             const driverId = 'test-driver-1';
             const timestamp = Date.now();
             const signal = 'invalid-signal';
             
-            await expect(ShiftService.handleSignal(driverId, timestamp, signal))
+            await expect(ShiftSignalService.isValidSignal(driverId, signal))
                 .rejects.toThrow('Invalid signal transition');
         });
 
@@ -59,7 +61,7 @@ describe('ShiftService Unit Tests', () => {
             const signal = 'start';
             
             try {
-                await ShiftService.handleSignal(driverId, timestamp, signal);
+                await ShiftSignalService.handleStartSignal(driverId, timestamp);
             } catch (error) {
                 // Expected to fail in unit test environment without database
                 expect(error).toBeDefined();
@@ -74,7 +76,7 @@ describe('ShiftService Unit Tests', () => {
             const signal = 'pause';
             
             try {
-                await ShiftService.handleSignal(driverId, timestamp, signal);
+                await ShiftSignalService.handlePauseSignal(driverId, timestamp);
             } catch (error) {
                 // Expected to fail in unit test environment
                 expect(error).toBeDefined();
@@ -89,7 +91,7 @@ describe('ShiftService Unit Tests', () => {
             const signal = 'continue';
             
             try {
-                await ShiftService.handleSignal(driverId, timestamp, signal);
+                await ShiftSignalService.handleContinueSignal(driverId, timestamp);
             } catch (error) {
                 // Expected to fail in unit test environment
                 expect(error).toBeDefined();
@@ -104,7 +106,7 @@ describe('ShiftService Unit Tests', () => {
             const signal = 'stop';
             
             try {
-                await ShiftService.handleSignal(driverId, timestamp, signal);
+                await ShiftSignalService.handleStopSignal(driverId, timestamp);
             } catch (error) {
                 // Expected to fail in unit test environment
                 expect(error).toBeDefined();
@@ -194,7 +196,7 @@ describe('ShiftService Unit Tests', () => {
             // Test that saveShiftPause throws error when driver is not on pause
             const driverId = 'test-driver-2';
             
-            await expect(ShiftService.saveShiftPause(driverId))
+            await expect(PauseService.saveShiftPause(driverId))
                 .rejects.toThrow('No active shift found');
         });
 
@@ -204,7 +206,7 @@ describe('ShiftService Unit Tests', () => {
             const driverId = 'test-driver-1';
             
             try {
-                await ShiftService.saveShiftPause(driverId);
+                await PauseService.saveShiftPause(driverId);
             } catch (error) {
                 // Expected to fail in unit test environment
                 expect(error).toBeDefined();
@@ -270,7 +272,8 @@ describe('ShiftService Unit Tests', () => {
             const shiftEnd = new Date('2024-01-01T17:00:00Z');
             const driverId = 'test-driver-1';
             
-            const result = await ShiftService.computeBreaks(shiftStart, shiftEnd, driverId);
+            const pauses: Array<{ start: Date; end: Date }> = [];
+            const result = ShiftCalculator.computeBreaks(shiftStart, shiftEnd, pauses);
             expect(result).toBeDefined();
             expect(typeof result.totalBreakTimeMs).toBe('number');
             expect(typeof result.numberOfBreaks).toBe('number');
@@ -286,7 +289,9 @@ describe('ShiftService Unit Tests', () => {
             const shiftEnd = new Date('2024-01-01T17:00:00Z');
             const driverId = 'test-driver-1';
             
-            const result = await ShiftService.computeWorkTime(shiftStart, shiftEnd, driverId);
+            const totalDurationMs = shiftEnd.getTime() - shiftStart.getTime();
+            const breakTimeMs = 0; // No breaks for this test
+            const result = ShiftCalculator.computeWorkTime(totalDurationMs, breakTimeMs);
             expect(typeof result).toBe('number');
             expect(result).toBeGreaterThanOrEqual(0);
         });

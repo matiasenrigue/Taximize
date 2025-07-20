@@ -1,5 +1,6 @@
 import { Pause } from './pause.model';
-import { ShiftSignal } from '../shifts/shiftSignal.model';
+import { ShiftSignal } from './shiftSignal.model';
+import { ShiftService } from './shift.service';
 
 export class PauseService {
 
@@ -9,9 +10,15 @@ export class PauseService {
      */
     static async saveShiftPause(driverId: string): Promise<void> {
         
+        // Get active shift first
+        const activeShift = await ShiftService.getActiveShift(driverId);
+        if (!activeShift) {
+            throw new Error('No active shift found');
+        }
+        
         // Get the last two signals (should be pause and continue)
         const signals = await ShiftSignal.findAll({
-            where: { driver_id: driverId },
+            where: { shift_id: activeShift.id },
             order: [['timestamp', 'DESC']],
             limit: 2
         });
@@ -51,9 +58,20 @@ export class PauseService {
         lastPauseEnd: Date | null;
         pauseDuration: number | null;
     }> {
+        // Get active shift first
+        const activeShift = await ShiftService.getActiveShift(driverId);
+        if (!activeShift) {
+            return {
+                isPaused: false,
+                pauseStart: null,
+                lastPauseEnd: null,
+                pauseDuration: null
+            };
+        }
+        
         // Get the last signal for this driver
         const lastSignal = await ShiftSignal.findOne({
-            where: { driver_id: driverId },
+            where: { shift_id: activeShift.id },
             order: [['timestamp', 'DESC']]
         });
 
@@ -79,7 +97,7 @@ export class PauseService {
         // Get the last pause end time (last continue signal)
         const lastContinue = await ShiftSignal.findOne({
             where: { 
-                driver_id: driverId,
+                shift_id: activeShift.id,
                 signal: 'continue'
             },
             order: [['timestamp', 'DESC']]
@@ -103,31 +121,5 @@ export class PauseService {
         });
     }
 
-    /**
-     * Calculate pause statistics for a shift
-     */
-    static async calculatePauseStats(shiftId: string): Promise<{
-        totalPauseTime: number;
-        numPauses: number;
-        averagePauseDuration: number;
-    }> {
-        const pauses = await this.getPausesForShift(shiftId);
-        
-        if (pauses.length === 0) {
-            return {
-                totalPauseTime: 0,
-                numPauses: 0,
-                averagePauseDuration: 0
-            };
-        }
 
-        const totalPauseTime = pauses.reduce((sum, pause) => sum + Number(pause.duration_ms), 0);
-        const averagePauseDuration = Math.round(totalPauseTime / pauses.length);
-
-        return {
-            totalPauseTime,
-            numPauses: pauses.length,
-            averagePauseDuration
-        };
-    }
 }

@@ -28,7 +28,5 @@ router.put('/:shiftId', protect, requireDriver, ShiftController.editShift);
 router.delete('/:shiftId', protect, requireDriver, ShiftController.deleteShift);
 router.post('/:shiftId/restore', protect, requireDriver, ShiftController.restoreShift);
 router.get('/', protect, requireDriver, ShiftController.getShifts);
-router.get('/:shiftId', protect, requireDriver, ShiftController.getShift);
-router.post('/:shiftId/end', protect, requireDriver, ShiftController.endShiftById);
 
 export default router; 

@@ -6,6 +6,20 @@ import { modelToResponse, requestToModel } from '../../shared/utils/caseTransfor
 
 export class ShiftController {
 
+    /**
+     * Helper method to handle errors with appropriate status codes
+     */
+    private static handleError(error: any, res: Response): void {
+        if (error.message.includes('Not authorized')) {
+            res.status(403);
+        } else if (error.message.includes('not found')) {
+            res.status(404);
+        } else {
+            res.status(400);
+        }
+        throw new Error(error.message || 'Operation failed');
+    }
+
     // @desc    Get current shift status
     // @route   GET /api/shifts/current
     // @access  Protected
@@ -81,7 +95,7 @@ export class ShiftController {
         try {
             // Get all relevant data for debugging
             const hasActiveRide = await RideService.hasActiveRide(driverId);
-            const activeShift = await ShiftService.getActiveShiftForDriver(driverId);
+            const activeShift = await ShiftService.getActiveShift(driverId);
             const shiftStatus = await ShiftService.getCurrentShiftStatus(driverId);
             
             let activeRideInfo = null;
@@ -126,67 +140,6 @@ export class ShiftController {
 
 
 
-    // @desc    Edit shift details
-    // @route   PUT /api/shifts/:shiftId
-    // @access  Protected
-    static editShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { shiftId } = req.params;
-        const driverId = req.driverId!; 
-        const updateData = req.body;
-
-        try {
-            const updatedShift = await ShiftService.editShift(shiftId, driverId, updateData);
-            res.status(200).json(updatedShift);
-        } catch (error: any) {
-            if (error.message.includes('Not authorized')) {
-                res.status(403);
-            } else {
-                res.status(400);
-            }
-            throw new Error(error.message || 'Failed to edit shift');
-        }
-    });
-
-    // @desc    Delete shift (soft delete)
-    // @route   DELETE /api/shifts/:shiftId
-    // @access  Protected
-    static deleteShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { shiftId } = req.params;
-        const driverId = req.driverId!; 
-
-        try {
-            await ShiftService.deleteShift(shiftId, driverId);
-            res.status(200).json({ message: 'Shift deleted successfully' });
-        } catch (error: any) {
-            if (error.message.includes('Not authorized')) {
-                res.status(403);
-            } else {
-                res.status(400);
-            }
-            throw new Error(error.message || 'Failed to delete shift');
-        }
-    });
-
-    // @desc    Restore deleted shift
-    // @route   POST /api/shifts/:shiftId/restore
-    // @access  Protected
-    static restoreShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { shiftId } = req.params;
-        const driverId = req.driverId!; 
-
-        try {
-            await ShiftService.restoreShift(shiftId, driverId);
-            res.status(200).json({ message: 'Shift restored successfully' });
-        } catch (error: any) {
-            if (error.message.includes('Not authorized')) {
-                res.status(403);
-            } else {
-                res.status(400);
-            }
-            throw new Error(error.message || 'Failed to restore shift');
-        }
-    });
-
     // @desc    Get all shifts for driver
     // @route   GET /api/shifts
     // @access  Protected
@@ -202,43 +155,52 @@ export class ShiftController {
         }
     });
 
-    // @desc    Get single shift
-    // @route   GET /api/shifts/:shiftId
+
+
+    // @desc    Edit shift details
+    // @route   PUT /api/shifts/:shiftId
     // @access  Protected
-    static getShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    static editShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        const { shiftId } = req.params;
+        const driverId = req.driverId!; 
+        const updateData = req.body;
+
+        try {
+            const updatedShift = await ShiftService.editShift(shiftId, driverId, updateData);
+            res.status(200).json(updatedShift);
+        } catch (error: any) {
+            this.handleError(error, res);
+        }
+    });
+
+    // @desc    Delete shift (soft delete)
+    // @route   DELETE /api/shifts/:shiftId
+    // @access  Protected
+    static deleteShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { shiftId } = req.params;
         const driverId = req.driverId!; 
 
         try {
-            const shift = await ShiftService.getShiftById(shiftId, driverId);
-            res.status(200).json(shift);
+            await ShiftService.deleteShift(shiftId, driverId);
+            res.status(200).json({ message: 'Shift deleted successfully' });
         } catch (error: any) {
-            if (error.message.includes('Not authorized')) {
-                res.status(403);
-            } else {
-                res.status(400);
-            }
-            throw new Error(error.message || 'Failed to get shift');
+            this.handleError(error, res);
         }
     });
 
-    // @desc    End shift by ID
-    // @route   POST /api/shifts/:shiftId/end
+    // @desc    Restore deleted shift
+    // @route   POST /api/shifts/:shiftId/restore
     // @access  Protected
-    static endShiftById = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    static restoreShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { shiftId } = req.params;
-        const driverId = req.driverId!; // Already validated by middleware
+        const driverId = req.driverId!; 
 
         try {
-            const result = await ShiftService.endShiftById(shiftId, driverId);
-            res.status(200).json({
-                success: true,
-                message: 'Shift ended successfully',
-                data: modelToResponse(result)
-            });
+            await ShiftService.restoreShift(shiftId, driverId);
+            res.status(200).json({ message: 'Shift restored successfully' });
         } catch (error: any) {
-            res.status(400);
-            throw new Error(error.message || 'Failed to end shift');
+            this.handleError(error, res);
         }
     });
+
 } 

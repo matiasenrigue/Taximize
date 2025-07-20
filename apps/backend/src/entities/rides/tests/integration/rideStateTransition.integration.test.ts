@@ -13,7 +13,8 @@ const DEFAULT_RIDE_REQUEST = {
     startLatitude: 53.349805,
     startLongitude: -6.260310,
     destinationLatitude: 53.359805,
-    destinationLongitude: -6.270310
+    destinationLongitude: -6.270310,
+    predictedScore: 0.85
 };
 
 beforeAll(async () => {
@@ -232,7 +233,8 @@ describe('Ride State Transition Tests', () => {
                         startLongitude: -6.280310,
                         destinationLatitude: 53.379805,
                         destinationLongitude: -6.290310,
-                        address: "Test Address Concurrent Driver 2"
+                        address: "Test Address Concurrent Driver 2",
+                        predictedScore: 0.75
                     })
             ];
 

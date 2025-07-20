@@ -88,7 +88,7 @@ export class RideController {
             };
 
             // Get the driver's current active shift
-            const activeShift = await ShiftService.getActiveShiftForDriver(driverId);
+            const activeShift = await ShiftService.getActiveShift(driverId);
             if (!activeShift) {
                 res.status(400);
                 throw new Error('No active shift found');
