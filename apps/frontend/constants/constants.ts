@@ -6,7 +6,7 @@ export const MINUTE_IN_MILLISECONDS = 60 * 1000;
 export const HOUR_IN_MILLISECONDS = 60 * MINUTE_IN_MILLISECONDS;
 
 // map config
-export const MAP_ID = "f1310920ec56c7b65c64dec9";
+export const MAP_ID_LIGHT = "f1310920ec56c7b65c64dec9";
 export const MAP_CENTER = {lat: 40.7831, lng: -73.9712};
 
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

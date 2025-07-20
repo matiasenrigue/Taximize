@@ -1,15 +1,15 @@
-import styles from "./Button.module.css";
-import clsx from "clsx";
 import React from "react";
+import {ButtonTheme} from "./Button";
+import clsx from "clsx";
+import styles from "./Button.module.css";
+import Link from "next/link";
 
-export type ButtonTheme = 'primary' | 'secondary' | 'danger';
-
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
+export interface LinkButtonProps extends React.LinkHTMLAttributes<HTMLLinkElement> {
     theme?: ButtonTheme;
     elevated?: boolean;
 }
 
-export const Button = (props: ButtonProps) => {
+export const LinkButton = (props: LinkButtonProps) => {
     const {
         children,
         theme = 'primary',
@@ -18,7 +18,7 @@ export const Button = (props: ButtonProps) => {
     } = props;
 
     return (
-        <button
+        <Link
             {...rest}
             className={clsx(
                 styles.button,
@@ -28,6 +28,6 @@ export const Button = (props: ButtonProps) => {
                 theme === 'danger' && styles.button_danger
             )}>
             {children}
-        </button>
+        </Link>
     );
-};
+}

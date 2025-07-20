@@ -4,13 +4,14 @@ import styles from "./Map.module.css";
 import {AdvancedMarker, Map as GoogleMap, useMap, useMapsLibrary} from "@vis.gl/react-google-maps";
 import {useCallback, useEffect, useRef, useState} from "react";
 import {useRide} from "../../contexts/RideContext/RideContext";
-import {MAP_CENTER, MAP_ID} from "../../constants/constants";
+import {MAP_CENTER, MAP_ID_LIGHT} from "../../constants/constants";
 import {NoRouteFoundModal} from "../modals/NoRouteFoundModal";
 import {ModalHandle} from "../Modal/Modal";
 import {UnknownLocationModal} from "../modals/UnknownLocationModal";
 import {RouteErrorModal} from "../modals/RouteErrorModal";
 import {useUserLocationContext} from "../../contexts/UserLocationContext/UserLocationContext";
 import {TaxiZones} from "../TaxiZones/TaxiZones";
+import {useColorScheme} from "../../hooks/useColorScheme";
 
 interface MapProps {
     className?: string;
@@ -25,6 +26,7 @@ export const Map = (props: MapProps) => {
         setRouteStatus,
     } = useRide();
 
+    const colorScheme = useColorScheme();
     const previousRouteStatus = useRef<google.maps.DirectionsStatus>(null!);
 
     useEffect(() => {
@@ -117,6 +119,8 @@ export const Map = (props: MapProps) => {
         }
     }, [routeStatus, openUnknownLocationModal, openNoRouteModal, openRouteErrorModal])
 
+    console.log("color", colorScheme);
+
     return (
         <>
             <NoRouteFoundModal
@@ -126,7 +130,7 @@ export const Map = (props: MapProps) => {
             <RouteErrorModal
                 ref={routeErrorModalRef}/>
             <GoogleMap
-                mapId={MAP_ID}
+                mapId={MAP_ID_LIGHT}
                 className={className}
                 defaultCenter={MAP_CENTER}
                 defaultZoom={12}

@@ -38,3 +38,10 @@
 .button_close:hover {
     color: var(--color-on-surface);
 }
+
+@media (min-width: 500px) {
+    .dialog {
+        max-width: 400px;
+        margin: var(--padding-md) auto;
+    }
+}
