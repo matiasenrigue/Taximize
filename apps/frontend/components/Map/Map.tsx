@@ -119,8 +119,6 @@ export const Map = (props: MapProps) => {
         }
     }, [routeStatus, openUnknownLocationModal, openNoRouteModal, openRouteErrorModal])
 
-    console.log("color", colorScheme);
-
     return (
         <>
             <NoRouteFoundModal
