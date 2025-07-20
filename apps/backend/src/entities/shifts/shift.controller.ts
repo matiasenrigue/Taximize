@@ -166,7 +166,7 @@ export class ShiftController {
                 throw new Error('No active shift to skip pause');
             }
 
-            // Register a fake pause of 0 minutes by emitting pause and continue signals
+            // Register a 0-minute pause by emitting pause and continue signals at the same timestamp
             await ShiftService.handleSignal(driverId, signalTimestamp, 'pause');
             await ShiftService.handleSignal(driverId, signalTimestamp, 'continue');
             

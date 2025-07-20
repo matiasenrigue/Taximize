@@ -240,8 +240,7 @@ export class ShiftService {
         }));
 
         // Use the shift calculator utility
-        ShiftCalculator.addPauseData(driverId, pauseData);
-        return ShiftCalculator.computeBreaks(shiftStart, shiftEnd, driverId);
+        return ShiftCalculator.computeBreaks(shiftStart, shiftEnd, pauseData);
     }
 
     static async computeWorkTime(shiftStart: Date, shiftEnd: Date, driverId: string): Promise<number> {
