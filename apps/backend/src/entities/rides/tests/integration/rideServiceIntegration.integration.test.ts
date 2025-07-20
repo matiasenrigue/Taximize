@@ -208,10 +208,10 @@ describe('Ride Service Integration Tests', () => {
             const endResult = await RideService.endRide(rideResult.rideId, 1500, 5.2);
 
             expect(endResult.rideId).toBe(rideResult.rideId);
-            expect(endResult.earning_cents).toBe(1500);
-            expect(endResult.distance_km).toBe(5.2);
-            expect(endResult.total_time_ms).toBeGreaterThan(0);
-            expect(endResult.earning_per_min).toBeGreaterThan(0);
+            expect(endResult.earningCents).toBe(1500);
+            expect(endResult.distanceKm).toBe(5.2);
+            expect(endResult.totalTimeMs).toBeGreaterThan(0);
+            expect(endResult.earningPerMin).toBeGreaterThan(0);
 
             // Verify database state
             const dbRide = await Ride.findByPk(rideResult.rideId);

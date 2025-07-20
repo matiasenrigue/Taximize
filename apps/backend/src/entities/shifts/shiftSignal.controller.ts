@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
+import { ResponseHandler } from '../../shared/utils/responseHandler';
 
 // Services
 import ShiftSignalService from './shiftSignal.service';
@@ -17,11 +18,7 @@ abstract class ShiftSignalHandler {
     protected abstract SignalHandler(driverId: string, timestamp: number, ...extraParams: any[]): Promise<any>;
 
     protected async processSuccessResponse(result: any, res: Response): Promise<void> {
-        res.status(200).json({
-            success: true,
-            message: this.getSuccessMessage(),
-            data: result ? result : {}
-        });
+        ResponseHandler.success(res, result || {}, this.getSuccessMessage());
     }
 
     public handle = asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -37,11 +34,9 @@ abstract class ShiftSignalHandler {
             await this.processSuccessResponse(result, res);
         } catch (error: any) {
             if (error.message.includes('Invalid signal transition')) {
-                res.status(400);
-                throw new Error(this.getErrorMessage());
+                error.message = this.getErrorMessage();
             }
-            res.status(400);
-            throw new Error(error.message || `Failed to ${this.getSignalType()} shift`);
+            ResponseHandler.error(error, res, `Failed to ${this.getSignalType()} shift`);
         }
     });
 }

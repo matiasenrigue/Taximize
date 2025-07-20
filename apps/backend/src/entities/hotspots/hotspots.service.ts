@@ -101,9 +101,11 @@ export class HotspotsService {
                         if (newHotspotsData === false) {
                                 // If fetching new data fails, try to get cached data
                                 const cachedData = await this.retrieveCachedHotspotsData();
+
                                 if (cachedData === false) {
                                         throw new Error('No hotspots data available');
                                 }
+                                
                                 return cachedData;
                         }
                         return newHotspotsData;

@@ -1,27 +1,50 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../../shared/config/db';
+import { RIDE_CONSTANTS } from './ride.constants';
 
 export class Ride extends Model {
+    // Identity
     public id!: string;
     public shift_id!: string;
     public driver_id!: string;
+    
+    // Location data
     public start_latitude!: number;
     public start_longitude!: number;
     public destination_latitude!: number;
     public destination_longitude!: number;
     public address!: string;
+    
+    // Time data
     public start_time!: Date;
-    public predicted_score!: number;
     public end_time!: Date | null;
+    
+    // Scoring
+    public predicted_score!: number;
+    
+    // Metrics (populated on ride end)
     public earning_cents!: number | null;
     public earning_per_min!: number | null;
     public distance_km!: number | null;
+    
+    // Timestamps
     public created_at!: Date;
     public updated_at!: Date;
     public deleted_at!: Date | null;
-
-    // Paranoid model methods
+    
+    // Instance methods
     public restore!: () => Promise<void>;
+    
+    // Custom instance methods
+    public isActive(): boolean {
+        return this.end_time === null;
+    }
+    
+    public getDurationMs(): number | null {
+        if (!this.end_time) return null;
+        return this.end_time.getTime() - this.start_time.getTime();
+    }
+
 }
 
 Ride.init(
