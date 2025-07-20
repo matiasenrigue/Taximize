@@ -6,7 +6,7 @@ import { PauseService } from '../shift-pauses/pause.service';
 import { Ride } from '../rides/ride.model';
 import { RideRepository } from '../rides/ride.repository';
 import { RideService } from '../rides/ride.service';
-import { Signal } from './utils/signalValidation';
+import { Signal } from '../shift-signals/utils/signalValidation';
 import { ShiftCalculationUtils } from './utils/ShiftCalculationUtils';
 import { Op } from 'sequelize';
 import { ShiftCreationData, ShiftEndData, ShiftMetrics } from './shift.types';

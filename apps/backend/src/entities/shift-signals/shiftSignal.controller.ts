@@ -8,7 +8,6 @@ import ShiftSignalService from './shiftSignal.service';
 
 
 
-
 abstract class ShiftSignalHandler {
 
     protected abstract getSignalType(): 'start' | 'pause' | 'continue' | 'stop';

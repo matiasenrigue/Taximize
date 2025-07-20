@@ -8,7 +8,7 @@ import ShiftSignal from './shiftSignal.model';
 import Shift from '../shifts/shift.model';
 
 
-import { SignalValidation, Signal } from '../shifts/utils/signalValidation';
+import { SignalValidation, Signal } from './utils/signalValidation';
 
 
 
