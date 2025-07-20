@@ -17,7 +17,7 @@ router.post('/end-shift', protect, requireDriver, ShiftSignalController.endShift
 router.post('/pause-shift', protect, requireDriver, ShiftSignalController.pauseShift);
 router.post('/continue-shift', protect, requireDriver, ShiftSignalController.continueShift);
 
-router.post('/skip-pause', protect, requireDriver, ShiftController.skipPause);
+router.post('/skip-pause', protect, requireDriver, ShiftSignalController.skipPause);
 
 // Shift Status
 router.get('/current', protect, requireDriver, ShiftController.getCurrentShift);

@@ -116,12 +116,34 @@ class EndShiftHandler extends ShiftSignalHandler {
 }
 
 
+class SkipPauseHandler extends ShiftSignalHandler {
+    protected getSignalType() { return 'pause' as const; }
+    protected getExtraParams(body: any) { return []; }
+    protected getSuccessMessage() { return 'Pause skipped successfully'; }
+    protected getErrorMessage() { return 'No active shift to skip pause'; }
+
+    protected async SignalHandler(driverId: string, timestamp: number, ...extraParams: any[]): Promise<any> {
+        
+        await ShiftSignalService.handlePauseSignal(
+            driverId,
+            timestamp
+        );
+        
+        return await ShiftSignalService.handleContinueSignal(
+            driverId,
+            timestamp
+        );
+    }
+}
+
+
 
 export class ShiftSignalController {
     private static startHandler = new StartShiftHandler();
     private static pauseHandler = new PauseShiftHandler();
     private static continueHandler = new ContinueShiftHandler();
     private static endHandler = new EndShiftHandler();
+    private static skipPauseHandler = new SkipPauseHandler();
 
     // @desc    Start shift
     // @route   POST /api/shifts/start-shift
@@ -142,4 +164,9 @@ export class ShiftSignalController {
     // @route   POST /api/shifts/end-shift
     // @access  Protected
     static endShift = ShiftSignalController.endHandler.handle;
+
+    // @desc    Skip pause (register a 0-minute pause), in case the driver wants to skip a pause
+    // @route   POST /api/shifts/skip-pause
+    // @access  Protected
+    static skipPause = ShiftSignalController.skipPauseHandler.handle;
 }
