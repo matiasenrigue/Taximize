@@ -6,6 +6,34 @@
     "endShift": "Schicht beenden",
     "locationSearchPlaceholder": "Adresse suchen..."
   },
+  "introduction": {
+    "title": "Taxi Assistent",
+    "subtitle": "Die App hilft Taxifahrern dabei, den Umsatz zu maximieren und Ausfallzeiten zu minimieren",
+    "findHotspots": {
+      "title": "Hotspots finden",
+      "description": "Finden Sie Zonen mit hoher Wahrscheinlichkeit für Fahrgäste",
+      "howItWorks": "Wie es funktioniert",
+      "subwindowTitle": "Hotspots finden",
+      "subwindowSummary": "Eine Live-Heatmap zeigt Ihnen, wo das Geld gerade ist.",
+      "subwindowDescription": "Mit historischen und Live-Daten prognostiziert das System die Nachfrage mit Straßengenauigkeit für die nächsten 15-60 Minuten, sodass Fahrer proaktiv positionieren können, anstatt auf Einbrüche zu reagieren."
+    },
+    "rideScoring": {
+      "title": "Fahrtbewertung",
+      "description": "Erhalten Sie eine Bewertung für jede Fahrt",
+      "howItWorks": "Wie es funktioniert",
+      "subwindowTitle": "Fahrtbewertung",
+      "subwindowSummary": "Die Fahrtwert-Bewertung hilft Fahrern, fundierte Entscheidungen darüber zu treffen, welche Fahrten sie annehmen.",
+      "subwindowDescription": "Das System weist jeder Fahrt eine Bewertung basierend auf Faktoren wie Entfernung, Zeit und Nachfrage zu und hilft Fahrern dabei, hochwertige Fahrten zu priorisieren. Diese Funktion ist darauf ausgelegt, den Verdienst zu maximieren und Ausfallzeiten zu minimieren."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "Sehen Sie Ihre Verdienste und Fahrthistorie",
+      "howItWorks": "Wie es funktioniert",
+      "subwindowTitle": "Dashboard",
+      "subwindowSummary": "Sehen Sie Ihre Verdienste und Fahrthistorie",
+      "subwindowDescription": "Das Dashboard bietet einen umfassenden Überblick über Ihre Verdienste und Fahrthistorie und ermöglicht es Ihnen, Ihre Leistung im Laufe der Zeit zu verfolgen. Es umfasst Funktionen wie tägliche Verdienste, Fahrtanzahl und detaillierte Fahrtprotokolle."
+    }
+  },
   "signin": {
     "email": "E-Mail",
     "password": "Passwort",
