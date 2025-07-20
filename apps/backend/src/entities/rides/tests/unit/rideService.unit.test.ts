@@ -1,5 +1,6 @@
 import { RideService } from '../../ride.service';
 import { sequelize } from '../../../../shared/config/db';
+import { ExpiredDataCleanup } from '../../../shifts/utils/cleanup/expiredDataCleanup';
 
 // Mock external dependencies
 jest.mock('../../utils/zoneDetector', () => ({
@@ -341,19 +342,22 @@ describe('RideService Unit Tests', () => {
         it('should end expired rides that have exceeded time limit', async () => {
             // Test that manageExpiredRides ends expired rides that have exceeded time limit
             // This method should not throw
-            await expect(RideService.manageExpiredRides()).resolves.not.toThrow();
+            const driverId = 'test-driver-1';
+            await expect(ExpiredDataCleanup.manageExpiredRides(driverId)).resolves.not.toThrow();
         });
 
 
         it('should not alter any active ride that began less than 4 hours ago', async () => {
             // Test that manageExpiredRides does not alter any active ride that began less than 4 hours ago
-            await expect(RideService.manageExpiredRides()).resolves.not.toThrow();
+            const driverId = 'test-driver-2';
+            await expect(ExpiredDataCleanup.manageExpiredRides(driverId)).resolves.not.toThrow();
         });
 
 
         it('should close rides older than 4 hours by setting duration 0', async () => {
             // Test that manageExpiredRides closes rides older than 4 hours by setting duration 0
-            await expect(RideService.manageExpiredRides()).resolves.not.toThrow();
+            const driverId = 'test-driver-3';
+            await expect(ExpiredDataCleanup.manageExpiredRides(driverId)).resolves.not.toThrow();
         });
     });
 }); 

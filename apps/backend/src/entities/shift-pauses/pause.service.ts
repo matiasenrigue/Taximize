@@ -1,6 +1,6 @@
-import { Pause } from '../shift-pauses/pause.model';
+import { Pause } from './pause.model';
 import { ShiftSignal } from '../shift-signals/shiftSignal.model';
-import { ShiftService } from './shift.service';
+import { ShiftService } from '../shifts/shift.service';
 
 export class PauseService {
 

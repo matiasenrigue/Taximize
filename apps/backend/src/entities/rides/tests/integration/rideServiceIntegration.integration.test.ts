@@ -4,6 +4,7 @@ import { ShiftService } from '../../../shifts/shift.service';
 import Ride from '../../ride.model';
 import Shift from '../../../shifts/shift.model';
 import { TestHelpers } from '../../../../shared/tests/utils/testHelpers';
+import { ExpiredDataCleanup } from '../../../shifts/utils/cleanup/expiredDataCleanup';
 
 TestHelpers.setupEnvironment();
 
@@ -284,7 +285,7 @@ describe('Ride Service Integration Tests', () => {
             });
 
             // Run expired rides cleanup
-            await RideService.manageExpiredRides();
+            await ExpiredDataCleanup.manageExpiredRides(user.id);
 
             // Verify old ride is now ended
             const updatedRide = await Ride.findByPk(oldRide.id);

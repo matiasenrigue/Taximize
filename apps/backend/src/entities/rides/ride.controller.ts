@@ -144,7 +144,7 @@ export class RideController {
             const rides = await RideService.getRidesByDriver(driverId);
             // Transform each ride to camelCase
             const transformedRides = rides.map(ride => modelToResponse(ride));
-            ResponseHandler.raw(res, transformedRides);
+            ResponseHandler.success(res, transformedRides);
         } catch (error: any) {
             ResponseHandler.error(error, res, 'Failed to get rides');
         }

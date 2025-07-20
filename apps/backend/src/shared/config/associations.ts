@@ -2,8 +2,8 @@
 export const initializeAssociations = () => {
     // Use dynamic imports to avoid circular dependencies
     const { Shift } = require('../../entities/shifts/shift.model');
-    const { ShiftSignal } = require('../../entities/shifts/shiftSignal.model');
-    const { Pause } = require('../../entities/shifts/pause.model');
+    const { ShiftSignal } = require('../../entities/shift-signals/shiftSignal.model');
+    const { Pause } = require('../../entities/shift-pauses/pause.model');
     const { Ride } = require('../../entities/rides/ride.model');
     const User = require('../../entities/users/user.model').default;
 

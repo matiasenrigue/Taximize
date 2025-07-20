@@ -18,11 +18,11 @@ export class RideRepository {
         });
     }
     
-    static async findExpiredRides(): Promise<Ride[]> {
-        const fourHoursAgo = new Date(Date.now() - RIDE_CONSTANTS.EXPIRY_TIME_MS);
+    static async findExpiredRidesForDriver(driverId: string, expiryThreshold: Date): Promise<Ride[]> {
         return Ride.findAll({
             where: {
-                start_time: { [Op.lt]: fourHoursAgo },
+                driver_id: driverId,
+                start_time: { [Op.lt]: expiryThreshold },
                 end_time: null
             }
         });
@@ -66,21 +66,4 @@ export class RideRepository {
         return !!activeRide;
     }
     
-    /**
-     * End all expired rides with zero earnings
-     */
-    static async endExpiredRides(): Promise<number> {
-        const expiredRides = await this.findExpiredRides();
-        
-        for (const ride of expiredRides) {
-            await this.update(ride, {
-                end_time: new Date(),
-                earning_cents: 0,
-                earning_per_min: 0,
-                distance_km: 0
-            });
-        }
-        
-        return expiredRides.length;
-    }
 }

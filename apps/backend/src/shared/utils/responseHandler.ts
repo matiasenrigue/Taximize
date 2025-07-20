@@ -30,8 +30,7 @@ export class ResponseHandler {
             if (error.message.toLowerCase().includes('not authorized') || 
                 error.message.toLowerCase().includes('unauthorized')) {
                 statusCode = 403;
-            } else if (error.message.toLowerCase().includes('not found') || 
-                       error.message.toLowerCase().includes('no active')) {
+            } else if (error.message.toLowerCase().includes('not found')) {
                 statusCode = 404;
             } else if (error.message.toLowerCase().includes('already exists') || 
                        error.message.toLowerCase().includes('duplicate')) {

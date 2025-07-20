@@ -1,22 +1,16 @@
 import { Shift } from './shift.model';
-import { ShiftSignal } from './shiftSignal.model';
-import { Pause } from './pause.model';
-import { PauseService } from './pause.service';
+import { ShiftSignal } from '../shift-signals/shiftSignal.model';
+import { Pause } from '../shift-pauses/pause.model';
+import { ShiftRepository } from './shift.repository';
+import { PauseService } from '../shift-pauses/pause.service';
 import { Ride } from '../rides/ride.model';
+import { RideRepository } from '../rides/ride.repository';
 import { RideService } from '../rides/ride.service';
-import { SignalValidation, Signal } from './utils/signalValidation';
+import { Signal } from './utils/signalValidation';
 import { ShiftCalculationUtils } from './utils/ShiftCalculationUtils';
 import { Op } from 'sequelize';
-
-interface ShiftStatus {
-    isOnShift: boolean;
-    shiftStart: number | null;
-    isPaused: boolean;
-    pauseStart: number | null;
-    lastPauseEnd: number | null;
-    duration: number | null;
-    pauseDuration: number | null;
-}
+import { ShiftCreationData, ShiftEndData, ShiftMetrics } from './shift.types';
+import { SHIFT_CONSTANTS, SHIFT_ERRORS } from './shift.constants';
 
 export class ShiftService {
 
@@ -24,9 +18,9 @@ export class ShiftService {
      * Helper method to get and validate shift ownership
      */
     private static async getShiftWithAuth(shiftId: string, driverId: string): Promise<Shift> {
-        const shift = await Shift.findByPk(shiftId);
+        const shift = await ShiftRepository.findById(shiftId);
         if (!shift) {
-            throw new Error('Shift not found');
+            throw new Error(SHIFT_ERRORS.SHIFT_NOT_FOUND);
         }
 
         if (shift.driver_id !== driverId) {
@@ -50,14 +44,25 @@ export class ShiftService {
      */
     private static async getShiftRelatedData(shiftId: string): Promise<{ pauses: Pause[], rides: Ride[] }> {
         const [pauses, rides] = await Promise.all([
-            Pause.findAll({ where: { shift_id: shiftId } }),
-            Ride.findAll({ where: { shift_id: shiftId } })
+            Pause.findAll({
+                where: { shift_id: shiftId },
+                order: [['pause_start', 'ASC']]
+            }),
+            RideRepository.findAllByShift(shiftId)
         ]);
         return { pauses, rides };
     }
 
 
-    static async getCurrentShiftStatus(driverId: string): Promise<ShiftStatus | null> {
+    static async getCurrentShiftStatus(driverId: string): Promise<{
+        isOnShift: boolean;
+        shiftStart: number | null;
+        isPaused: boolean;
+        pauseStart: number | null;
+        lastPauseEnd: number | null;
+        duration: number | null;
+        pauseDuration: number | null;
+    } | null> {
         const lastSignal = await this.getLastSignalWithDetails(driverId);
         
         if (!lastSignal) {
@@ -77,12 +82,6 @@ export class ShiftService {
         
         // Get active shift to retrieve planned durations
         const activeShift = await this.getActiveShift(driverId);
-        
-        // Get planned pause duration from the current pause signal if paused
-        let plannedPauseDuration = null;
-        if (lastSignal.signal === 'pause') {
-            plannedPauseDuration = lastSignal.planned_duration_ms || null;
-        }
 
         return {
             isOnShift: true,
@@ -91,7 +90,7 @@ export class ShiftService {
             pauseStart: lastSignal.signal === 'pause' ? lastSignal.timestamp.getTime() : null,
             lastPauseEnd: pauseInfo.lastPauseEnd ? pauseInfo.lastPauseEnd.getTime() : null,
             duration: activeShift ? activeShift.planned_duration_ms : null,
-            pauseDuration: plannedPauseDuration
+            pauseDuration: lastSignal.signal === 'pause' ? (lastSignal.planned_duration_ms || null) : null
         };
     }
 
@@ -119,23 +118,19 @@ export class ShiftService {
     static async createShift(driverId: string, timestamp: number, duration?: number): Promise<void> {
         
         // To create a new shift, first check if the driver has an active shift
-        const activeShift = await this.getActiveShift(driverId);
-        if (activeShift) {
-            throw new Error('Driver already has an active shift');
+        const activeShift = await ShiftRepository.findActiveByDriverId(driverId);
+        if (activeShift !== null) {
+            throw new Error(SHIFT_ERRORS.SHIFT_ALREADY_ACTIVE);
         }
         
         // Shift get created with default values
-        await Shift.create({
+        const shiftData: ShiftCreationData = {
             driver_id: driverId,
             shift_start: new Date(timestamp),
-            shift_end: null,
-            total_duration_ms: null,
-            work_time_ms: null,
-            break_time_ms: null,
-            num_breaks: null,
-            avg_break_ms: null,
-            planned_duration_ms: duration || null
-        });
+            planned_duration_ms: duration || SHIFT_CONSTANTS.DEFAULT_PLANNED_DURATION_MS
+        };
+        
+        await Shift.create(shiftData as any);
     }
 
 
@@ -159,64 +154,6 @@ export class ShiftService {
         }
     }
 
-    static async manageExpiredShifts(): Promise<void> {
-        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
-
-        // Find each driver with no 'stop' signal and last signal > 2 days ago
-        // First get all active shifts (shift_end is null)
-        const activeShifts = await Shift.findAll({
-            where: { shift_end: null }
-        });
-
-        for (const shift of activeShifts) {
-            // Get the last signal for this shift
-            const lastSignal = await ShiftSignal.findOne({
-                where: { shift_id: shift.id },
-                order: [['timestamp', 'DESC']]
-            });
-
-            // Skip if no signals or last signal is 'stop' or within 2 days
-            if (!lastSignal || lastSignal.signal === 'stop' || lastSignal.timestamp.getTime() > twoDaysAgo.getTime()) {
-                continue;
-            }
-
-            // Check if they have rides during this period
-            const ridesCount = await Ride.count({
-                where: { shift_id: shift.id }
-            });
-
-            if (ridesCount > 0) {
-                // Generate synthetic stop at end of last ride
-                const lastRide = await Ride.findOne({
-                    where: { shift_id: shift.id },
-                    order: [['start_time', 'DESC']]
-                });
-
-                if (lastRide) {
-                    const syntheticStopTime = lastRide.end_time || lastRide.start_time;
-                    
-                    // Create synthetic stop signal
-                    await ShiftSignal.create({
-                        timestamp: syntheticStopTime,
-                        shift_id: shift.id,
-                        signal: 'stop'
-                    });
-
-                    // Save shift using the existing method
-                    await this.saveShiftByShiftId(shift.id);
-                }
-            } else {
-                // Delete stale shift signals (no rides recorded)
-                this.deleteShiftSignals(shift.driver_id);
-                
-                await Shift.destroy({
-                    where: { id: shift.id }
-                });
-            }
-
-            console.log(`Managed expired shift for driver: ${shift.driver_id}`);
-        }
-    }
 
 
 
@@ -245,12 +182,7 @@ export class ShiftService {
     }
 
     static async getActiveShift(driverId: string): Promise<Shift | null> {
-        return await Shift.findOne({
-            where: { 
-                driver_id: driverId,
-                shift_end: null
-            }
-        });
+        return await ShiftRepository.findActiveByDriverId(driverId);
     }
 
     private static async getShiftStartSignal(driverId: string): Promise<ShiftSignal | null> {
@@ -283,34 +215,36 @@ export class ShiftService {
     }
 
     private static async saveShiftByShiftId(shiftId: string): Promise<Shift> {
-        const shift = await Shift.findByPk(shiftId);
+        const shift = await ShiftRepository.findById(shiftId);
         if (!shift) {
-            throw new Error('Shift not found');
+            throw new Error(SHIFT_ERRORS.SHIFT_NOT_FOUND);
         }
 
         // Check if there are any active rides for this shift
-        const activeRide = await Ride.findOne({
-            where: { 
-                shift_id: shiftId,
-                end_time: null 
-            }
-        });
+        const hasActiveRide = await RideRepository.hasActiveRideForShift(shiftId);
 
-        if (activeRide) {
+        if (hasActiveRide) {
             throw new Error('Cannot end shift while ride is in progress. Please end the active ride first.');
         }
 
         const shiftEnd = new Date();
-        shift.shift_end = shiftEnd;
         
-        // Save the shift_end immediately
-        await shift.save();
-
+        const endData: ShiftEndData = {
+            shift_end: shiftEnd,
+            total_duration_ms: shiftEnd.getTime() - shift.shift_start.getTime()
+        };
+        
         // Get pauses and rides for calculations
         const { pauses, rides } = await this.getShiftRelatedData(shiftId);
 
         // Use the new utils to calculate and update shift data
         await ShiftCalculationUtils.updateShiftCalculations(shift, 'full', pauses, rides);
+        
+        // Update with calculated values
+        await shift.update({
+            ...shift.dataValues, // Include calculated values from ShiftCalculationUtils
+            shift_end: shiftEnd  // Ensure shift_end is set after spreading
+        });
 
         // Clean up shift signals for this shift
         await ShiftSignal.destroy({
@@ -328,52 +262,24 @@ export class ShiftService {
         this.validateShiftNotActive(shift, 'edit');
 
         // Validate temporal boundaries
-        if ('shift_start' in updateData && 'shift_end' in updateData) {
-            const start = new Date(updateData.shift_start);
-            const end = new Date(updateData.shift_end);
-            
-            if (start >= end) {
-                throw new Error('Shift start must be before shift end');
-            }
+        const newStart = updateData.shift_start ? new Date(updateData.shift_start) : shift.shift_start;
+        const newEnd = updateData.shift_end ? new Date(updateData.shift_end) : shift.shift_end;
 
-            // Check 24 hour limit
-            const duration = end.getTime() - start.getTime();
-            if (duration > 24 * 60 * 60 * 1000) {
-                throw new Error('Shift cannot exceed 24 hours');
-            }
-        } else if ('shift_start' in updateData) {
-            const start = new Date(updateData.shift_start);
-            if (shift.shift_end && start >= shift.shift_end) {
-                throw new Error('Shift start must be before shift end');
-            }
-            
-            // Check 24 hour limit
-            if (shift.shift_end) {
-                const duration = shift.shift_end.getTime() - start.getTime();
-                if (duration > 24 * 60 * 60 * 1000) {
-                    throw new Error('Shift cannot exceed 24 hours');
-                }
-            }
-        } else if ('shift_end' in updateData) {
-            const end = new Date(updateData.shift_end);
-            if (end <= shift.shift_start) {
-                throw new Error('Shift start must be before shift end');
-            }
-            
-            // Check 24 hour limit
-            const duration = end.getTime() - shift.shift_start.getTime();
-            if (duration > 24 * 60 * 60 * 1000) {
-                throw new Error('Shift cannot exceed 24 hours');
+        if (newEnd && newStart >= newEnd) {
+            throw new Error('Shift start must be before shift end');
+        }
+
+        // Check max shift duration limit
+        if (newEnd) {
+            const duration = newEnd.getTime() - newStart.getTime();
+            if (duration > SHIFT_CONSTANTS.MAX_SHIFT_DURATION_MS) {
+                throw new Error(SHIFT_ERRORS.INVALID_SHIFT_DURATION);
             }
         }
 
         // Check consistency with rides
-        const newStart = updateData.shift_start ? new Date(updateData.shift_start) : shift.shift_start;
-        const newEnd = updateData.shift_end ? new Date(updateData.shift_end) : shift.shift_end;
 
-        const rides = await Ride.findAll({
-            where: { shift_id: shiftId }
-        });
+        const rides = await RideRepository.findAllByShift(shiftId);
 
         for (const ride of rides) {
             if (ride.start_time < newStart || (ride.end_time && ride.end_time > newEnd!)) {
@@ -415,9 +321,7 @@ export class ShiftService {
         this.validateShiftNotActive(shift, 'delete');
 
         // Check for associated rides
-        const rides = await Ride.findAll({
-            where: { shift_id: shiftId }
-        });
+        const rides = await RideRepository.findAllByShift(shiftId);
 
         if (rides.length > 0) {
             throw new Error('Cannot delete shift with associated rides. Please delete rides first.');
@@ -431,7 +335,7 @@ export class ShiftService {
         // Find the deleted shift (paranoid: false to include soft-deleted records)
         const shift = await Shift.findByPk(shiftId, { paranoid: false });
         if (!shift) {
-            throw new Error('Shift not found');
+            throw new Error(SHIFT_ERRORS.SHIFT_NOT_FOUND);
         }
 
         // Check authorization
@@ -450,32 +354,27 @@ export class ShiftService {
     }
 
     static async getShiftsByDriver(driverId: string): Promise<Shift[]> {
-        return await Shift.findAll({
-            where: { driver_id: driverId },
-            order: [['shift_start', 'DESC']]
-        });
+        const endDate = new Date();
+        const startDate = new Date(0); // Beginning of time
+        return await ShiftRepository.findByDriverAndDateRange(driverId, startDate, endDate);
     }
 
     static async getShiftById(shiftId: string, driverId: string): Promise<Shift> {
         return await this.getShiftWithAuth(shiftId, driverId);
     }
 
+    
     static async endShiftById(shiftId: string, driverId: string): Promise<any> {
         const shift = await this.getShiftWithAuth(shiftId, driverId);
 
         if (shift.shift_end) {
-            throw new Error('Shift already ended');
+            throw new Error(SHIFT_ERRORS.SHIFT_ALREADY_ENDED);
         }
 
         // Check if there are any active rides for this shift
-        const activeRide = await Ride.findOne({
-            where: { 
-                shift_id: shiftId,
-                end_time: null 
-            }
-        });
+        const hasActiveRide = await RideRepository.hasActiveRideForShift(shiftId);
 
-        if (activeRide) {
+        if (hasActiveRide) {
             throw new Error('Cannot end shift while ride is in progress. Please end the active ride first.');
         }
 
@@ -485,20 +384,20 @@ export class ShiftService {
         await shift.reload();
         
         // Calculate total earnings
-        const totalEarnings = shift.total_earnings_cents ? shift.total_earnings_cents / 100 : 0;
+        const totalEarnings = shift.total_earnings_cents ? shift.total_earnings_cents / SHIFT_CONSTANTS.CENTS_TO_DOLLARS : 0;
         
         return {
-            totalDuration: shift.total_duration_ms,
-            workTime: shift.work_time_ms,
-            breakTime: shift.break_time_ms,
-            numBreaks: shift.num_breaks,
-            averageBreak: shift.avg_break_ms,
+            totalDuration: shift.total_duration_ms || 0,
+            workTimeMs: shift.work_time_ms || 0,
+            breakTimeMs: shift.break_time_ms || 0,
+            numBreaks: shift.num_breaks || 0,
+            averageBreak: shift.avg_break_ms || 0,
             totalEarnings: totalEarnings
         };
     }
 
     private static async recalculateShiftStatistics(shiftId: string): Promise<void> {
-        const shift = await Shift.findByPk(shiftId);
+        const shift = await ShiftRepository.findById(shiftId);
         if (!shift || !shift.shift_end) return;
 
         // Get pauses and rides for calculations
@@ -507,13 +406,4 @@ export class ShiftService {
         await ShiftCalculationUtils.updateShiftCalculations(shift, 'full', pauses, rides);
     }
 
-    static async calculateShiftEarnings(shiftId: string): Promise<number> {
-        const shift = await Shift.findByPk(shiftId);
-        if (!shift) {
-            throw new Error('Shift not found');
-        }
-        
-        // Return the stored value, converting cents to currency units
-        return shift.total_earnings_cents ? shift.total_earnings_cents / 100 : 0;
-    }
 } 

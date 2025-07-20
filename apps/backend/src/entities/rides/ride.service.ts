@@ -1,7 +1,8 @@
 import { Ride } from './ride.model';
 import { Shift } from '../shifts/shift.model';
+import { ShiftRepository } from '../shifts/shift.repository';
 import { ShiftCalculationUtils } from '../shifts/utils/ShiftCalculationUtils';
-import { ShiftSignal } from '../shifts/shiftSignal.model';
+import { ShiftSignal } from '../shift-signals/shiftSignal.model';
 import { RIDE_ERRORS } from './ride.constants';
 import { 
     RideCoordinates, 
@@ -19,12 +20,7 @@ import { RideMLService } from './ride.mlService';
 export class RideService {
     static async hasActiveRide(driverId: string): Promise<boolean> {
         // Get active shift for driver first
-        const activeShift = await Shift.findOne({
-            where: { 
-                driver_id: driverId,
-                shift_end: null
-            }
-        });
+        const activeShift = await ShiftRepository.findActiveByDriverId(driverId);
 
         if (!activeShift) return false;
 
@@ -33,12 +29,7 @@ export class RideService {
 
     static async canStartRide(driverId: string): Promise<CanStartRideResult> {
         // Check if driver has active shift
-        const activeShift = await Shift.findOne({
-            where: { 
-                driver_id: driverId,
-                shift_end: null
-            }
-        });
+        const activeShift = await ShiftRepository.findActiveByDriverId(driverId);
 
         if (!activeShift) {
             return { canStart: false, reason: RIDE_ERRORS.NO_ACTIVE_SHIFT };
@@ -150,15 +141,10 @@ export class RideService {
 
     static async getRideStatus(driverId: string): Promise<RideStatus> {
         // Get active shift for driver first
-        const activeShift = await Shift.findOne({
-            where: { 
-                driver_id: driverId,
-                shift_end: null
-            }
-        });
+        const activeShift = await ShiftRepository.findActiveByDriverId(driverId);
 
         if (!activeShift) {
-            throw new Error(RIDE_ERRORS.NO_ACTIVE_SHIFT);
+            throw new Error(RIDE_ERRORS.NO_ACTIVE_SHIFT_STATUS);
         }
 
         // Find active ride for driver
@@ -187,9 +173,6 @@ export class RideService {
         };
     }
 
-    static async manageExpiredRides(): Promise<void> {
-        await RideRepository.endExpiredRides();
-    }
 
 
     static async editRide(rideId: string, driverId: string, updateData: RideUpdateData): Promise<Ride> {

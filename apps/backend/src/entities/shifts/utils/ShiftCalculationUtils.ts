@@ -1,6 +1,6 @@
 import { Shift } from '../shift.model';
 import { Ride } from '../../rides/ride.model';
-import { Pause } from '../pause.model';
+import { Pause } from '../../shift-pauses/pause.model';
 
 import { camelToSnake } from '../../../shared/utils/caseTransformer';
 

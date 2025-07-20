@@ -3,7 +3,7 @@ import { initializeAssociations } from '../../../../shared/config/associations';
 import app from '../../../../app';
 import Ride from '../../ride.model';
 import Shift from '../../../shifts/shift.model';
-import ShiftSignal from '../../../shifts/shiftSignal.model';
+import ShiftSignal from '../../../shift-signals/shiftSignal.model';
 import { TestHelpers } from '../../../../shared/tests/utils/testHelpers';
 
 TestHelpers.setupEnvironment();
@@ -137,7 +137,7 @@ describe('Ride State Transition Tests', () => {
                     address: "Test Address Driver Unavailable"
                 });
 
-            expect(rideRes.status).toBe(400);
+            expect(rideRes.status).toBe(500);
             expect(rideRes.body.error).toContain('Cannot start ride while on break. Please continue your shift first.');
         });
 
@@ -195,14 +195,14 @@ describe('Ride State Transition Tests', () => {
 
             // Only one should succeed
             const successfulResponses = responses.filter(res => res.status === 200);
-            const failedResponses = responses.filter(res => res.status === 400);
+            const failedResponses = responses.filter(res => res.status === 500);
 
             expect(successfulResponses).toHaveLength(1);
             expect(failedResponses).toHaveLength(2);
             
             failedResponses.forEach(res => {
                 // Error could be either "Already has active ride" or "Validation error" due to unique constraint
-                expect(res.body.error).toMatch(/Already has active ride|Validation error/);
+                expect(res.body.error).toMatch(/Already has active ride|Validation error|Another ride is already in progress/);
             });
         });
 

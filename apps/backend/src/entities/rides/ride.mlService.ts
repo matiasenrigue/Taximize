@@ -5,6 +5,7 @@ import { RideCoordinates, RideEvaluation } from './ride.types';
 import { RideValidators } from './ride.validators';
 
 export class RideMLService {
+    
     static async evaluateRideScore(coords: Partial<RideCoordinates>): Promise<RideEvaluation> {
 
         if (!coords.startLat || !coords.startLng || !coords.destLat || !coords.destLng) {

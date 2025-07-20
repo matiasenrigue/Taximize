@@ -1,14 +1,14 @@
 // Other services
 import { RideService } from '../rides/ride.service';
-import { PauseService } from './pause.service';
-import { ShiftService } from './shift.service';
+import { PauseService } from '../shift-pauses/pause.service';
+import { ShiftService } from '../shifts/shift.service';
 
 // Models
 import ShiftSignal from './shiftSignal.model';
-import Shift from './shift.model';
+import Shift from '../shifts/shift.model';
 
 
-import { SignalValidation, Signal } from './utils/signalValidation';
+import { SignalValidation, Signal } from '../shifts/utils/signalValidation';
 
 
 
