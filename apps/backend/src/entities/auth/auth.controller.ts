@@ -28,8 +28,8 @@ export const signup = asyncHandler(async (req: Request, res: Response) => {
     // Ensure email is unique
     const exists = await User.findOne({ where: { email } });
     if (exists) {
-        res.status(400).json({ success: false, error: 'User with this email already exists' });
-        return;
+        res.status(400);
+        throw new Error('User with this email already exists');
     }
 
     // Create user
@@ -89,7 +89,8 @@ export const signin = asyncHandler(async (req: Request, res: Response) => {
         return;
     }
 
-    res.status(400).json({ success: false, error: 'Invalid email or password' });
+    res.status(400);
+    throw new Error('Invalid email or password');
 });
 
 // @desc    Refresh access token
@@ -99,8 +100,8 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
     const token = req.cookies.refreshToken;
 
     if (!token) {
-        res.status(401).json({ success: false, error: 'No refresh token' });
-        return;
+        res.status(401);
+        throw new Error('No refresh token');
     }
 
     try {
@@ -109,6 +110,7 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
 
         res.json({ success: true, data: { token: newAccess } });
     } catch {
-        res.status(403).json({ success: false, error: 'Invalid refresh token' });
+        res.status(403);
+        throw new Error('Invalid refresh token');
     }
 });

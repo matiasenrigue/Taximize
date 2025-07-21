@@ -1,8 +1,7 @@
-// Placeholder file for TDD Red phase - full implementation in Green phase
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../../shared/config/db';
 
-export class ShiftPause extends Model {
+export class Pause extends Model {
     public id!: string;
     public shift_id!: string;
     public pause_start!: Date;
@@ -12,7 +11,7 @@ export class ShiftPause extends Model {
     public updated_at!: Date;
 }
 
-ShiftPause.init(
+Pause.init(
     {
         id: {
             type: DataTypes.UUID,
@@ -44,4 +43,7 @@ ShiftPause.init(
     }
 );
 
-export default ShiftPause; 
+// Export as ShiftPause for backward compatibility
+export { Pause as ShiftPause };
+
+export default Pause; 

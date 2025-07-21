@@ -1,5 +1,5 @@
 import { Hotspots } from './hotspots.model';
-import { getHotspotPredictions, formatDateTimeForHotspot } from '../../shared/utils/dataApiClient';
+import { getHotspotPredictions } from '../../shared/utils/dataApiClient';
 import moment from 'moment';
 
 export class HotspotsService {

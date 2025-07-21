@@ -42,13 +42,7 @@ export class RideController {
     // @access  Protected
     static startRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { startLatitude, startLongitude, destinationLatitude, destinationLongitude, timestamp, address, predictedScore } = req.body;
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         // Validate required fields
         if (!startLatitude || !startLongitude || !destinationLatitude || !destinationLongitude || !address || predictedScore === undefined) {
@@ -94,7 +88,7 @@ export class RideController {
             };
 
             // Get the driver's current active shift
-            const activeShift = await ShiftService.getActiveShiftForDriver(driverId);
+            const activeShift = await ShiftService.getActiveShift(driverId);
             if (!activeShift) {
                 res.status(400);
                 throw new Error('No active shift found');
@@ -128,13 +122,7 @@ export class RideController {
     // @route   GET /api/rides/current
     // @access  Protected
     static getRideStatus = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         try {
             const rideStatus = await RideService.getRideStatus(driverId);
@@ -155,13 +143,7 @@ export class RideController {
     // @access  Protected
     static endRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { fareCents, actualDistanceKm, timestamp } = req.body;
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         // Validate required fields
         if (fareCents === undefined || actualDistanceKm === undefined) {
@@ -207,14 +189,8 @@ export class RideController {
     // @access  Protected
     static editRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { rideId } = req.params;
-        const driverId = req.user?.id;
+        const driverId = req.driverId!; 
         const updateData = req.body;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
 
         try {
             // Transform camelCase request to snake_case for service
@@ -237,13 +213,7 @@ export class RideController {
     // @access  Protected
     static deleteRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { rideId } = req.params;
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         try {
             await RideService.deleteRide(rideId, driverId);
@@ -263,13 +233,7 @@ export class RideController {
     // @access  Protected
     static restoreRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { rideId } = req.params;
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         try {
             await RideService.restoreRide(rideId, driverId);
@@ -288,13 +252,7 @@ export class RideController {
     // @route   GET /api/rides
     // @access  Protected
     static getRides = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const driverId = req.user?.id;
-
-        // Validate authentication
-        if (!driverId) {
-            res.status(401);
-            throw new Error('Driver authentication required');
-        }
+        const driverId = req.driverId!; 
 
         try {
             const rides = await RideService.getRidesByDriver(driverId);

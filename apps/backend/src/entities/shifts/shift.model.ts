@@ -12,11 +12,19 @@ export class Shift extends Model {
     public shift_end_location_latitude!: number | null;
     public shift_end_location_longitude!: number | null;
     public total_duration_ms!: number | null;
+    public planned_duration_ms!: number | null;
+
+    // From Pause Data
     public work_time_ms!: number | null;
     public break_time_ms!: number | null;
     public num_breaks!: number | null;
     public avg_break_ms!: number | null;
-    public planned_duration_ms!: number | null;
+
+    // From Ride Data
+    public total_earnings_cents!: number | null;
+    public total_distance_km!: number | null;
+    public number_of_rides!: number | null;
+
     public created_at!: Date;
     public updated_at!: Date;
     public deleted_at!: Date | null;
@@ -82,6 +90,18 @@ Shift.init(
         },
         shift_end_location_longitude: {
             type: DataTypes.DOUBLE,
+            allowNull: true,
+        },
+        total_earnings_cents: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        total_distance_km: {
+            type: DataTypes.DOUBLE,
+            allowNull: true,
+        },
+        number_of_rides: {
+            type: DataTypes.INTEGER,
             allowNull: true,
         },
     },

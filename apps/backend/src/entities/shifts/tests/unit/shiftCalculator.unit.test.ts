@@ -1,10 +1,11 @@
 import { ShiftCalculator } from '../../utils/shiftCalculator';
+import { ShiftCalculatorTestUtils } from '../utils/shiftCalculator.testUtils';
 
 
 describe('ShiftCalculator Unit Tests', () => {
     beforeEach(() => {
         // Clear pause data before each test
-        ShiftCalculator.clearPauseData();
+        ShiftCalculatorTestUtils.clearPauseData();
     });
 
 
@@ -20,9 +21,9 @@ describe('ShiftCalculator Unit Tests', () => {
                 { start: new Date('2024-01-01T12:00:00Z'), end: new Date('2024-01-01T12:30:00Z') }, // 30 min break
                 { start: new Date('2024-01-01T15:00:00Z'), end: new Date('2024-01-01T15:15:00Z') }  // 15 min break
             ];
-            ShiftCalculator.addPauseData(driverId, pauses);
+            ShiftCalculatorTestUtils.addPauseData(driverId, pauses);
 
-            const result = ShiftCalculator.computeBreaks(shiftStart, shiftEnd, driverId);
+            const result = ShiftCalculator.computeBreaks(shiftStart, shiftEnd, pauses);
 
             expect(result).toBeDefined();
             expect(result.numberOfBreaks).toBe(2);
@@ -37,7 +38,7 @@ describe('ShiftCalculator Unit Tests', () => {
             const shiftEnd = new Date('2024-01-01T17:00:00Z');
             const driverId = 'test-driver-2';
 
-            const result = ShiftCalculator.computeBreaks(shiftStart, shiftEnd, driverId);
+            const result = ShiftCalculator.computeBreaks(shiftStart, shiftEnd, []);
 
             expect(result).toBeDefined();
             expect(result.numberOfBreaks).toBe(0);
