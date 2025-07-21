@@ -169,7 +169,8 @@ def predict_hotspots():
             return jsonify({"error": "Missing 'pickup_zone' column in features", "columns": df.columns.tolist()}), 500
         zone_names = df["pickup_zone"].copy()
 
-        encoding_dir = os.path.join("models", "encoding_maps")
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        encoding_dir = os.path.join(BASE_DIR, "hotspot_model", "models", "encoding_maps")
         if not os.path.exists(encoding_dir):
             return jsonify({"error": "Encoding dir not found."}), 500
 

@@ -4,8 +4,8 @@ import { initializeAssociations } from '../../../../shared/config/associations';
 import app from '../../../../app';
 import User from '../../../users/user.model';
 import Shift from '../../shift.model';
-import ShiftSignal from '../../shiftSignal.model';
-import { Pause } from '../../pause.model';
+import ShiftSignal from '../../../shift-signals/shiftSignal.model';
+import { Pause } from '../../../shift-pauses/pause.model';
 import { generateAccessToken } from '../../../auth/utils/generateTokens';
 
 // Set up environment variables for testing
@@ -295,11 +295,26 @@ describe('Shift API Integration Tests', () => {
                 .expect(200);
 
             // End first shift
-            await request(app)
+            const endRes = await request(app)
                 .post('/api/shifts/end-shift')
                 .set('Authorization', `Bearer ${token}`)
                 .send({ timestamp: Date.now() })
                 .expect(200);
+            
+            console.log('End shift response:', endRes.body);
+
+            // Wait a bit to ensure database operations complete
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Check if shift was actually ended
+            const Shift = require('../../shift.model').default;
+            const activeShifts = await Shift.findAll({
+                where: { driver_id: user.id, shift_end: null }
+            });
+            console.log('Active shifts after ending:', activeShifts.length);
+            if (activeShifts.length > 0) {
+                console.log('First active shift:', activeShifts[0].toJSON());
+            }
 
             // Start second shift - should succeed
             const res = await request(app)
@@ -307,6 +322,9 @@ describe('Shift API Integration Tests', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .send({ timestamp: Date.now() });
 
+            if (res.status !== 200) {
+                console.log('Error starting second shift:', res.body);
+            }
             expect(res.status).toBe(200);
             expect(res.body.success).toBe(true);
             expect(res.body.message).toContain('started successfully');

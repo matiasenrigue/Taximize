@@ -189,7 +189,7 @@ describe('Ride API Integration Tests', () => {
                 
             expect(res.status).toBe(400);
             expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('Invalid predicted score');
+            expect(res.body.error).toContain('Invalid prediction score. Must be between 0 and 1');
         });
     });
 

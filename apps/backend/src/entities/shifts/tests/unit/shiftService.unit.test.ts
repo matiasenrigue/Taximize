@@ -1,7 +1,8 @@
 import { ShiftService } from '../../shift.service';
-import ShiftSignalService from '../../shiftSignal.service';
-import { PauseService } from '../../pause.service';
+import ShiftSignalService from '../../../shift-signals/shiftSignal.service';
+import { PauseService } from '../../../shift-pauses/pause.service';
 import { ShiftCalculator } from '../../utils/shiftCalculator';
+import { ExpiredDataCleanup } from '../../utils/cleanup/expiredDataCleanup';
 import { sequelize } from '../../../../shared/config/db';
 
 // Set up test database before running tests
@@ -218,49 +219,57 @@ describe('ShiftService Unit Tests', () => {
     describe('manageExpiredShifts', () => {
         it('should end expired shifts that have exceeded time limit', async () => {
             // Test that manageExpiredShifts ends expired shifts that have exceeded time limit
-            await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+            const driverId = 'test-driver-id-1';
+            await expect(ExpiredDataCleanup.manageExpiredShifts(driverId)).resolves.not.toThrow();
         });
 
 
         it('should purge shifts older than 2 days with no rides', async () => {
             // Test that manageExpiredShifts purges shifts older than 2 days with no rides
-            await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+            const driverId = 'test-driver-id-1';
+            await expect(ExpiredDataCleanup.manageExpiredShifts(driverId)).resolves.not.toThrow();
         });
 
 
         it('should generate synthetic stop for stale shifts that have rides', async () => {
             // Test that manageExpiredShifts generates synthetic stop for stale shifts that have rides
-            await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+            const driverId = 'test-driver-id-1';
+            await expect(ExpiredDataCleanup.manageExpiredShifts(driverId)).resolves.not.toThrow();
         });
 
 
         it('should not affect active or recently stopped shifts', async () => {
             // Test that manageExpiredShifts does not affect active or recently stopped shifts
-            await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+            const driverId = 'test-driver-id-1';
+            await expect(ExpiredDataCleanup.manageExpiredShifts(driverId)).resolves.not.toThrow();
         });
 
 
         it('should only process active shifts (shift_end is null)', async () => {
             // Test that manageExpiredShifts only processes active shifts as per documentation
-            await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+            const driverId = 'test-driver-id-1';
+            await expect(ExpiredDataCleanup.manageExpiredShifts(driverId)).resolves.not.toThrow();
         });
 
 
         it('should skip shifts with stop signal even if old', async () => {
             // Test that manageExpiredShifts skips shifts that have proper stop signal
-            await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+            const driverId = 'test-driver-id-1';
+            await expect(ExpiredDataCleanup.manageExpiredShifts(driverId)).resolves.not.toThrow();
         });
 
 
         it('should skip shifts with recent signals within 2 days', async () => {
             // Test that manageExpiredShifts skips shifts with recent activity
-            await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+            const driverId = 'test-driver-id-1';
+            await expect(ExpiredDataCleanup.manageExpiredShifts(driverId)).resolves.not.toThrow();
         });
 
 
         it('should log each cleanup action performed', async () => {
             // Test that manageExpiredShifts logs each cleanup action performed
-            await expect(ShiftService.manageExpiredShifts()).resolves.not.toThrow();
+            const driverId = 'test-driver-id-1';
+            await expect(ExpiredDataCleanup.manageExpiredShifts(driverId)).resolves.not.toThrow();
         });
     });
 

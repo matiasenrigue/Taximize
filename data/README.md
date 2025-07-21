@@ -65,7 +65,7 @@ Ellie will add
 3. Start the API
     python app.py
 
-4. Visit: http://localhost:5000/ to verify it's running.
+4. Visit: http://localhost:5050/ to verify it's running.
 
 
 # Notes 
