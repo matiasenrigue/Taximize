@@ -1,5 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../../shared/config/db';
+import { sequelize, Model, DataTypes } from '../../shared/config/db';
 import { RIDE_CONSTANTS } from './ride.constants';
 
 export class Ride extends Model {

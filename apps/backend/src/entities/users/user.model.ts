@@ -1,4 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes } from '../../shared/config/db';
 import bcrypt from 'bcrypt';
 import { sequelize } from '../../shared/config/db';
 
