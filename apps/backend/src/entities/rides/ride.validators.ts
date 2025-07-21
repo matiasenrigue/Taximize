@@ -1,5 +1,5 @@
 import { RIDE_CONSTANTS, RIDE_ERRORS } from './ride.constants';
-import { RideCoordinates, RideUpdateData } from './ride.types';
+import { RideCoordinates } from './ride.types';
 import { Ride } from './ride.model';
 
 export class RideValidators {
@@ -40,34 +40,4 @@ export class RideValidators {
             score > RIDE_CONSTANTS.PREDICTION_SCALE.MAX) {
             throw new Error(`Invalid prediction score. Must be between ${RIDE_CONSTANTS.PREDICTION_SCALE.MIN} and ${RIDE_CONSTANTS.PREDICTION_SCALE.MAX}`);
         }
-    }
-
-    static validateUpdateData(updateData: RideUpdateData, ride: Ride): void {
-        // Validate end time
-        if (updateData.end_time) {
-            const endTime = new Date(updateData.end_time);
-            if (endTime <= ride.start_time) {
-                throw new Error('End time must be after start time');
-            }
-        }
-
-        // Validate earnings
-        if (updateData.earning_cents !== undefined && updateData.earning_cents <= 0) {
-            throw new Error('Earning must be positive');
-        }
-
-        // Validate distance
-        if (updateData.distance_km !== undefined && updateData.distance_km <= 0) {
-            throw new Error('Distance must be positive');
-        }
-    }
-
-    static validateForbiddenFields(updateData: any): void {
-        const forbiddenFields = ['id', 'shift_id', 'driver_id', 'start_time', 'start_latitude', 'start_longitude', 'predicted_score'];
-        for (const field of forbiddenFields) {
-            if (field in updateData) {
-                throw new Error(`Cannot modify ${field}`);
-            }
-        }
-    }
-}
+    }}

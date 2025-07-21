@@ -12,10 +12,6 @@ router.post('/start-ride', protect, requireDriver, validateRideCoordinates, vali
 router.get('/current', protect, requireDriver, RideController.getRideStatus);
 router.post('/end-ride', protect, requireDriver, validateEndRideRequest, RideController.endRide);
 
-// Edit and Delete routes
-router.put('/:rideId', protect, requireDriver, RideController.editRide);
-router.delete('/:rideId', protect, requireDriver, RideController.deleteRide);
-router.post('/:rideId/restore', protect, requireDriver, RideController.restoreRide);
 router.get('/', protect, requireDriver, RideController.getRides);
 
 export default router; 

@@ -50,14 +50,6 @@ export class RideRepository {
         return ride;
     }
     
-    static async softDelete(ride: Ride): Promise<void> {
-        await ride.destroy();
-    }
-    
-    static async restore(ride: Ride): Promise<void> {
-        await ride.restore();
-    }
-    
     /**
      * Check if a driver has an active ride in their current shift
      */

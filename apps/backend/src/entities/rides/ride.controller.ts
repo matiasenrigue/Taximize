@@ -86,54 +86,6 @@ export class RideController {
         }
     });
 
-    // @desc    Edit ride details
-    // @route   PUT /api/rides/:rideId
-    // @access  Protected
-    static editRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { rideId } = req.params;
-        const driverId = req.driverId!; 
-        const updateData = req.body;
-
-        try {
-            // Transform camelCase request to snake_case for service
-            const snakeCaseData = requestToModel(updateData);
-            const updatedRide = await RideService.editRide(rideId, driverId, snakeCaseData);
-            ResponseHandler.success(res, updatedRide);
-        } catch (error: any) {
-            ResponseHandler.error(error, res, 'Failed to edit ride');
-        }
-    });
-
-    // @desc    Delete ride (soft delete)
-    // @route   DELETE /api/rides/:rideId
-    // @access  Protected
-    static deleteRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { rideId } = req.params;
-        const driverId = req.driverId!; 
-
-        try {
-            await RideService.deleteRide(rideId, driverId);
-            ResponseHandler.success(res, null, 'Ride deleted successfully');
-        } catch (error: any) {
-            ResponseHandler.error(error, res, 'Failed to delete ride');
-        }
-    });
-
-    // @desc    Restore deleted ride
-    // @route   POST /api/rides/:rideId/restore
-    // @access  Protected
-    static restoreRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { rideId } = req.params;
-        const driverId = req.driverId!; 
-
-        try {
-            await RideService.restoreRide(rideId, driverId);
-            ResponseHandler.success(res, null, 'Ride restored successfully');
-        } catch (error: any) {
-            ResponseHandler.error(error, res, 'Failed to restore ride');
-        }
-    });
-
     // @desc    Get all rides for driver
     // @route   GET /api/rides
     // @access  Protected

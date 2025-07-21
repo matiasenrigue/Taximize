@@ -20,9 +20,6 @@ export const RIDE_ERRORS = {
     NO_ACTIVE_SHIFT_STATUS: 'No active shift found. Please start a shift before checking ride status.',
     RIDE_IN_PROGRESS: 'Another ride is already in progress. Please end the current ride first.',
     PAUSED_SHIFT: 'Cannot start ride while on break. Please continue your shift first.',
-    CANNOT_DELETE_ACTIVE: 'Cannot delete active ride',
-    NOT_AUTHORIZED: 'Not authorized to perform this action',
-    CANNOT_EDIT_ACTIVE: 'Cannot edit active ride',
     INVALID_LATITUDE: 'Invalid latitude provided',
     INVALID_LONGITUDE: 'Invalid longitude provided'
 };

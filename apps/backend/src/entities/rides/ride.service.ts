@@ -6,7 +6,6 @@ import { ShiftSignal } from '../shift-signals/shiftSignal.model';
 import { RIDE_ERRORS } from './ride.constants';
 import { 
     RideCoordinates, 
-    RideUpdateData, 
     RideMetrics, 
     StartRideResult, 
     CanStartRideResult, 
@@ -173,97 +172,6 @@ export class RideService {
         };
     }
 
-
-
-    static async editRide(rideId: string, driverId: string, updateData: RideUpdateData): Promise<Ride> {
-        // Find the ride
-        const ride = await RideRepository.findById(rideId);
-        if (!ride) {
-            throw new Error(RIDE_ERRORS.NOT_FOUND);
-        }
-
-        // Check authorization
-        if (ride.driver_id !== driverId) {
-            throw new Error(RIDE_ERRORS.NOT_AUTHORIZED);
-        }
-
-        // Check if ride is active
-        if (!ride.end_time) {
-            throw new Error(RIDE_ERRORS.CANNOT_EDIT_ACTIVE);
-        }
-
-        // Validate forbidden fields
-        RideValidators.validateForbiddenFields(updateData);
-
-        // Validate coordinates if provided
-        if ('destination_latitude' in updateData || 'destination_longitude' in updateData) {
-            const destLat = updateData.destination_latitude || ride.destination_latitude;
-            const destLng = updateData.destination_longitude || ride.destination_longitude;
-            RideValidators.validateCoordinates({ destLat, destLng });
-        }
-
-        // Validate update data
-        RideValidators.validateUpdateData(updateData, ride);
-
-        // Update the ride
-        await RideRepository.update(ride, updateData);
-
-        // If earnings or distance were updated, recalculate shift statistics
-        if ('earning_cents' in updateData || 'distance_km' in updateData) {
-            const shift = await Shift.findByPk(ride.shift_id);
-            if (shift) {
-                const rides = await RideRepository.findAllByShift(shift.id);
-                await ShiftCalculationUtils.updateShiftCalculations(shift, 'onlyRideData', undefined, rides);
-            }
-        }
-
-        return ride;
-    }
-
-    static async deleteRide(rideId: string, driverId: string): Promise<void> {
-        // Find the ride
-        const ride = await RideRepository.findById(rideId);
-        if (!ride) {
-            throw new Error(RIDE_ERRORS.NOT_FOUND);
-        }
-
-        // Check authorization
-        if (ride.driver_id !== driverId) {
-            throw new Error(RIDE_ERRORS.NOT_AUTHORIZED);
-        }
-
-        // Check if ride is active
-        if (!ride.end_time) {
-            throw new Error(RIDE_ERRORS.CANNOT_DELETE_ACTIVE);
-        }
-
-        // Soft delete the ride
-        await RideRepository.softDelete(ride);
-
-    }
-
-    static async restoreRide(rideId: string, driverId: string): Promise<void> {
-        // Find the deleted ride (paranoid: false to include soft-deleted records)
-        const ride = await RideRepository.findById(rideId, true);
-        if (!ride) {
-            throw new Error(RIDE_ERRORS.NOT_FOUND);
-        }
-
-        // Check authorization
-        if (ride.driver_id !== driverId) {
-            throw new Error(RIDE_ERRORS.NOT_AUTHORIZED);
-        }
-
-        // Check if ride is deleted (handle both snake_case and camelCase)
-        const deletedAt = ride.deleted_at || (ride as any).deletedAt;
-        if (!deletedAt) {
-            throw new Error('Ride is not deleted');
-        }
-
-        // Restore the ride using repository method
-        await RideRepository.restore(ride);
-
-    }
 
     static async getRidesByDriver(driverId: string): Promise<Ride[]> {
         return await RideRepository.findByDriver(driverId);

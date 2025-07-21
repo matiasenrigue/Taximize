@@ -27,15 +27,6 @@ export interface RideStatus {
     elapsedTimeMs: number;
 }
 
-export interface RideUpdateData {
-    destination_latitude?: number;
-    destination_longitude?: number;
-    address?: string;
-    end_time?: Date | string;
-    earning_cents?: number;
-    distance_km?: number;
-}
-
 export interface RideMetrics {
     rideId: string;
     totalTimeMs: number;
