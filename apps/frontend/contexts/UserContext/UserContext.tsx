@@ -28,7 +28,7 @@ export const UserContextProvider: React.FC<{ children: ReactNode }> = ({ childre
     // Refresh user data from the API
     const refreshUser = async () => {
         try {
-            const response = await api.get("/user/me");
+            const response = await api.get("users/user/me");
             if (response.data.success) {
                 setUser(response.data.data);
             } else {
