@@ -86,19 +86,4 @@ export class RideController {
         }
     });
 
-    // @desc    Get all rides for driver
-    // @route   GET /api/rides
-    // @access  Protected
-    static getRides = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const driverId = req.driverId!; 
-
-        try {
-            const rides = await RideService.getRidesByDriver(driverId);
-            // Transform each ride to camelCase
-            const transformedRides = rides.map(ride => modelToResponse(ride));
-            ResponseHandler.success(res, transformedRides);
-        } catch (error: any) {
-            ResponseHandler.error(error, res, 'Failed to get rides');
-        }
-    });
 } 

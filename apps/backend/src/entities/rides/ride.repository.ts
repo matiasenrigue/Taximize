@@ -1,6 +1,7 @@
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { Ride } from './ride.model';
 import { RIDE_CONSTANTS } from './ride.constants';
+import { sequelize } from '../../shared/config/db';
 
 export class RideRepository {
     
@@ -56,6 +57,88 @@ export class RideRepository {
     static async hasActiveRideForShift(shiftId: string): Promise<boolean> {
         const activeRide = await this.findActiveByShift(shiftId);
         return !!activeRide;
+    }
+    
+    /**
+     * Find rides within a date range for a driver
+     */
+    static async findRidesInDateRange(driverId: string, startDate: Date, endDate: Date): Promise<Ride[]> {
+        return Ride.findAll({
+            where: {
+                driver_id: driverId,
+                start_time: {
+                    [Op.between]: [startDate, endDate]
+                }
+            },
+            order: [['start_time', 'ASC']]
+        });
+    }
+    
+    
+    /**
+     * Find rides by day of week for a driver
+     */
+    static async findRidesByDayOfWeek(driverId: string, dayOfWeek: number): Promise<Ride[]> {
+        const dialectType = sequelize.getDialect();
+        
+        let whereClause: any = { driver_id: driverId };
+        
+        if (dialectType === 'postgres') {
+            whereClause[Op.and] = [
+                Sequelize.where(
+                    Sequelize.fn('EXTRACT', Sequelize.literal('DOW FROM start_time')),
+                    dayOfWeek
+                )
+            ];
+        } else {
+            // SQLite uses 0-6 where 0 is Sunday
+            whereClause[Op.and] = [
+                Sequelize.where(
+                    Sequelize.fn('strftime', '%w', Sequelize.col('start_time')),
+                    dayOfWeek.toString()
+                )
+            ];
+        }
+        
+        return Ride.findAll({
+            where: whereClause,
+            order: [['start_time', 'DESC']]
+        });
+    }
+    
+    /**
+     * Aggregate earnings by date for a driver
+     */
+    static async aggregateEarningsByDate(driverId: string, startDate: Date, endDate: Date): Promise<any[]> {
+        const dialectType = sequelize.getDialect();
+        
+        let dateFunction;
+        if (dialectType === 'postgres') {
+            dateFunction = Sequelize.fn('DATE', Sequelize.col('start_time'));
+        } else {
+            // SQLite
+            dateFunction = Sequelize.fn('date', Sequelize.col('start_time'));
+        }
+        
+        const result = await Ride.findAll({
+            attributes: [
+                [dateFunction, 'date'],
+                [Sequelize.fn('SUM', Sequelize.col('earning_cents')), 'totalCents']
+            ],
+            where: {
+                driver_id: driverId,
+                start_time: {
+                    [Op.between]: [startDate, endDate]
+                },
+                earning_cents: {
+                    [Op.not]: null
+                }
+            },
+            group: [dateFunction],
+            raw: true
+        });
+        
+        return result;
     }
     
 }

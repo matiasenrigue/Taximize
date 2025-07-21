@@ -12,6 +12,4 @@ router.post('/start-ride', protect, requireDriver, validateRideCoordinates, vali
 router.get('/current', protect, requireDriver, RideController.getRideStatus);
 router.post('/end-ride', protect, requireDriver, validateEndRideRequest, RideController.endRide);
 
-router.get('/', protect, requireDriver, RideController.getRides);
-
 export default router; 

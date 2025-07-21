@@ -30,7 +30,7 @@ export class ShiftRepository {
      * Find shifts by driver within date range
      * @returns Array of shifts (empty array if none found)
      */
-    static async findByDriverAndDateRange(
+    static async findShiftsInDateRange(
         driverId: string, 
         startDate: Date, 
         endDate: Date
@@ -46,5 +46,6 @@ export class ShiftRepository {
             order: [['shift_start', 'DESC']]
         });
     }
+
 
 }

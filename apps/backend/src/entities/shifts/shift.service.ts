@@ -257,7 +257,7 @@ export class ShiftService {
     static async getShiftsByDriver(driverId: string): Promise<Shift[]> {
         const endDate = new Date();
         const startDate = new Date(0); // Beginning of time
-        return await ShiftRepository.findByDriverAndDateRange(driverId, startDate, endDate);
+        return await ShiftRepository.findShiftsInDateRange(driverId, startDate, endDate);
     }
 
     static async getShiftById(shiftId: string, driverId: string): Promise<Shift> {

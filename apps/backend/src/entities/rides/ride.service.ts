@@ -17,6 +17,7 @@ import { RideMLService } from './ride.mlService';
 
 
 export class RideService {
+
     static async hasActiveRide(driverId: string): Promise<boolean> {
         // Get active shift for driver first
         const activeShift = await ShiftRepository.findActiveByDriverId(driverId);
@@ -25,6 +26,7 @@ export class RideService {
 
         return RideRepository.hasActiveRideForShift(activeShift.id);
     }
+
 
     static async canStartRide(driverId: string): Promise<CanStartRideResult> {
         // Check if driver has active shift
@@ -53,9 +55,13 @@ export class RideService {
         return { canStart: true };
     }
 
+
+
     static async evaluateRide(startLat: number, startLng: number, destLat: number, destLng: number): Promise<number> {
         return RideMLService.evaluateRide(startLat, startLng, destLat, destLng);
     }
+
+
 
     static async startRide(driverId: string, shiftId: string, coords: RideCoordinates): Promise<StartRideResult> {
         // Validate coordinates
@@ -96,6 +102,7 @@ export class RideService {
             predicted_score: predictedScore
         };
     }
+
 
     static async endRide(rideId: string, fareCents: number, actualDistanceKm: number, timestamp?: number): Promise<RideMetrics> {
         // Find the active ride
@@ -138,6 +145,7 @@ export class RideService {
         };
     }
 
+    
     static async getRideStatus(driverId: string): Promise<RideStatus> {
         // Get active shift for driver first
         const activeShift = await ShiftRepository.findActiveByDriverId(driverId);
@@ -172,9 +180,5 @@ export class RideService {
         };
     }
 
-
-    static async getRidesByDriver(driverId: string): Promise<Ride[]> {
-        return await RideRepository.findByDriver(driverId);
-    }
 
 } 
