@@ -106,10 +106,14 @@ Final iterations focused on optimizing a production-ready scoring pipeline. This
   - Exports final scoring weights for production deployment
 
 - **`Trip Prediction Model Exploration.ipynb`**  
-  Advanced analysis exploring:
-  - Dropoff zone prediction based on pickup patterns
-  - Hotspot identification using clustering techniques
-  - Geographic profitability analysis
+  Documents the exploratory phase of our hotspot prediction pipeline and evaluates
+  multiple approaches for understanding and forecasting spatial taxi demand across NYC:
+  - Tests multiple regression models (Random Forest, XGBoost, LightGBM) to predict
+    hourly pickup demand at the zone level
+    
+  **Outcome:** This analysis informed the design of our final LightGBM-based hotspot
+    prediction model, which achieved R² = 0.9591, RMSE = 15.07, and MAE = 7.09 when
+    trained on January and tested on February data.
 
 - **`zone_coordinates.csv`** 📍
   Essential lookup table mapping 263 NYC taxi zones to their geographic coordinates:
