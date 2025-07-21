@@ -18,6 +18,7 @@ This folder contains all code, data, and model artifacts used for **predicting h
 | `zone_stats_with_all_densities.csv`  | Precomputed zone-level data including POI densities and interaction terms, used during feature generation. |
 | `models/`                            | Directory (not shown here) for storing trained model files (e.g., LightGBM `.txt`, XGBoost `.json`) for inference. |
 | `__pycache__/`                       | Auto-generated cache from Python interpreter (safe to ignore). |
+| `README.md`                       | Documentation for the hotspot prediction module, including file descriptions, model usage, and feature overview.  |
 
 ---
 
