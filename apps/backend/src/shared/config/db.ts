@@ -1,6 +1,8 @@
 // src/config/db.ts
-import { Sequelize } from 'sequelize';
+import { Sequelize, DataTypes, Model } from 'sequelize';
 import { initializeAssociations } from './associations';
+
+export { DataTypes, Model };
 
 const isTest = process.env.NODE_ENV === 'test';
 const isProd = process.env.NODE_ENV === 'production';

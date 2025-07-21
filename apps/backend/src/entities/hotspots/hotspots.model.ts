@@ -1,5 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../../shared/config/db';
+import { sequelize, Model, DataTypes } from '../../shared/config/db';
 
 export class Hotspots extends Model {
     public id!: string;
