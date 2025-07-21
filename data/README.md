@@ -100,8 +100,6 @@ Only a few months for the models will be pushed on here in order to not overwhel
 For the Scoring Model:
 https://drive.google.com/drive/folders/1OqawUIecsM4yhQDphoMm26Tem7bxy-Dy?usp=sharing 
 
-Ellie Will add her link here: 
-
 # Versioning & Contributions
 
 This folder is organized for reproducibility, modularity, and API integration.
