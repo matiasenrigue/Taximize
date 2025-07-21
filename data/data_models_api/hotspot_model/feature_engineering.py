@@ -138,7 +138,9 @@ def apply_target_encoding(feature_df, encoding_dir="encoding_maps"):
 
     return feature_df
 
-def align_with_model_features(feature_df, feature_list_path="model_features.pkl"):
+def align_with_model_features(feature_df, feature_list_path="None"):
+    if feature_list_path is None:
+        feature_list_path = os.path.join(os.path.dirname(__file__), "model_features.pkl")
     try:
         allowed_features = joblib.load(feature_list_path)
     except Exception as e:
