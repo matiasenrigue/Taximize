@@ -4,7 +4,6 @@ import { protect } from '../../shared/middleware/auth.middleware';
 
 const router = Router();
 
-// Protected routes
-router.get('/me/stats', protect, UserController.getUserStats);
+router.get('/me', protect, UserController.getCurrentUser);
 
 export default router;
