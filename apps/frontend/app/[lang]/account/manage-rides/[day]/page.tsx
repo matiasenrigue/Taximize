@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import BackButton from "../../../../../components/BackButton/BackButton";
 import api from "../../../../../lib/axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 interface Ride {
     id: string;
@@ -44,7 +46,7 @@ export default function ManageRidesDay() {
                             <div key={ride.id}>
                                 <div onClick={() => setExpanded(expanded === ride.id ? null : ride.id)}>
                                     <span>To {ride.to}</span>
-                                    <span>{expanded === ride.id ? "▼" : "▶"}</span>
+                                    <span>{expanded === ride.id ? <FontAwesomeIcon icon={faChevronDown} /> : <FontAwesomeIcon icon={faChevronRight} />}</span>
                                 </div>
                                 {expanded === ride.id && (
                                     <div>

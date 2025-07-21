@@ -97,7 +97,7 @@ export default function Profile() {
                                 </MenuItem>
                             </div>
                             <div>
-                                <MenuItem href="/account/profile/change-email">
+                                <MenuItem href="#">
                                     <span>{t('email')}</span>
                                     <div className={styles.itemValue}>
                                         <span>{email}</span>
