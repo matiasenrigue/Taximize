@@ -1,72 +1,93 @@
 # Data Science and Modeling for Taximize
 
-This folder contains all components related to data preparation, modeling, and backend API integration for the NYC Taxi Trip Prediction Project.
+This folder contains all components related to data preparation, machine learning model development, and backend API integration for the NYC Taxi Trip Prediction Project, **Taximize**.
 
 ## Folder Structure
 
 ```
-Data/
-├── cleaning_exploration/         #EDA, notebooks, exploratory analysis
+TaxiApp/data/
+├── cleaning_exploration/        # EDA, notebooks, exploratory analysis
 │
-│   ├── zone_coordinates.csv/      #Load zone → borough map (used for encoding)
+├── Coordinates_to_Zone/         # Mapping between zones and coordinates (lat/lon)
 │
-└── data_models_api/
-    ├── combined_flask/            # Used for Integration
+├── ReadME.md                    # This file
+│
+└── data_models_api/             # All model logic and API integration
+    ├── combined_flask_app/           # Used for Integration
     │         
-    ├── scoring_model/            # Scoring logic and model assets
+    ├── scoring_model/                # Scoring logic and model assets
     │
-    └── hotspot_model/             # Hotspot logic and model assets
+    └── hotspot_model/                # Hotspot logic and model assets
 
 ```
 
 ## Folder Explanition
 
-(1) cleaning_exploration: 
+### 1. `Coordinates_to_Zone/`
 
-- Jupyter notebooks and scripts used for:
-  - Cleaning raw datasets
-  - Feature engineering
-  - Data exploration & visualizations
-  - Summary statistics and distribution analysis
+Contains scripts and outputs for mapping **NYC taxi zones to geographic coordinates**.
 
-(2) data_models_api/
+- Uses official TLC zone shapefiles to compute **centroid latitude/longitude** for each zone polygon.
+- Outputs are used in downstream modeling and frontend mapping.
 
-Main integration folder for all model-related code and APIs. Contains three components:
+### 2. `cleaning_exploration/`
 
-(a) scoring_model/
+Jupyter notebooks and scripts for:
+- Cleaning and preprocessing raw datasets
+- Time-based feature engineering
+- Exploratory data analysis and visualizations
+- Demand heatmaps and zone clustering
+- Borough-level and hourly breakdowns
 
-- Trained models (XGBoost & LightGBM) by month
-- Scoring weights (JSON)
-- Scalers (MinMax)
-- Hotness/duration feature CSVs
-- `scoring_utils.py` and `test_score.py` for API logic and testing
+---
 
-(b) hotspot_model/ 
+### 3. `data_models_api/`
 
-Ellie will add 
+Main folder for model logic and deployment.
 
-(c) combined_flask/
+#### a. `scoring_model/`
 
-- Unified Flask API that serves both:
-  - Trip scoring model (`/score_xgb`, `/score_lgbm`)
-  - Hotspot prediction model (`/hotspot`)
-- Includes `requirements.txt` and Flask entry script (`app.py`)
- 
+- XGBoost and LightGBM models trained to score trips
+- Monthly model files
+- Feature scalers and weighting schemes
+- `scoring_utils.py` and `test_score.py` for serving and testing trip scores
+- Precomputed zone-level features (e.g., duration averages, hotness)
+
+#### b. `hotspot_model/`
+
+- LightGBM regression model predicting `log1p(trip_count)` for each zone-hour
+- Feature engineering: POI density, zone interactions, holidays, time-of-day
+- Encoders and target transformation
+- `generate_features_for_time()` and related prediction utilities
+
+#### c. `combined_flask_app/`
+
+- Flask server exposing the following routes:
+  - `POST /score_xgb` and `POST /score_lgbm` — Score an individual trip
+  - `GET /hotspots?time=...` — Predict zone-level demand for a given time
+- Contains:
+  - `flask_app.py` (Flask entry point)
+  - `requirements.txt` (dependency list)
+
+---
 
 # Setup and Running
 
 1. Navigate to the `combined_flask` directory:
-   bash
+   ```bash
    cd data_models_api/combined_flask
 
 2. Install required Python packages:
-    pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
 
-3. Start the API
-    python app.py
+4. Run the API
+   ```bash
+    python flask_app.py
 
-4. Visit: http://localhost:5050/ to verify it's running.
-
+6. Open your browser to:
+   ```bash
+   http://localhost:5050/
 
 # Notes 
 
@@ -83,8 +104,8 @@ Ellie Will add her link here:
 
 # Versioning & Contributions
 
-This folder is organized for reproducibility and API integration.
+This folder is organized for reproducibility, modularity, and API integration.
 
-All inital cleaning and exploration as well as essential files for serving predictions are included .
-
-Docker integration handled separately
+- All initial data cleaning, exploration notebooks, and modeling scripts are included.
+- All files required to serve predictions (trained models, encoders, feature utilities) are provided.
+- Docker integration is handled separately and not included in this directory.
