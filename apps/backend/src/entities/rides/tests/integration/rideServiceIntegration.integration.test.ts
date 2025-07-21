@@ -4,6 +4,7 @@ import { ShiftService } from '../../../shifts/shift.service';
 import Ride from '../../ride.model';
 import Shift from '../../../shifts/shift.model';
 import { TestHelpers } from '../../../../shared/tests/utils/testHelpers';
+import { ExpiredDataCleanup } from '../../../shifts/utils/cleanup/expiredDataCleanup';
 
 TestHelpers.setupEnvironment();
 
@@ -208,10 +209,10 @@ describe('Ride Service Integration Tests', () => {
             const endResult = await RideService.endRide(rideResult.rideId, 1500, 5.2);
 
             expect(endResult.rideId).toBe(rideResult.rideId);
-            expect(endResult.earning_cents).toBe(1500);
-            expect(endResult.distance_km).toBe(5.2);
-            expect(endResult.total_time_ms).toBeGreaterThan(0);
-            expect(endResult.earning_per_min).toBeGreaterThan(0);
+            expect(endResult.earningCents).toBe(1500);
+            expect(endResult.distanceKm).toBe(5.2);
+            expect(endResult.totalTimeMs).toBeGreaterThan(0);
+            expect(endResult.earningPerMin).toBeGreaterThan(0);
 
             // Verify database state
             const dbRide = await Ride.findByPk(rideResult.rideId);
@@ -284,7 +285,7 @@ describe('Ride Service Integration Tests', () => {
             });
 
             // Run expired rides cleanup
-            await RideService.manageExpiredRides();
+            await ExpiredDataCleanup.manageExpiredRides(user.id);
 
             // Verify old ride is now ended
             const updatedRide = await Ride.findByPk(oldRide.id);

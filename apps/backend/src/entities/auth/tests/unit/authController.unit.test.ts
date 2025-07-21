@@ -5,6 +5,20 @@ import User from '../../../users/user.model';
 import { generateRefreshToken } from '../../utils/generateTokens';
 import jwt from 'jsonwebtoken';
 
+// Mock express-async-handler to pass errors to our test handler
+jest.mock('express-async-handler', () => {
+    return (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
+        return Promise.resolve(fn(req, res, next)).catch((err) => {
+            // In tests, we want to handle errors as JSON responses
+            res.status(res.statusCode || 500);
+            res.json({
+                success: false,
+                error: err.message
+            });
+        });
+    };
+});
+
 // Set up environment variables for testing
 process.env.ACCESS_TOKEN_SECRET = 'test-access-token-secret';
 process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
@@ -110,13 +124,9 @@ describe('Auth Controller Unit Tests', () => {
             const req = createRequest(body);
             const res = mockResponse();
 
-            try {
-                await signup(req, res, mockNext);
-            } catch (error) {
-                expect(error).toEqual(new Error('Please provide all fields'));
-            }
+            await signup(req, res, mockNext);
 
-            expect(res.status).toHaveBeenCalledWith(400);
+            expectErrorResponse(res, 400, 'Please provide all fields');
         });
 
 
@@ -127,13 +137,9 @@ describe('Auth Controller Unit Tests', () => {
             const req = createRequest(body);
             const res = mockResponse();
 
-            try {
-                await signup(req, res, mockNext);
-            } catch (error) {
-                expect(error).toEqual(new Error('Invalid email or password'));
-            }
+            await signup(req, res, mockNext);
 
-            expect(res.status).toHaveBeenCalledWith(400);
+            expectErrorResponse(res, 400, 'Invalid email or password');
         });
 
 

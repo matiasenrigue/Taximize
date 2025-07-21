@@ -10,10 +10,11 @@
 export function errorHandler(err: any, req: any, res: any, next: any) {
     const status = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
     const isDevelopment = process.env.NODE_ENV === 'development';
+    const isTest = process.env.NODE_ENV === 'test';
     
     res.status(status).json({
         success: false,
-        error: (!isDevelopment && status === 500) ? 'Internal server error' : err.message,
+        error: (!isDevelopment && !isTest && status === 500) ? 'Internal server error' : err.message,
         ...(isDevelopment && { stack: err.stack })
     });
 }

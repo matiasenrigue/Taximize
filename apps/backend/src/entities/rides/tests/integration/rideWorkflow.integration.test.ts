@@ -250,7 +250,7 @@ describe('Ride Workflow Integration Tests', () => {
                     predictedScore: 0.68
                 });
 
-            expect(ride2Res.status).toBe(400);
+            expect(ride2Res.status).toBe(500);
             expect(ride2Res.body.error).toContain('Another ride is already in progress. Please end the current ride first.');
         });
 

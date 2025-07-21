@@ -3,22 +3,9 @@ import asyncHandler from 'express-async-handler';
 import { ShiftService } from './shift.service';
 import { RideService } from '../rides/ride.service';
 import { modelToResponse, requestToModel } from '../../shared/utils/caseTransformer';
+import { ResponseHandler } from '../../shared/utils/responseHandler';
 
 export class ShiftController {
-
-    /**
-     * Helper method to handle errors with appropriate status codes
-     */
-    private static handleError(error: any, res: Response): void {
-        if (error.message.includes('Not authorized')) {
-            res.status(403);
-        } else if (error.message.includes('not found')) {
-            res.status(404);
-        } else {
-            res.status(400);
-        }
-        throw new Error(error.message || 'Operation failed');
-    }
 
     // @desc    Get current shift status
     // @route   GET /api/shifts/current
@@ -51,14 +38,18 @@ export class ShiftController {
             }
 
             // Get ride information if driver is on a ride
-            let rideInfo = { startLatitude: null, startLongitude: null, destinationAddress: null };
+            let rideInfo: { startLatitude: number | null; startLongitude: number | null; destinationAddress: string | null } = { 
+                startLatitude: null, 
+                startLongitude: null, 
+                destinationAddress: null 
+            };
             if (isOnRide) {
                 try {
                     const rideStatus = await RideService.getRideStatus(driverId);
                     rideInfo = {
-                        startLatitude: rideStatus.start_latitude,
-                        startLongitude: rideStatus.start_longitude,
-                        destinationAddress: rideStatus.destination_address || null
+                        startLatitude: rideStatus.startLatitude,
+                        startLongitude: rideStatus.startLongitude,
+                        destinationAddress: rideStatus.address || null
                     };
                 } catch (error) {
                     // If we can't get ride status, just use defaults
@@ -105,8 +96,8 @@ export class ShiftController {
                     activeRideInfo = {
                         found: true,
                         rideId: rideStatus.rideId,
-                        startTime: rideStatus.start_time,
-                        shiftId: rideStatus.shift_id
+                        startTime: rideStatus.startTime,
+                        shiftId: 'N/A' // RideStatus doesn't include shiftId
                     };
                 } catch (error: any) {
                     activeRideInfo = {
@@ -155,52 +146,5 @@ export class ShiftController {
         }
     });
 
-
-
-    // @desc    Edit shift details
-    // @route   PUT /api/shifts/:shiftId
-    // @access  Protected
-    static editShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { shiftId } = req.params;
-        const driverId = req.driverId!; 
-        const updateData = req.body;
-
-        try {
-            const updatedShift = await ShiftService.editShift(shiftId, driverId, updateData);
-            res.status(200).json(updatedShift);
-        } catch (error: any) {
-            this.handleError(error, res);
-        }
-    });
-
-    // @desc    Delete shift (soft delete)
-    // @route   DELETE /api/shifts/:shiftId
-    // @access  Protected
-    static deleteShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { shiftId } = req.params;
-        const driverId = req.driverId!; 
-
-        try {
-            await ShiftService.deleteShift(shiftId, driverId);
-            res.status(200).json({ message: 'Shift deleted successfully' });
-        } catch (error: any) {
-            this.handleError(error, res);
-        }
-    });
-
-    // @desc    Restore deleted shift
-    // @route   POST /api/shifts/:shiftId/restore
-    // @access  Protected
-    static restoreShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const { shiftId } = req.params;
-        const driverId = req.driverId!; 
-
-        try {
-            await ShiftService.restoreShift(shiftId, driverId);
-            res.status(200).json({ message: 'Shift restored successfully' });
-        } catch (error: any) {
-            this.handleError(error, res);
-        }
-    });
 
 } 

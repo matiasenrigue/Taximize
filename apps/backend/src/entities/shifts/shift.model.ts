@@ -1,30 +1,35 @@
-// Placeholder file for TDD Red phase - full implementation in Green phase
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../../shared/config/db';
 
 export class Shift extends Model {
+    // Identity
     public id!: string;
     public driver_id!: string;
+    
+    // Time data
     public shift_start!: Date;
     public shift_end!: Date | null;
+    public total_duration_ms!: number | null;
+    public planned_duration_ms!: number | null;
+    
+    // Location data
     public shift_start_location_latitude!: number | null;
     public shift_start_location_longitude!: number | null;
     public shift_end_location_latitude!: number | null;
     public shift_end_location_longitude!: number | null;
-    public total_duration_ms!: number | null;
-    public planned_duration_ms!: number | null;
 
-    // From Pause Data
+    // Pause metrics (calculated from pause data)
     public work_time_ms!: number | null;
     public break_time_ms!: number | null;
     public num_breaks!: number | null;
     public avg_break_ms!: number | null;
 
-    // From Ride Data
+    // Ride metrics (calculated from ride data)
     public total_earnings_cents!: number | null;
     public total_distance_km!: number | null;
     public number_of_rides!: number | null;
 
+    // Timestamps
     public created_at!: Date;
     public updated_at!: Date;
     public deleted_at!: Date | null;
