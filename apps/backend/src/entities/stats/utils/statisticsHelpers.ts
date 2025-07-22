@@ -1,5 +1,5 @@
-import { generateDateArray, getWeekdayLabel, getMonthDayLabel, formatDate, calculateDurationHours } from '../../../utils/dateHelpers';
-import { centsToDecimal } from '../../../utils/currencyHelpers';
+import { generateDateArray, getWeekdayLabel, getMonthDayLabel, formatDate, calculateDurationHours } from './dateHelpers';
+import { centsToDecimal } from './currencyHelpers';
 
 interface EarningsData {
     date: string;

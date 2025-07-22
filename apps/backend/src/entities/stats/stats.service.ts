@@ -8,8 +8,8 @@ import {
     formatDuration, 
     formatDate,
     formatDateTimeCompact 
-} from '../../utils/dateHelpers';
-import { formatCurrency, centsToDecimal } from '../../utils/currencyHelpers';
+} from './utils/dateHelpers';
+import { formatCurrency, centsToDecimal } from './utils/currencyHelpers';
 import { 
     generateEarningsBreakdown, 
     calculateTotalEarnings,

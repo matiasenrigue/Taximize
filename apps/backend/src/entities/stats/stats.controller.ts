@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { StatsService } from './stats.service';
 import { ResponseHandler } from '../../shared/utils/responseHandler';
-import { isValidDayOfWeek } from '../../utils/dateHelpers';
+import { isValidDayOfWeek } from './utils/dateHelpers';
 
 export class StatsController {
 

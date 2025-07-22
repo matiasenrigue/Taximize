@@ -11,7 +11,7 @@
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node src/server.ts'",
     "devStart": "nodemon dist/server.js",
     "test": "cross-env NODE_ENV=test jest",
-    "create-db": "ts-node --transpile-only src/scripts/create-db.ts"
+    "create-db": "ts-node --transpile-only src/shared/config/setup-db.ts"
   },
   "dependencies": {
     "axios": "^1.10.0",
