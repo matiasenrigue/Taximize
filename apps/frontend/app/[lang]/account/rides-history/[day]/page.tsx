@@ -49,6 +49,7 @@ export default function ManageRidesDay() {
     const [shifts, setShifts] = useState<Shift[]>([]);
     const [expanded, setExpanded] = useState<{ [shiftId: string]: string | null }>({});
     const t = useTranslations('manageRidesDay');
+
     useEffect(() => {
         setLoading(true);
         api.get(`/stats/rides-by-weekday`, { params: { day } })

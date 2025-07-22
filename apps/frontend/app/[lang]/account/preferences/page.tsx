@@ -13,7 +13,7 @@ import BackButton from "../../../../components/BackButton/BackButton";
 export default function Preferences() {
     const t = useTranslations('preferences');
     const locale = useLocale();
-    const { theme, setTheme } = useTheme();
+    const { setTheme } = useTheme();
     const router = useRouter();
     const pathname = usePathname();
 
