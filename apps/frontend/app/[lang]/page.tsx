@@ -1,5 +1,4 @@
 import styles from "./page.module.css";
-import Link from "next/link";
 import Image from 'next/image';
 import {useTranslations} from "next-intl";
 import {LinkButton} from "../../components/Button/LinkButton";

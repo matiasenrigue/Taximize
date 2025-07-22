@@ -1,10 +1,10 @@
-import React from "react";
+import React, {PropsWithChildren} from "react";
 import {ButtonTheme} from "./Button";
 import clsx from "clsx";
 import styles from "./Button.module.css";
-import Link from "next/link";
+import Link, {LinkProps} from "next/link";
 
-export interface LinkButtonProps extends React.LinkHTMLAttributes<HTMLLinkElement> {
+export interface LinkButtonProps extends LinkProps, PropsWithChildren {
     theme?: ButtonTheme;
     elevated?: boolean;
 }
