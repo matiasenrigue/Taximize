@@ -48,6 +48,7 @@ export class RideMLService {
             
             // Validate and convert score
             const prediction = scoreResult.predicted_score / 100;
+
             RideValidators.validatePredictionScore(prediction);
             
             const rating = this.convertPredictionToRating(prediction);
