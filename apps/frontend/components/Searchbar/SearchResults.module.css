@@ -5,6 +5,7 @@
     border: solid 1px var(--color-border);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
+    max-width: 400px;
 }
 
 .item {

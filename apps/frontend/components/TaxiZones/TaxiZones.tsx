@@ -1,9 +1,31 @@
-import React from "react";
+import React, {useEffect} from "react";
 import zones from "../../assets/taxi_zones.json";
 import {Polygon} from "../Polygon/Polygon";
 import {COLOR_PRIMARY} from "../../constants/constants";
+import api from "../../lib/axios";
 
 export const TaxiZones = () => {
+
+    useEffect(() => {
+        api.get("/hotspots").then((response) => {
+            const {
+                success,
+                message: error,
+                data
+            } = response.data;
+
+            if (!success) {
+                console.warn("Failed getting current ride.", error);
+                return;
+            }
+
+            console.log(data);
+
+        }).catch((error) => {
+            console.warn(error);
+        });
+    }, [])
+
     return (
         <>
             {zones.map((zone, index) => (

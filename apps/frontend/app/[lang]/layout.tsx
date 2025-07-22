@@ -28,7 +28,7 @@ const roboto_mono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Taxi Driver App",
+  title: "Taximize",
   description: "Maximize your profit by getting recommended routes to quickly find passengers!",
   keywords: "taxi, passenger, routing",
 
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   referrer: "no-referrer",
 
   openGraph: {
-    title: "Taxi Driver App",
+    title: "Taximize",
     type: "website",
     description: "Maximize your profit by getting recommended routes to quickly find passengers!"
   },
