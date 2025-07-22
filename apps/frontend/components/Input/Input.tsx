@@ -5,7 +5,7 @@
  * It allows users to enter text and clear the input easily.
  * * @module Input
  */
-import styles from "./input.module.css";
+import styles from "./Input.module.css";
 import React, { useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmarkCircle } from "@fortawesome/free-solid-svg-icons";

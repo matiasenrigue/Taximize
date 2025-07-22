@@ -11,7 +11,6 @@ import {UnknownLocationModal} from "../modals/UnknownLocationModal";
 import {RouteErrorModal} from "../modals/RouteErrorModal";
 import {useUserLocationContext} from "../../contexts/UserLocationContext/UserLocationContext";
 import {TaxiZones} from "../TaxiZones/TaxiZones";
-import {useColorScheme} from "../../hooks/useColorScheme";
 
 interface MapProps {
     className?: string;
@@ -26,7 +25,6 @@ export const Map = (props: MapProps) => {
         setRouteStatus,
     } = useRide();
 
-    const colorScheme = useColorScheme();
     const previousRouteStatus = useRef<google.maps.DirectionsStatus>(null!);
 
     useEffect(() => {

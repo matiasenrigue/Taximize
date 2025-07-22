@@ -35,14 +35,14 @@ export const Select = (props: SelectProps) => {
     const handleClickOutside = useCallback(() => setIsOpen(false), []);
     useClickOutside(ref, handleClickOutside);
 
-    const selectOption = (value: string, label: React.ReactNode) => {
+    const selectOption = useCallback((value: string, label: React.ReactNode) => {
         setValue(value);
         setLabel(label as string);
         setIsOpen(false);
         if (onChange) {
             onChange(value);
         }
-    };
+    }, []);
 
     return (
         <div
@@ -53,7 +53,7 @@ export const Select = (props: SelectProps) => {
                     styles.select_button,
                     elevated && styles.select_button_elevated,
                 )}
-                onClick={() => setIsOpen(prev => !prev)}
+                onClick={() => {setIsOpen(prev => !prev)}}
                 aria-haspopup={"listbox"}
                 aria-expanded={isOpen}
                 aria-controls={optionContainerId}>
@@ -96,9 +96,10 @@ export const Option = (props: OptionProps) => {
         throw new Error('Option can only be used as a child of Select!');
 
     useEffect(() => {
-        if (selected)
-            context!.onClick!(value, children);
-    }, [children, context, selected, value]);
+        if (!selected)
+            return;
+        context.onClick!(value, children);
+    }, [children, context.onClick, selected, value]);
 
     return (
         <button
