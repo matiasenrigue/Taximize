@@ -42,7 +42,7 @@ export const useEarningStatistics = () => {
         setEarningsError(null);
         try {
             // e.g. /statistics/earnings?view=weekly&startDate=2025-01-01&endDate=2025-01-31
-            const response = await api.get('/rides/statistics/earnings', {
+            const response = await api.get('/stats/earnings', {
                 params: {
                     view: params.view,
                     startDate: params.startDate,

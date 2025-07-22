@@ -36,7 +36,7 @@ export const useUser = () => {
                 if (!user?.id)
                     throw new Error('User not found');
              }
-            const res = await api.delete(`users/${user.id}`);
+            const res = await api.delete(`/users/${user.id}`);
             setUser(null);
             return { type: 'success' as MessageType, message: res?.data?.message || 'User deleted successfully' };
         } catch (err: any) {
@@ -67,7 +67,7 @@ export const useUser = () => {
                 await refreshUser();
                 if (!user?.id) { throw new Error('User not found'); }
              }
-            const res = await api.put(`users/${user.id}/username`, { username });
+            const res = await api.put(`/users/${user.id}/username`, { username });
             return { type: 'success' as MessageType, message: res?.data?.message || 'User username updated successfully' };
         } catch (err: any) {
             const errorMessage = err?.response?.data?.error || 'Failed to update user username';
@@ -83,7 +83,7 @@ export const useUser = () => {
                 await refreshUser();
                 if (!user?.id) { throw new Error('User not found'); }
              }
-            const res = await api.put(`users/${user.id}/password`, { password });
+            const res = await api.put(`/users/${user.id}/password`, { password });
             return { type: 'success' as MessageType, message: res?.data?.message || 'User password updated successfully' };
         } catch (err: any) {
             const errorMessage = err?.response?.data?.error || 'Failed to update user password';
