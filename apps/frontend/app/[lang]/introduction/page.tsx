@@ -7,18 +7,20 @@ import { Button } from "apps/frontend/components/Button/Button";
 import  SubWindow from "apps/frontend/components/SubWindow/SubWindow";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faStar, faClipboardList } from "@fortawesome/free-solid-svg-icons";
+import { useTranslations } from "next-intl";
 
 export default function Introduction() {
     const [isHotSpotWindowOpen, setHotSpotWindowOpen] = useState(false);
     const [isRideScoringWindowOpen, setRideScoringWindowOpen] = useState(false);
     const [isDashboardWindowOpen, setDashboardWindowOpen] = useState(false);
+    const t = useTranslations('introduction');
     return (
         <div>
              <div className={styles.page}>
              <div className={styles.container}>
-                <h2 className={styles.title}>Taxi Assistant</h2>
+                <h2 className={styles.title}>{t('title')}</h2>
                 <p className={styles.subtitle}>
-                    The app helps taxi drivers in maximising revenue and minimising downtime
+                    {t('subtitle')}
                 </p>
 
 
@@ -30,21 +32,21 @@ export default function Introduction() {
                                 <FontAwesomeIcon icon={faLocationDot} className={styles.icon} />
                             </div>
                             <div className={styles.textContainer}>
-                                <h3 className={styles.cardTitle}>Find Hotspots</h3>
-                                <p className={styles.cardDescription}>Find high-probability pickup zones</p>
+                                <h3 className={styles.cardTitle}>{t('findHotspots.title')}</h3>
+                                <p className={styles.cardDescription}>{t('findHotspots.description')}</p>
                             </div>
                         </div>
-                        <Button onClick={() => setHotSpotWindowOpen(true)}>How It Works</Button>
+                        <Button onClick={() => setHotSpotWindowOpen(true)}>{t('findHotspots.howItWorks')}</Button>
                     </section>
                     {/* Find hotspots subwindow */}
                     <SubWindow
                         isOpen={isHotSpotWindowOpen}
                         onClose={() => setHotSpotWindowOpen(false)}
-                        title="Find hotspots"
-                        summary="A live heatmap shows you 'where the money is' right now."
+                        title={t('findHotspots.subwindowTitle')}
+                        summary={t('findHotspots.subwindowSummary')}
                         imageUrl="/images/hotspots.png" 
                         imageAlt="Map showing taxi hotspots"
-                        description="Using historical and live data, the system predicts demand at street-level granularity for the next 15–60 minutes, so drivers can position themselves proactively instead of reacting to dips."
+                        description={t('findHotspots.subwindowDescription')}
                     />
                     {/* ride scoring */}
                     <section className={styles.section}>
@@ -53,21 +55,21 @@ export default function Introduction() {
                                 <FontAwesomeIcon icon={faStar} className={styles.icon} />
                             </div>
                             <div className={styles.textContainer}>
-                                <h3 className={styles.cardTitle}>Ride Scoring</h3>
-                                <p className={styles.cardDescription}>Get a score for each ride</p>
+                                <h3 className={styles.cardTitle}>{t('rideScoring.title')}</h3>
+                                <p className={styles.cardDescription}>{t('rideScoring.description')}</p>
                             </div>
                         </div>
-                        <Button onClick={() => setRideScoringWindowOpen(true)}>How It Works</Button>
+                        <Button onClick={() => setRideScoringWindowOpen(true)}>{t('rideScoring.howItWorks')}</Button>
                     </section>
                     {/* ride scoring subwindow */}
                     <SubWindow
                         isOpen={isRideScoringWindowOpen}
                         onClose={() => setRideScoringWindowOpen(false)}
-                        title="Ride Scoring"
-                        summary="Ride-Value Scoring helps drivers make informed decisions about which rides to accept."
+                        title={t('rideScoring.subwindowTitle')}
+                        summary={t('rideScoring.subwindowSummary')}
                         imageUrl="/images/scoring.png" 
                         imageAlt="Window showing ride scoring"
-                        description="The system assigns a score to each ride based on factors like distance, time, and demand, helping drivers prioritize high-value rides. This feature is designed to maximize earnings and minimize downtime."
+                        description={t('rideScoring.subwindowDescription')}
                     />
                     {/* dashboard */}
                     <section className={styles.section}>
@@ -76,20 +78,20 @@ export default function Introduction() {
                                 <FontAwesomeIcon icon={faClipboardList} className={styles.icon} />
                             </div>
                             <div className={styles.textContainer}>
-                                <h3 className={styles.cardTitle}>Dashboard</h3>
-                                <p className={styles.cardDescription}>View your earnings and ride history</p>
+                                <h3 className={styles.cardTitle}>{t('dashboard.title')}</h3>
+                                <p className={styles.cardDescription}>{t('dashboard.description')}</p>
                             </div>
                         </div>
-                        <Button onClick={() => setDashboardWindowOpen(true)}>How It Works</Button>
-                        {/* ride scoring subwindow */}
+                        <Button onClick={() => setDashboardWindowOpen(true)}>{t('dashboard.howItWorks')}</Button>
+                        {/* dashboard subwindow */}
                         <SubWindow
                             isOpen={isDashboardWindowOpen}
                             onClose={() => setDashboardWindowOpen(false)}
-                            title="Dashboard"
-                            summary="View your earnings and ride history"
+                            title={t('dashboard.subwindowTitle')}
+                            summary={t('dashboard.subwindowSummary')}
                             imageUrl="/images/dashboard.png" 
                             imageAlt="Window showing dashboard"
-                            description="The dashboard provides a comprehensive overview of your earnings and ride history, allowing you to track your performance over time. It includes features like daily earnings, ride counts, and detailed ride logs."
+                            description={t('dashboard.subwindowDescription')}
                         />
                     </section>
                 </div>

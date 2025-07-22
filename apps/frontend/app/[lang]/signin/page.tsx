@@ -117,13 +117,13 @@ export default function Signin() {
                         >
                             {t("noAccount")}
                         </div>
-                        <div 
+                        {/* <div 
                             className={styles.link} 
                             onClick={() => router.push('/forgot-password')}
                             style={{ cursor: 'pointer' }}
                         >
                             {t("forgotPassword")}
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
