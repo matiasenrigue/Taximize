@@ -40,13 +40,13 @@ export const LocationSearchbar = (props: SearchbarProps) => {
                 radius: 500
             };
             placesService.textSearch(request, (results, status) => {
-                if (status === placesLibrary.PlacesServiceStatus.OK)
+                if (status === "OK")
                     resolve(results ?? []);
                 else
                     reject(status);
             });
         });
-    }, [locale, placesService, placesLibrary.PlacesServiceStatus.OK]);
+    }, [locale, placesService]);
 
     // search address to show places with a similar address
     const searchAddress = useCallback((query: string) => {
