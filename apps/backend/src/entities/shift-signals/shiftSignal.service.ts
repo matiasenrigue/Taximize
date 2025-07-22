@@ -1,6 +1,6 @@
 // Other services
 import { RideService } from '../rides/ride.service';
-import { PauseService } from '../shift-pauses/pause.service';
+import PauseService from '../shift-pauses/pause.service';
 import { ShiftService } from '../shifts/shift.service';
 
 // Models

@@ -2,7 +2,7 @@ import { Shift } from './shift.model';
 import { ShiftSignal } from '../shift-signals/shiftSignal.model';
 import { Pause } from '../shift-pauses/pause.model';
 import { ShiftRepository } from './shift.repository';
-import { PauseService } from '../shift-pauses/pause.service';
+import PauseService from '../shift-pauses/pause.service';
 import { Ride } from '../rides/ride.model';
 import { RideRepository } from '../rides/ride.repository';
 import { RideService } from '../rides/ride.service';

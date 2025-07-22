@@ -1,6 +1,6 @@
 import { ShiftService } from '../../shift.service';
 import ShiftSignalService from '../../../shift-signals/shiftSignal.service';
-import { PauseService } from '../../../shift-pauses/pause.service';
+import PauseService from '../../../shift-pauses/pause.service';
 import { ShiftCalculator } from '../../utils/shiftCalculator';
 import { ExpiredDataCleanup } from '../../utils/cleanup/expiredDataCleanup';
 import { sequelize } from '../../../../shared/config/db';
