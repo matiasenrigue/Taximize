@@ -136,7 +136,7 @@
     "shiftSettings": "Shift Settings",
     "preferences": "Preferences",
     "statistics": "Statistics",
-    "manageRides": "Manage Rides"
+    "ridesHistory": "Rides History"
   },
   "preferences": {
     "preferences": "Preferences",
@@ -205,5 +205,18 @@
     "errorEarnings": "Error loading earnings data",
     "withPassenger": "with passenger",
     "empty": "empty"
-  }
+  },
+  "rides-history": {
+    "shifts": "Shifts"
+  },
+  "manageRidesDay": {
+  "workTime": "Work Time",
+  "rides": "Rides",
+  "noShifts": "No shifts found for this day.",
+  "noRides": "No rides for this shift.",
+  "from": "From",
+  "to": "To",
+  "duration": "Duration",
+  "fare": "Fare"
+  } 
 }

@@ -133,7 +133,7 @@
     "shiftSettings": "Schichteinstellungen",
     "preferences": "Einstellungen",
     "statistics": "Statistiken",
-    "manageRides": "Fahrten verwalten"
+    "ridesHistory": "Fahrtenverlauf"
   },
   "preferences": {
     "preferences": "Einstellungen",
@@ -202,5 +202,18 @@
     "errorEarnings": "Fehler beim Laden der Verdienstdaten",
     "withPassenger": "mit Fahrgast",
     "empty": "leer"
+  },
+  "rides-history": {
+    "shifts": "Schichten"
+  },
+  "manageRidesDay": {
+  "workTime": "Arbeitszeit",
+  "rides": "Fahrten",
+  "noShifts": "Keine Schichten für diesen Tag gefunden.",
+  "noRides": "Keine Fahrten für diese Schicht.",
+  "from": "Von",
+  "to": "Nach",
+  "duration": "Dauer",
+  "fare": "Fahrpreis"
   }
 }
