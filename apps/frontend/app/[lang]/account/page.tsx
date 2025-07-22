@@ -15,7 +15,7 @@ export default function Account() {
         { label: 'shiftSettings', href: '/account/shift-settings', icon: <FontAwesomeIcon icon={faCog} /> },
         { label: 'preferences', href: '/account/preferences', icon: <FontAwesomeIcon icon={faSliders} /> },
         { label: 'statistics', href: '/account/statistics', icon: <FontAwesomeIcon icon={faChartBar} /> },
-        { label: 'manageRides', href: '/account/manage-rides', icon: <FontAwesomeIcon icon={faCar} /> },
+        { label: 'ridesHistory', href: '/account/rides-history', icon: <FontAwesomeIcon icon={faCar} /> },
     ];
 
     return (

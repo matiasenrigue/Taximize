@@ -7,6 +7,7 @@ import BackButton from "../../../../../components/BackButton/BackButton";
 import api from "../../../../../lib/axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { useTranslations } from "next-intl";
 
 interface Ride {
     id: string;
@@ -47,7 +48,7 @@ export default function ManageRidesDay() {
     const [loading, setLoading] = useState(true);
     const [shifts, setShifts] = useState<Shift[]>([]);
     const [expanded, setExpanded] = useState<{ [shiftId: string]: string | null }>({});
-    
+    const t = useTranslations('manageRidesDay');
     useEffect(() => {
         setLoading(true);
         api.get(`/stats/rides-by-weekday`, { params: { day } })
@@ -82,7 +83,6 @@ export default function ManageRidesDay() {
     //                 distanceKm: 10,
     //                 farePerMinute: "$0.50"
     //             },
-    //             // Add more rides as needed
     //             {
     //                 id: "ride2",
     //                 startDate: "2023-10-01 10:00",
@@ -111,17 +111,17 @@ export default function ManageRidesDay() {
                 ) : (
                     <div>
                         {shifts.length === 0 ? (
-                            <div className={styles.noShifts}>No shifts found for this day.</div>
+                            <div className={styles.noShifts}>{t('noShifts')}</div>
                         ) : (
                             shifts.map((shift) => (
                                 <React.Fragment key={shift.id}>
                                     <div className={styles.shiftContainer}>
                                         <div className={styles.ridesContainer}>
-                                            <span className={styles.workTime}>Work Time: {getTotalTimeString(shift.stats.workTime, shift.stats.breakTime)}</span>
+                                            <span className={styles.workTime}>{t('workTime')}: {getTotalTimeString(shift.stats.workTime, shift.stats.breakTime)}</span>
                                         </div>
-                                        <h3 className={styles.ridesTitle}>Rides</h3>
+                                        <h3 className={styles.ridesTitle}>{t('rides')}</h3>
                                         {shift.rides.length === 0 ? (
-                                            <div className={styles.noRides}>No rides for this shift.</div>
+                                            <div className={styles.noRides}>{t('noRides')}</div>
                                         ) : (
                                             shift.rides.map((ride) => (
                                                 <div key={ride.id} className={styles.rideItem}>
@@ -137,10 +137,10 @@ export default function ManageRidesDay() {
                                                     </div>
                                                     {expanded[shift.id] === ride.id && (
                                                         <div className={styles.rideDetails}>
-                                                            <div><strong>From:</strong> {ride.from}</div>
-                                                            <div><strong>To:</strong> {ride.to}</div>
-                                                            <div><strong>Duration:</strong> {ride.duration}</div>
-                                                            <div><strong>Fare:</strong> {ride.fare}</div>
+                                                            <div><strong>{t('from')}:</strong> {ride.from}</div>
+                                                            <div><strong>{t('to')}:</strong> {ride.to}</div>
+                                                            <div><strong>{t('duration')}:</strong> {ride.duration}</div>
+                                                            <div><strong>{t('fare')}:</strong> {ride.fare}</div>
                                                         </div>
                                                     )}
                                                 </div>
