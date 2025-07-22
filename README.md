@@ -15,7 +15,7 @@ A comprehensive full-stack application designed for taxi drivers to efficiently 
 - **📱 Responsive Design**: Mobile-first approach for on-the-go usage
 
 ## 🛠️ Tech Stack
-
+ 
 ### Frontend
 - **Framework**: Next.js 15 with React 19
 - **Language**: TypeScript
