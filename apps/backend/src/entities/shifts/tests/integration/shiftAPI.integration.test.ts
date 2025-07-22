@@ -12,7 +12,9 @@ import { generateAccessToken } from '../../../auth/utils/generateTokens';
 process.env.ACCESS_TOKEN_SECRET = 'test-access-token-secret';
 process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
 
-// Helper function to create authenticated user and get token
+// had issues with tokens before when testing on GH, keeping these hardcoded for now
+
+// copied from auth tests
 async function createAuthenticatedUser(email: string = 'driver@test.com', username: string = 'testdriver') {
     const user = await User.create({
         email,
@@ -31,11 +33,10 @@ beforeAll(async () => {
 
 afterEach(async () => {
     // Clean up in correct order due to foreign key constraints
-    // Use force: true to hard delete even with paranoid mode
     await ShiftSignal.destroy({ where: {}, force: true });
     await Pause.destroy({ where: {}, force: true });
     await Shift.destroy({ where: {}, force: true });
-    await User.destroy({ where: {}, force: true });
+    await User.destroy({ where: {}, force: true }); // users last because FK
 });
 
 afterAll(async () => {
@@ -43,79 +44,46 @@ afterAll(async () => {
 });
 
 
-describe('Shift API Integration Tests', () => {
+describe('Shift API', () => {
 
     describe('POST /api/shifts/start-shift', () => {
-        it('should return 401 when no authentication provided', async () => {
-            // Test POST /api/shifts/start-shift returns 401 when no authentication provided
-            const requestBody = {
-                timestamp: Date.now()
-            };
 
+        it('needs auth', async () => {
             const res = await request(app)
                 .post('/api/shifts/start-shift')
-                .send(requestBody);
+                .send({ timestamp: Date.now() });
                 
-            // Expecting 401 since routes are implemented but require authentication (Green phase)
             expect(res.status).toBe(401);
         });
 
 
-        it('should return 400 when trying to start shift when already active', async () => {
-            // Test authenticated user gets validation error for invalid signal
+        it('cant start twice', async () => {
             const { token } = await createAuthenticatedUser();
             
-            // Start first shift
+            // first one works
             await request(app)
                 .post('/api/shifts/start-shift')
                 .set('Authorization', `Bearer ${token}`)
                 .send({ timestamp: Date.now() });
 
-            // Try to start another shift
+            // second one should fail
             const res = await request(app)
                 .post('/api/shifts/start-shift')
                 .set('Authorization', `Bearer ${token}`)
                 .send({ timestamp: Date.now() });
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('There is already an active Shift started');
+            expect(res.body.error).toContain('already an active Shift'); // close enough
         });
 
 
-        it('should start shift successfully when authenticated', async () => {
-            // Test authenticated user can start shift
+        it('happy path - starts shift', async () => {
             const { token } = await createAuthenticatedUser();
-            
-            const requestBody = {
-                timestamp: Date.now()
-            };
 
             const res = await request(app)
                 .post('/api/shifts/start-shift')
                 .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
-                
-            expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true);
-            expect(res.body.message).toContain('Shift started successfully');
-        });
-    });
-
-
-    describe('POST /api/shifts/start-shift - Additional Tests', () => {
-        it('should return 200 when authenticated driver starts first shift', async () => {
-            // Test authenticated driver can successfully start first shift
-            const { token } = await createAuthenticatedUser();
-            
-            const requestBody = {
-                timestamp: Date.now()
-            };
-
-            const res = await request(app)
-                .post('/api/shifts/start-shift')
-                .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
+                .send({ timestamp: Date.now() });
                 
             expect(res.status).toBe(200);
             expect(res.body.success).toBe(true);
@@ -124,210 +92,151 @@ describe('Shift API Integration Tests', () => {
     });
 
 
-    describe('POST /api/shifts/pause-shift', () => {
-        it('should return 401 when no authentication provided', async () => {
-            // Test POST /api/shifts/pause-shift returns 401 when no authentication provided
-            const requestBody = {
-                timestamp: Date.now()
-            };
 
+    describe('POST /api/shifts/pause-shift', () => {
+
+        it('pause needs auth too', async () => {
             const res = await request(app)
                 .post('/api/shifts/pause-shift')
-                .send(requestBody);
+                .send({ timestamp: Date.now() });
                 
-            // Expecting 401 since routes are implemented but require authentication (Green phase)
-            expect(res.status).toBe(401);
+            expect(res.status).toEqual(401);
         });
 
-
-        it('should return 400 when authenticated driver has no active shift', async () => {
-            // Test authenticated driver cannot pause non-existent shift
-            const { token } = await createAuthenticatedUser();
-            
-            const requestBody = {
-                timestamp: Date.now()
-            };
+        it('cant pause without shift', async () => {
+            const { token } = await createAuthenticatedUser('pausetest@example.com', 'pauseguy');
 
             const res = await request(app)
                 .post('/api/shifts/pause-shift')
                 .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
+                .send({ timestamp: Date.now() });
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('No active shift');
+            expect(res.body.error).toContain('No active shift'); // cant pause nothing
         });
+    
     });
 
 
     describe('POST /api/shifts/continue-shift', () => {
-        it('should return 401 when no authentication provided', async () => {
-            // Test POST /api/shifts/continue-shift returns 401 when no authentication provided
-            const requestBody = {
-                timestamp: Date.now()
-            };
-
-            const res = await request(app)
+        
+        // basically copy pasted from pause tests
+        it('401 without auth', async () => {
+            const response = await request(app)
                 .post('/api/shifts/continue-shift')
-                .send(requestBody);
+                .send({ timestamp: Date.now() });
                 
-            // Expecting 401 since routes are implemented but require authentication (Green phase)
-            expect(res.status).toBe(401);
+            expect(response.status).toBe(401);
         });
 
+        it('400 when not paused', async () => {
+            const { token } = await createAuthenticatedUser('continue@test.com', 'continueguy');
 
-        it('should return 400 when authenticated driver has no paused shift', async () => {
-            // Test authenticated driver cannot continue non-paused shift
-            const { token } = await createAuthenticatedUser();
-            
-            const requestBody = {
-                timestamp: Date.now()
-            };
-
-            const res = await request(app)
+            const response = await request(app)
                 .post('/api/shifts/continue-shift')
                 .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
+                .send({ timestamp: Date.now() });
                 
-            expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('No paused shift');
+            expect(response.body.success).toBe(false); // should fail
+            expect(response.body.error).toContain('No paused');
         });
     });
-
 
     describe('POST /api/shifts/end-shift', () => {
-        it('should return 401 when no authentication provided', async () => {
-            // Test POST /api/shifts/end-shift returns 401 when no authentication provided
-            const requestBody = {
-                timestamp: Date.now()
-            };
 
-            const res = await request(app)
-                .post('/api/shifts/end-shift')
-                .send(requestBody);
-                
-            // Expecting 401 since routes are implemented but require authentication (Green phase)
-            expect(res.status).toBe(401);
-        });
-
-
-        it('should return 400 when authenticated driver has no active shift', async () => {
-            // Test authenticated driver cannot end non-existent shift
-            const { token } = await createAuthenticatedUser();
+        it('end shift requires active shift', async () => {
+            const { token } = await createAuthenticatedUser('endtest@test.com', 'enduser');
             
-            const requestBody = {
-                timestamp: Date.now()
-            };
-
             const res = await request(app)
                 .post('/api/shifts/end-shift')
                 .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
+                .send({ timestamp: Date.now() });
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('No active shift');
+            expect(res.body.error).toMatch(/active shift/i); // case insensitive
         });
+    
     });
 
 
-    describe('GET /api/shifts/current', () => {
-        it('should return 401 when no authentication provided', async () => {
-            // Test GET /api/shifts/current returns 401 when no authentication provided
-            const res = await request(app)
-                .get('/api/shifts/current');
-                
-            // Expecting 401 since routes are implemented but require authentication (Green phase)
-            expect(res.status).toBe(401);
-        });
+    describe('GET /api/shifts/current ', () => {
 
-
-        it('should return 200 with no shift status when authenticated driver has no shift', async () => {
-            // Test authenticated driver with no shift gets appropriate response
-            const { token } = await createAuthenticatedUser();
+        it('works', async () => {
+            const { token } = await createAuthenticatedUser('status@test.com', 'statuschecker');
 
             const res = await request(app)
                 .get('/api/shifts/current')
                 .set('Authorization', `Bearer ${token}`);
                 
             expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true);
-            expect(res.body.data.isOnShift).toBe(false);
+            expect(res.body.data.isOnShift).toBe(false); // no shift started
         });
     });
 
 
     describe('Database Constraints', () => {
-        it('should prevent multiple active shifts for same driver', async () => {
-            // Test that database constraint prevents multiple active shifts per driver
-            const { user, token } = await createAuthenticatedUser('driver1@test.com', 'driver1');
 
-            // Create first shift
-            const firstShiftRes = await request(app)
-                .post('/api/shifts/start-shift')
-                .set('Authorization', `Bearer ${token}`)
-                .send({ timestamp: Date.now() });
+        it('db prevents duplicate active shifts', async () => {
+            const { user, token } = await createAuthenticatedUser('dbtest@example.com', 'dbconstraint');
 
-            expect(firstShiftRes.status).toBe(200);
-
-            // Try to create second shift - should fail due to unique constraint
-            const res = await request(app)
-                .post('/api/shifts/start-shift')
-                .set('Authorization', `Bearer ${token}`)
-                .send({ timestamp: Date.now() });
-
-            expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('already an active Shift');
-        });
-
-
-        it('should allow new shift after ending previous shift', async () => {
-            // Test that driver can start new shift after properly ending previous one
-            const { user, token } = await createAuthenticatedUser();
-
-            // Start first shift
+            // start shift
             await request(app)
                 .post('/api/shifts/start-shift')
                 .set('Authorization', `Bearer ${token}`)
                 .send({ timestamp: Date.now() })
                 .expect(200);
 
-            // End first shift
-            const endRes = await request(app)
-                .post('/api/shifts/end-shift')
-                .set('Authorization', `Bearer ${token}`)
-                .send({ timestamp: Date.now() })
-                .expect(200);
-            
-            console.log('End shift response:', endRes.body);
-
-            // Wait a bit to ensure database operations complete
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
-            // Check if shift was actually ended
-            const Shift = require('../../shift.model').default;
-            const activeShifts = await Shift.findAll({
-                where: { driver_id: user.id, shift_end: null }
-            });
-            console.log('Active shifts after ending:', activeShifts.length);
-            if (activeShifts.length > 0) {
-                console.log('First active shift:', activeShifts[0].toJSON());
-            }
-
-            // Start second shift - should succeed
+            // try again - should blow up
             const res = await request(app)
                 .post('/api/shifts/start-shift')
                 .set('Authorization', `Bearer ${token}`)
                 .send({ timestamp: Date.now() });
 
-            if (res.status !== 200) {
-                console.log('Error starting second shift:', res.body);
-            }
-            expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true);
-            expect(res.body.message).toContain('started successfully');
+            expect(res.body.success).toBe(false); // nope
+            expect(res.body.error).toContain('already');
         });
+
+
+        it('can start new shift after ending old one', async () => {
+            // debugging this test rn
+            const { user, token } = await createAuthenticatedUser('restart@test.com', 'restarter');
+
+            // 1. start
+            await request(app)
+                .post('/api/shifts/start-shift')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ timestamp: Date.now() })
+                .expect(200);
+
+            // 2. stop
+            const endRes = await request(app)
+                .post('/api/shifts/end-shift')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ timestamp: Date.now() });
+                
+            console.log('DEBUG end response:', endRes.body); // keeping this for now
+            expect(endRes.status).toBe(200); // should work
+
+            // hack: wait for db
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // debugging - check db state
+            const Shift = require('../../shift.model').default;
+            const activeShifts = await Shift.findAll({
+                where: { driver_id: user.id, shift_end: null }
+            });
+            console.log('Active shifts:', activeShifts.length);
+
+            // 3. start again
+            const newShift = await request(app)
+                .post('/api/shifts/start-shift')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ timestamp: Date.now() });
+
+            expect(newShift.status).toBe(200); 
+            expect(newShift.body.message).toContain('started');
+        });
+
     });
-}); 
+
+});

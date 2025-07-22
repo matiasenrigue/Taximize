@@ -1,10 +1,12 @@
 import { Shift } from './shift.model';
 import { Op } from 'sequelize';
 
+/**
+ * Database operations for shifts.
+ */
 export class ShiftRepository {
     /**
-     * Find active shift for a driver
-     * @returns The active shift if found, null otherwise
+     * Find driver's active shift (shift_end is null).
      */
     static async findActiveByDriverId(driverId: string): Promise<Shift | null> {
         return await Shift.findOne({
@@ -17,8 +19,7 @@ export class ShiftRepository {
 
 
     /**
-     * Find shift by ID
-     * @returns The shift if found, null otherwise
+     * Get shift by ID.
      */
     static async findById(shiftId: string): Promise<Shift | null> {
         return await Shift.findByPk(shiftId);
@@ -27,8 +28,8 @@ export class ShiftRepository {
 
     
     /**
-     * Find shifts by driver within date range
-     * @returns Array of shifts (empty array if none found)
+     * Get driver's shifts in date range.
+     * @returns Shifts sorted by start time (newest first)
      */
     static async findShiftsInDateRange(
         driverId: string, 

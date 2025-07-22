@@ -5,11 +5,17 @@ import { RideService } from '../rides/ride.service';
 import { modelToResponse, requestToModel } from '../../shared/utils/caseTransformer';
 import { ResponseHandler } from '../../shared/utils/responseHandler';
 
+/**
+ * Handles HTTP requests for shift management.
+ * All endpoints require authentication.
+ */
 export class ShiftController {
 
-    // @desc    Get current shift status
-    // @route   GET /api/shifts/current
-    // @access  Protected
+    /**
+     * Get current shift status with ride info.
+     * @route GET /api/shifts/current
+     * @access Protected
+     */
     static getCurrentShift = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const driverId = req.driverId!; 
 
@@ -37,11 +43,11 @@ export class ShiftController {
                 return;
             }
 
-            // Get ride information if driver is on a ride
-            let rideInfo: { startLatitude: number | null; startLongitude: number | null; destinationAddress: string | null } = { 
-                startLatitude: null, 
-                startLongitude: null, 
-                destinationAddress: null 
+            // Get ride details if active
+            let rideInfo = { 
+                startLatitude: null as number | null, 
+                startLongitude: null as number | null, 
+                destinationAddress: null as string | null
             };
             if (isOnRide) {
                 try {
@@ -52,7 +58,7 @@ export class ShiftController {
                         destinationAddress: rideStatus.address || null
                     };
                 } catch (error) {
-                    // If we can't get ride status, just use defaults
+                    // Ride status failed - continue with nulls
                 }
             }
             res.status(200).json({
@@ -77,14 +83,18 @@ export class ShiftController {
         }
     });
 
-    // @desc    Debug shift and ride status
-    // @route   GET /api/shifts/debug
-    // @access  Protected
+
+    
+    /**
+     * Debug endpoint for shift/ride troubleshooting.
+     * @route GET /api/shifts/debug
+     * @access Protected
+     */
     static debugShiftStatus = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const driverId = req.driverId!; 
 
         try {
-            // Get all relevant data for debugging
+            // Gather debug data
             const hasActiveRide = await RideService.hasActiveRide(driverId);
             const activeShift = await ShiftService.getActiveShift(driverId);
             const shiftStatus = await ShiftService.getCurrentShiftStatus(driverId);
@@ -97,7 +107,7 @@ export class ShiftController {
                         found: true,
                         rideId: rideStatus.rideId,
                         startTime: rideStatus.startTime,
-                        shiftId: 'N/A' // RideStatus doesn't include shiftId
+                        shiftId: 'N/A' // Not in RideStatus
                     };
                 } catch (error: any) {
                     activeRideInfo = {
@@ -131,9 +141,11 @@ export class ShiftController {
 
 
 
-    // @desc    Get all shifts for driver
-    // @route   GET /api/shifts
-    // @access  Protected
+    /**
+     * Get all shifts for authenticated driver.
+     * @route GET /api/shifts
+     * @access Protected
+     */
     static getShifts = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const driverId = req.driverId!; 
 

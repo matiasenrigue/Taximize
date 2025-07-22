@@ -10,14 +10,12 @@ export class ExpiredDataCleanup {
     private static readonly RIDE_EXPIRY_MS = ExpiredDataCleanup.RIDE_EXPIRY_HOURS * 60 * 60 * 1000;
 
     /**
-     * Manages expired rides by closing any ride that has been active for more than 4 hours
-     * Sets earnings to 0 for these rides as per business rules
-     * Only affects rides for the specified driver
+     * Close rides older than 4 hours with 0 earnings for the given driver
+     * Sets everything to 0
      */
     static async manageExpiredRides(driverId: string): Promise<void> {
         const fourHoursAgo = new Date(Date.now() - ExpiredDataCleanup.RIDE_EXPIRY_MS);
         
-        // Find expired rides for this driver only
         const expiredRides = await RideRepository.findExpiredRidesForDriver(driverId, fourHoursAgo);
         
         for (const ride of expiredRides) {
@@ -34,10 +32,10 @@ export class ExpiredDataCleanup {
         }
     }
 
+    
     /**
-     * Manages expired shifts by closing shifts with no activity for more than 1 day
-     * Creates synthetic stop signals for shifts with rides, deletes empty shifts
-     * Only affects the active shift for the specified driver
+     * End shifts inactive for 1+ days.
+     * Deletes empty shifts, saves shifts with rides.
      */
     static async manageExpiredShifts(driverId: string): Promise<void> {
         const expiryThreshold = new Date(Date.now() - ExpiredDataCleanup.SHIFT_EXPIRY_MS);
@@ -46,36 +44,32 @@ export class ExpiredDataCleanup {
         const activeShift = await ShiftService.getActiveShift(driverId);
         
         if (!activeShift) {
-            return; // No active shift to manage
+            return;
         }
 
-        // Get the last signal for this shift
         const lastSignal = await ShiftSignal.findOne({
             where: { shift_id: activeShift.id },
             order: [['timestamp', 'DESC']]
         });
 
-        // Skip if no signals or last signal is 'stop' or within expiry threshold
+        // Skip if already stopped or recent activity
         if (!lastSignal || lastSignal.signal === 'stop' || lastSignal.timestamp.getTime() > expiryThreshold.getTime()) {
             return;
         }
 
-        // Check if they have any rides at all during this shift
         const rides = await RideRepository.findAllByShift(activeShift.id);
 
         if (rides.length > 0) {
-            // If there are rides, just end the shift at the last signal time
-            // (rides would have already been closed by manageExpiredRides if needed)
+            // Has rides - create stop signal and save
             await ShiftSignal.create({
                 timestamp: lastSignal.timestamp,
                 shift_id: activeShift.id,
                 signal: 'stop'
             });
 
-            // Save shift using the existing method
             await ShiftService.endShiftById(activeShift.id, driverId);
         } else {
-            // No rides recorded - delete the empty shift entirely
+            // Empty shift - delete it
             await ShiftService.deleteShiftSignals(driverId);
             
             await Shift.destroy({
@@ -87,20 +81,16 @@ export class ExpiredDataCleanup {
     }
 
     /**
-     * Main cleanup method that handles both expired rides and shifts for a specific driver
-     * Should be called on user login to ensure data integrity
-     * Order matters: clean rides first, then shifts
+     * Run cleanup on login - rides first, then shifts.
      */
     static async performLoginCleanup(driverId: string): Promise<void> {
         try {
-            // First clean up expired rides (4+ hours) for this driver
             await this.manageExpiredRides(driverId);
             
-            // Then clean up expired shifts (1+ days) for this driver
             await this.manageExpiredShifts(driverId);
         } catch (error) {
             console.error(`Error during login cleanup for driver ${driverId}:`, error);
-            // Don't throw - we don't want cleanup failures to block login
+            // Don't block login on cleanup errors
         }
     }
 }

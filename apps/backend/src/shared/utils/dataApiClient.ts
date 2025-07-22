@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const DATA_API_URL = process.env.DATA_API_URL || 'http://localhost:5000';
+const DATA_API_URL = process.env.DATA_API_URL || 'http://localhost:5050';
 
 interface HotspotPrediction {
   pickup_zone: string;

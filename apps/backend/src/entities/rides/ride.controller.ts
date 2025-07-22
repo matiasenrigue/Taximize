@@ -9,11 +9,8 @@ import { RideValidators } from './ride.validators';
 import { RIDE_CONSTANTS } from './ride.constants';
 
 /**
- * Controller for ride-related operations.
- * 
- * Handles HTTP requests for ride management including evaluating rides,
- * starting rides, and ending rides. All endpoints require authentication
- * and validate input data before processing.
+ * Handles ride API endpoints - evaluation, start, end, and status.
+ * All routes require authentication.
  */
 export class RideController {
 
@@ -21,16 +18,9 @@ export class RideController {
     /**
      * Evaluates ride coordinates to get ML prediction score.
      * 
-     * Uses machine learning service to predict ride quality/profitability
-     * based on start and destination coordinates.
-     * 
      * @route POST /api/rides/evaluate-ride
-     * @access Protected (requires authentication)
-     * @param req.body.startLatitude - Starting point latitude
-     * @param req.body.startLongitude - Starting point longitude
-     * @param req.body.destinationLatitude - Destination latitude
-     * @param req.body.destinationLongitude - Destination longitude
-     * @returns JSON response with predicted rating (1-5 scale)
+     * @access Protected
+     * @returns Predicted rating (1-5 scale)
      */
     static evaluateRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { startLatitude, startLongitude, destinationLatitude, destinationLongitude } = req.body;
@@ -48,22 +38,11 @@ export class RideController {
 
 
     /**
-     * Starts a new ride for the authenticated driver.
-     * 
-     * Creates a new ride record after validating coordinates and ensuring
-     * the driver has an active shift and no other rides in progress.
+     * Starts a new ride.
      * 
      * @route POST /api/rides/start-ride
-     * @access Protected (requires authentication)
-     * @param req.body.startLatitude - Starting point latitude
-     * @param req.body.startLongitude - Starting point longitude
-     * @param req.body.destinationLatitude - Destination latitude
-     * @param req.body.destinationLongitude - Destination longitude
-     * @param req.body.address - Human-readable destination address
-     * @param req.body.predictedScore - ML predicted score for the ride
-     * @param req.body.timestamp - Optional start timestamp (defaults to now)
-     * @returns Success response with ride ID, start time, and predicted score
-     * @throws 400 error if no active shift or invalid coordinates
+     * @access Protected
+     * @throws 400 if no active shift or bad coordinates
      */
     static startRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { startLatitude, startLongitude, destinationLatitude, destinationLongitude, timestamp, address, predictedScore } = req.body;
@@ -94,13 +73,10 @@ export class RideController {
 
 
     /**
-     * Gets the current ride status for the authenticated driver.
-     * 
-     * Returns information about any active ride or indicates no ride in progress.
+     * Gets current ride status.
      * 
      * @route GET /api/rides/current
-     * @access Protected (requires authentication)
-     * @returns Current ride details or status indicating no active ride
+     * @access Protected
      */
     static getRideStatus = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const driverId = req.driverId!; 
@@ -116,25 +92,21 @@ export class RideController {
 
     
     /**
-     * Ends the current active ride for the authenticated driver.
-     * 
-     * Finalizes the ride with actual fare and distance information,
-     * calculates earnings per minute, and updates shift statistics.
+     * Ends active ride and calculates earnings.
      * 
      * @route POST /api/rides/end-ride
-     * @access Protected (requires authentication)
-     * @param req.body.fareCents - Total fare earned in cents
-     * @param req.body.actualDistanceKm - Actual distance traveled in kilometers
-     * @param req.body.timestamp - Optional end timestamp (defaults to now)
-     * @returns Ride summary with final metrics (duration, earnings, distance)
-     * @throws Error if no active ride found or ride already ended
+     * @access Protected
+     * @param req.body.fareCents
+     * @param req.body.actualDistanceKm
+     * @returns Ride summary with final metrics (duration, earnings, distance
+     * @throws If no active ride or already ended
      */
     static endRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { fareCents, actualDistanceKm, timestamp } = req.body;
         const driverId = req.driverId!; 
 
         try {
-            // First get the active ride to get the rideId
+            // Get active ride first, then end it
             const rideStatus = await RideService.getRideStatus(driverId);
             const result = await RideService.endRide(rideStatus.rideId, fareCents, actualDistanceKm, timestamp);
             

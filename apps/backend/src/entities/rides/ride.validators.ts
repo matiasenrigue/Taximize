@@ -3,21 +3,12 @@ import { RideCoordinates } from './ride.types';
 import { Ride } from './ride.model';
 
 /**
- * Validation utilities for ride-related data.
- * 
- * Provides methods to validate coordinates, prediction scores,
- * and other ride data before processing or storage.
+ * Validates ride data - coordinates, scores, etc.
  */
 export class RideValidators {
 
     /**
-     * Validates ride coordinates for geographic validity.
-     * 
-     * Checks that all provided coordinates fall within valid
-     * latitude and longitude bounds.
-     * 
-     * @param coords - Partial ride coordinates to validate
-     * @throws Error if any coordinate is out of bounds
+     * Check all coordinates are within valid bounds.
      */
     static validateCoordinates(coords: Partial<RideCoordinates>): void {
         const { startLat, startLng, destLat, destLng } = coords;
@@ -36,11 +27,8 @@ export class RideValidators {
         }
     }
 
-    /**
-     * Validates a latitude value.
-     * @param lat - Latitude to validate (-90 to 90)
-     * @throws Error if latitude is out of bounds
-     */
+
+    /** Validate latitude (-90 to 90). */
     private static validateLatitude(lat: number): void {
         if (lat < RIDE_CONSTANTS.COORDINATE_BOUNDS.LATITUDE.MIN || 
             lat > RIDE_CONSTANTS.COORDINATE_BOUNDS.LATITUDE.MAX) {
@@ -48,11 +36,8 @@ export class RideValidators {
         }
     }
 
-    /**
-     * Validates a longitude value.
-     * @param lng - Longitude to validate (-180 to 180)
-     * @throws Error if longitude is out of bounds
-     */
+
+    /** Validate longitude (-180 to 180). */
     private static validateLongitude(lng: number): void {
         if (lng < RIDE_CONSTANTS.COORDINATE_BOUNDS.LONGITUDE.MIN || 
             lng > RIDE_CONSTANTS.COORDINATE_BOUNDS.LONGITUDE.MAX) {
@@ -61,13 +46,7 @@ export class RideValidators {
     }
 
     /**
-     * Validates an ML prediction score.
-     * 
-     * Ensures the score falls within the expected range (0-1)
-     * before it's converted to a user-facing rating.
-     * 
-     * @param score - Prediction score to validate (0-1 scale)
-     * @throws Error if score is out of bounds
+     * Ensure ML score is within expected range (0-1).
      */
     static validatePredictionScore(score: number): void {
         if (score < RIDE_CONSTANTS.PREDICTION_SCALE.MIN || 
