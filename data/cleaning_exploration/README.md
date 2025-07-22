@@ -4,10 +4,10 @@ This directory contains all the preprocessing, initial modeling, and evaluation 
 
 ## 📊 Overview
 
-Our data pipeline transforms raw NYC taxi trip records into a sophisticated scoring model that predicts ride profitability. The journey spans from **3.3 million raw records** to a production-ready scoring system that achieves **R² = 0.43** in predicting fare per minute.
+Our data pipeline transforms raw NYC taxi trip records into a sophisticated scoring model that predicts ride profitability. The journey spans from **5.6 million raw records** (Jan-Feb Combined) to a production-ready scoring system that achieves **R² = 0.43** in predicting fare per minute.
 
 ### 🔗 Data Access
-Please note that due to limitations of github we are choosing to not upload the raw/cleaned csv if you want to reproduce these results please test locally and download the data following this link:
+Please note that due to limitations of github we are choosing to not upload the raw/cleaned csv if you want to reproduce these results **please test locally** and download the data following this link:
 
 **[📁 Download Dataset](https://drive.google.com/drive/folders/1Gk9p-tLLZkTv9fjC7BxSy8Wdx8TOYUx5?usp=drive_link)**
 
@@ -17,12 +17,13 @@ Please note that due to limitations of github we are choosing to not upload the 
 
 ### `Data_Cleaning&_Intital_Exploartion` 🧹
 
-Focused on preparing and understanding the core dataset. This phase processes **3.3M+ raw records** into clean, analysis-ready data.
+Focused on preparing and understanding the core dataset. This phase processes **5.6M+ raw records** into clean, analysis-ready data.
 
 - **`Data Cleaning.ipynb`**  
   Comprehensive data cleaning pipeline that:
   - Converts timestamps to NYC timezone-aware format
   - Filters trips by reasonable duration (< 4 hours) and distance (< 100 miles)
+  - Merges data with NYC Taxi Zone Lookup to get zones and boroughs
   - Removes invalid fare amounts and location IDs
   - Engineers key features: `fare_per_minute`, `fare_per_mile`, `trip_speed_mph`
   - Adds temporal features: hour encoding, day type, time of day segments
@@ -127,7 +128,7 @@ Final iterations focused on optimizing a production-ready scoring pipeline. This
 
 ### Data Processing Pipeline
 - **Input**: Raw NYC Yellow Taxi trip records (2022-2023)
-- **Initial Records**: 3.3M+ trips per month
+- **Initial Records**: 5.6M+ trips per month
 - **Clean Records**: ~3.1M after filtering (94% retention rate)
 - **Training Data**: January 2023 (2.87M records)
 - **Validation Data**: February 2023 (2.74M records)
