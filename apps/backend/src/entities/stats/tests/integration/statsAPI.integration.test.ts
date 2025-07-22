@@ -6,6 +6,10 @@ import { Shift } from '../../../shifts/shift.model';
 import { Ride } from '../../../rides/ride.model';
 import { TestHelpers } from '../../../../shared/tests/utils/testHelpers';
 
+// Set up environment variables for testing
+process.env.ACCESS_TOKEN_SECRET = 'test-access-token-secret';
+process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
+
 describe('Statistics API', () => {
     let authToken: string;
     let driver: User;

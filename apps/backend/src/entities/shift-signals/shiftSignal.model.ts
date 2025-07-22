@@ -1,6 +1,5 @@
 // Placeholder file for TDD Red phase - full implementation in Green phase
-import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../../shared/config/db';
+import { sequelize, Model, DataTypes } from '../../shared/config/db';
 
 export class ShiftSignal extends Model {
     public id!: string;

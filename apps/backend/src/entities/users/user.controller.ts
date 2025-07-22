@@ -2,26 +2,31 @@ import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { Ride } from '../rides/ride.model';
 import { modelToResponse } from '../../shared/utils/caseTransformer';
+import { ResponseHandler } from '../../shared/utils/responseHandler';
 
 export class UserController {
-    // @desc    Get user statistics
-    // @route   GET /api/users/me/stats
+    // @desc    Get current user information
+    // @route   GET /api/users/me
     // @access  Protected
-    static getUserStats = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        const userId = req.user?.id;
+    static getCurrentUser = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        
+        // User was already fetched from the DB by the middleware
+        const user = req.user;
 
-        if (!userId) {
+        if (!user) {
             res.status(401);
             throw new Error('User authentication required');
         }
 
-        // Get total rides count for the user
-        const totalRides = await Ride.count({
-            where: { driver_id: userId }
-        });
+        const userData = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+        };
 
-        res.status(200).json(modelToResponse({
-            total_rides: totalRides
-        }));
+        ResponseHandler.success(res, userData);
     });
+
 }

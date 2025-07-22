@@ -2,143 +2,93 @@ import { SignalValidation, Signal } from '../../utils/signalValidation';
 import { SignalValidationTestUtils } from '../utils/signalValidation.testUtils';
 
 
-describe('SignalValidation Unit Tests', () => {
+describe('SignalValidation', () => {
     beforeEach(() => {
-        // Reset driver states before each test
         SignalValidationTestUtils.clearAllDriverStates();
     });
 
 
     describe('isValidTransition', () => {
-        it('should return true for valid initial "start" signal', () => {
-            // Test that isValidTransition returns true for valid initial "start" signal
+        it('allows start as initial signal', () => {
             const result = SignalValidation.isValidTransition(null, 'start');
             expect(result).toBe(true);
         });
 
 
-        it('should return false for invalid initial signals that are not "start"', () => {
-            // Test that isValidTransition returns false for invalid initial signals that are not "start"
-            expect(SignalValidation.isValidTransition(null, 'pause')).toBe(false);
-            expect(SignalValidation.isValidTransition(null, 'continue')).toBe(false);
+        it('rejects other signals when no current state', () => {
+            expect(SignalValidation.isValidTransition(null, 'pause')).toBe(false); // can't pause nothing
+            expect(SignalValidation.isValidTransition(null, 'continue')).toBeFalsy(); // continue nothing
             expect(SignalValidation.isValidTransition(null, 'stop')).toBe(false);
         });
 
 
-        it('should return true for "start" -> "pause" transition', () => {
-            // Test that isValidTransition returns true for "start" -> "pause" transition
-            const result = SignalValidation.isValidTransition('start', 'pause');
-            expect(result).toBe(true);
+        it('should handle basic start transitions', () => {
+            expect(SignalValidation.isValidTransition('start', 'pause')).toBeTruthy(); // can pause
+            expect(SignalValidation.isValidTransition('start', 'stop')).toBe(true); // or stop
+            
+            // these make no sense
+            expect(SignalValidation.isValidTransition('start', 'start')).toBe(false); // already started!
+            expect(SignalValidation.isValidTransition('start', 'continue')).toBeFalsy();
         });
 
 
-        it('should return true for "start" -> "stop" transition', () => {
-            // Test that isValidTransition returns true for "start" -> "stop" transition
-            const result = SignalValidation.isValidTransition('start', 'stop');
-            expect(result).toBe(true);
+        describe('pause state transitions', () => {
+            it('can continue or stop from pause', () => {
+
+                expect(SignalValidation.isValidTransition('pause', 'continue')).toBe(true);
+                expect(SignalValidation.isValidTransition('pause', 'stop')).toBeTruthy(); // can always stop
+            });
+
+            it('prevents invalid pause transitions', () => {
+                expect(SignalValidation.isValidTransition('pause', 'start')).toBe(false); // can't restart
+                expect(SignalValidation.isValidTransition('pause', 'pause')).toEqual(false); // double pause??
+            });
         });
 
 
-        it('should return false for "start" -> "start" transition', () => {
-            // Test that isValidTransition returns false for "start" -> "start" transition
-            const result = SignalValidation.isValidTransition('start', 'start');
-            expect(result).toBe(false);
+        // had a bug with this before
+        it('handles continue -> pause/stop', () => {
+            expect(SignalValidation.isValidTransition('continue', 'pause')).toBe(true); // pause again
+            expect(SignalValidation.isValidTransition('continue', 'stop')).toBeTruthy();
         });
 
 
-        it('should return false for "start" -> "continue" transition', () => {
-            // Test that isValidTransition returns false for "start" -> "continue" transition
-            const result = SignalValidation.isValidTransition('start', 'continue');
-            expect(result).toBe(false);
+        it('blocks nonsense continue transitions', () => {
+            expect(SignalValidation.isValidTransition('continue', 'start')).toBeFalsy(); 
+            expect(SignalValidation.isValidTransition('continue', 'continue')).toBe(false); 
         });
 
 
-        it('should return true for "pause" -> "continue" transition', () => {
-            // Test that isValidTransition returns true for "pause" -> "continue" transition
-            const result = SignalValidation.isValidTransition('pause', 'continue');
-            expect(result).toBe(true);
-        });
-
-
-        it('should return true for "pause" -> "stop" transition', () => {
-            // Test that isValidTransition returns true for "pause" -> "stop" transition
-            const result = SignalValidation.isValidTransition('pause', 'stop');
-            expect(result).toBe(true);
-        });
-
-
-        it('should return false for "pause" -> "start" transition', () => {
-            // Test that isValidTransition returns false for "pause" -> "start" transition
-            const result = SignalValidation.isValidTransition('pause', 'start');
-            expect(result).toBe(false);
-        });
-
-
-        it('should return false for "pause" -> "pause" transition', () => {
-            // Test that isValidTransition returns false for "pause" -> "pause" transition
-            const result = SignalValidation.isValidTransition('pause', 'pause');
-            expect(result).toBe(false);
-        });
-
-
-        it('should return true for "continue" -> "pause" transition', () => {
-            // Test that isValidTransition returns true for "continue" -> "pause" transition
-            const result = SignalValidation.isValidTransition('continue', 'pause');
-            expect(result).toBe(true);
-        });
-
-
-        it('should return true for "continue" -> "stop" transition', () => {
-            // Test that isValidTransition returns true for "continue" -> "stop" transition
-            const result = SignalValidation.isValidTransition('continue', 'stop');
-            expect(result).toBe(true);
-        });
-
-
-        it('should return false for "continue" -> "start" transition', () => {
-            // Test that isValidTransition returns false for "continue" -> "start" transition
-            const result = SignalValidation.isValidTransition('continue', 'start');
-            expect(result).toBe(false);
-        });
-
-
-        it('should return false for "continue" -> "continue" transition', () => {
-            // Test that isValidTransition returns false for "continue" -> "continue" transition
-            const result = SignalValidation.isValidTransition('continue', 'continue');
-            expect(result).toBe(false);
-        });
-
-
-        it('should return false for any transition from "stop"', () => {
-            // Test that isValidTransition returns false for any transition from "stop"
+        it('stop is final', () => {
+            // once stopped, can't do anything
             expect(SignalValidation.isValidTransition('stop', 'start')).toBe(false);
-            expect(SignalValidation.isValidTransition('stop', 'pause')).toBe(false);
+            expect(SignalValidation.isValidTransition('stop', 'pause')).toBeFalsy();
             expect(SignalValidation.isValidTransition('stop', 'continue')).toBe(false);
-            expect(SignalValidation.isValidTransition('stop', 'stop')).toBe(false);
+            expect(SignalValidation.isValidTransition('stop', 'stop')).toEqual(false); // even stop again
         });
     });
 
 
     describe('canReceiveSignal', () => {
-        it('should return true when driver can receive the signal based on current state', () => {
-            // Test that canReceiveSignal returns true when driver can receive the signal based on current state
-            const driverId = 'test-driver-1';
-            const newSignal: Signal = 'start';
+        it('checks if driver can receive signal', () => {
+            const driverId = 'driver-123';
             
+            // driver starts with null state
             const currentState = SignalValidationTestUtils.getDriverState(driverId);
-            const result = SignalValidation.isValidTransition(currentState, newSignal);
-            expect(result).toBe(true);
+            const canStart = SignalValidation.isValidTransition(currentState, 'start');
+            expect(canStart).toBeTruthy(); // should be able to start
         });
 
 
-        it('should return false when driver cannot receive the signal based on current state', () => {
-            // Test that canReceiveSignal returns false when driver cannot receive the signal based on current state
-            const driverId = 'test-driver-2';
-            const newSignal: Signal = 'continue';
+        it('blocks invalid signals based on state', () => {
+            const driver = 'test-driver';
+            const badSignal: Signal = 'continue';
             
-            const currentState = SignalValidationTestUtils.getDriverState(driverId);
-            const result = SignalValidation.isValidTransition(currentState, newSignal);
-            expect(result).toBe(false);
+            // fresh driver can't continue
+            const state = SignalValidationTestUtils.getDriverState(driver);
+            expect(SignalValidation.isValidTransition(state, badSignal)).toBe(false); // nope
         });
+
+        // TODO: add more complex scenarios with actual state changes
     });
-}); 
+});

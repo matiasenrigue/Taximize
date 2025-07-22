@@ -46,7 +46,7 @@ export const LocationSearchbar = (props: SearchbarProps) => {
                     reject(status);
             });
         });
-    }, [locale, placesService]);
+    }, [locale, placesService, placesLibrary.PlacesServiceStatus.OK]);
 
     // search address to show places with a similar address
     const searchAddress = useCallback((query: string) => {

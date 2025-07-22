@@ -3,6 +3,7 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+    max-width: 400px;
     background-color: var(--color-surface);
     border: solid 1px var(--color-border);
     border-radius: var(--border-radius);
@@ -53,6 +54,7 @@
 }
 
 .input {
+    background-color: inherit;
     flex: 1 1 0;
     height: 100%;
     padding: 12px 0;
