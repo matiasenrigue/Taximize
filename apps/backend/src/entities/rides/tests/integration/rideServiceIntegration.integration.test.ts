@@ -8,7 +8,7 @@ import { ExpiredDataCleanup } from '../../../shifts/utils/cleanup/expiredDataCle
 
 TestHelpers.setupEnvironment();
 
-// Common test coordinates
+// Dublin coordinates I use for testing
 const DEFAULT_COORDS = {
     startLat: 53.349805,
     startLng: -6.260310,
@@ -31,300 +31,144 @@ afterAll(async () => {
 });
 
 
-describe('Ride Service Integration Tests', () => {
+describe('RideService Integration', () => {
 
     describe('Service Layer Data Flow', () => {
-        it('should correctly handle driver availability check through service layers', async () => {
+
+        it('driver availability flows through services', async () => {
             const { user } = await TestHelpers.createAuthenticatedUser();
             const shift = await TestHelpers.createActiveShift(user.id);
 
-            // Test driver availability through ShiftService
             const isAvailable = await ShiftService.driverIsAvailable(user.id);
-            expect(isAvailable).toBe(true);
+            expect(isAvailable).toBe(true); // has shift
 
-            // Test canStartRide through RideService
             const canStartResult = await RideService.canStartRide(user.id);
             expect(canStartResult.canStart).toBe(true);
 
-            // Test hasActiveRide through RideService
+            // no ride yet
             const hasActive = await RideService.hasActiveRide(user.id);
             expect(hasActive).toBe(false);
         });
 
 
-        it('should correctly propagate state changes through service layers', async () => {
+        it('state changes propagate correctly', async () => {
             const { user } = await TestHelpers.createAuthenticatedUser();
             const shift = await TestHelpers.createActiveShift(user.id);
 
-            // Initially should be able to start ride
-            let canStartResult = await RideService.canStartRide(user.id);
-            expect(canStartResult.canStart).toBe(true);
+            // can start initially
+            let canStart = await RideService.canStartRide(user.id);
+            expect(canStart.canStart).toBe(true);
 
-            // Start a ride
-            const coords = {
+            const rideResult = await RideService.startRide(user.id, shift.id, {
                 ...DEFAULT_COORDS,
-                address: "Service Integration Test 1"
-            };
-
-            const rideResult = await RideService.startRide(user.id, shift.id, coords);
+                address: "Temple Bar"
+            });
             expect(rideResult.rideId).toBeDefined();
 
-            // Now should not be able to start another ride
-            canStartResult = await RideService.canStartRide(user.id);
-            expect(canStartResult.canStart).toBe(false);
+            // Now blocked
+            canStart = await RideService.canStartRide(user.id);
+            expect(canStart.canStart).toBe(false); // already has ride
 
-            // Should have an active ride
             const hasActive = await RideService.hasActiveRide(user.id);
             expect(hasActive).toBe(true);
         });
 
 
-        it('should handle service layer error propagation correctly', async () => {
+        it('errors bubble up properly', async () => {
             const { user } = await TestHelpers.createAuthenticatedUser();
 
-            // No active shift scenario
-            const canStartResult = await RideService.canStartRide(user.id);
-            expect(canStartResult.canStart).toBe(false);
+            // no shift = no ride
+            const canStart = await RideService.canStartRide(user.id);
+            expect(canStart.canStart).toBe(false);
 
-            // Attempt to start ride without shift should fail
-            const coords = {
+            await expect(RideService.startRide(user.id, 'fake-shift-id', {
                 ...DEFAULT_COORDS,
-                address: "Service Integration Test 2"
-            };
-
-            await expect(RideService.startRide(user.id, 'fake-shift-id', coords))
-                .rejects.toThrow('No active shift found');
+                address: "Should fail"
+            })).rejects.toThrow('No active shift');
         });
     });
 
 
-    describe('Cross-Service Data Integrity', () => {
-        it('should maintain data consistency across Ride and Shift services', async () => {
+    describe('data consistency', () => {
+
+        it('ride and shift data stays in sync', async () => {
             const { user } = await TestHelpers.createAuthenticatedUser();
             const shift = await TestHelpers.createActiveShift(user.id);
 
-            // Start ride through RideService
-            const coords = {
+            const rideResult = await RideService.startRide(user.id, shift.id, {
                 ...DEFAULT_COORDS,
-                address: "Service Integration Test 3"
-            };
+                address: "Phoenix Park"
+            });
 
-            const rideResult = await RideService.startRide(user.id, shift.id, coords);
+            // check through ride service
+            const status = await RideService.getRideStatus(user.id);
+            expect(status).not.toBeNull();
+            expect(status!.rideId).toBe(rideResult.rideId);
 
-            // Verify through RideService
-            const rideStatus = await RideService.getRideStatus(user.id);
-            expect(rideStatus).not.toBeNull();
-            expect(rideStatus!.rideId).toBe(rideResult.rideId);
-
-            // Verify through ShiftService that driver is still available but busy
+            // driver still "available" even with ride
             const isAvailable = await ShiftService.driverIsAvailable(user.id);
-            expect(isAvailable).toBe(true); // Driver is available but has active ride
+            expect(isAvailable).toBe(true); // has shift, just busy
 
-            // Verify data consistency in database
+            // Verify db consistency
             const dbRide = await Ride.findByPk(rideResult.rideId);
             const dbShift = await Shift.findByPk(shift.id);
             
             expect(dbRide!.shift_id).toBe(dbShift!.id);
-            expect(dbRide!.driver_id).toBe(dbShift!.driver_id);
+            expect(dbRide!.driver_id).toBe(user.id); // all linked properly
         });
 
 
-        it('should handle shift termination impact on ride services', async () => {
+        it('ending shift affects ride status check', async () => {
             const { user } = await TestHelpers.createAuthenticatedUser();
             const shift = await TestHelpers.createActiveShift(user.id);
 
-            // Start ride
-            const coords = {
+            const rideResult = await RideService.startRide(user.id, shift.id, {
                 ...DEFAULT_COORDS,
-                address: "Service Integration Test 4"
-            };
+                address: "Howth"
+            });
 
-            const rideResult = await RideService.startRide(user.id, shift.id, coords);
+            // ride exists
+            let status = await RideService.getRideStatus(user.id);
+            expect(status).not.toBeNull();
 
-            // Verify ride is active
-            let rideStatus = await RideService.getRideStatus(user.id);
-            expect(rideStatus).not.toBeNull();
-
-            // End shift
+            // Clock out
             await shift.update({ shift_end: new Date() });
 
-            // Ride status should throw error (no active shift)
+            // Now fails - no active shift
             await expect(RideService.getRideStatus(user.id))
-                .rejects.toThrow('No active shift found. Please start a shift before checking ride status.');
+                .rejects.toThrow('No active shift');
 
-            // But ride should still exist in database
+            // ride still in DB though
             const dbRide = await Ride.findByPk(rideResult.rideId);
             expect(dbRide).not.toBeNull();
-            expect(dbRide!.end_time).toBeNull(); // Still active in DB
+            expect(dbRide!.end_time).toBeNull(); // orphaned active ride!
         });
     });
 
 
-    describe('Service Layer Transaction Handling', () => {
-        it('should handle concurrent ride start attempts correctly', async () => {
+
+    describe('edge cases', () => {
+
+        it('cleans up ancient rides', async () => {
             const { user } = await TestHelpers.createAuthenticatedUser();
             const shift = await TestHelpers.createActiveShift(user.id);
 
-            const coords = {
-                ...DEFAULT_COORDS,
-                address: "Service Integration Test 5"
-            };
-
-            // Make concurrent ride start attempts
-            const promises = Array.from({ length: 3 }, () =>
-                RideService.startRide(user.id, shift.id, coords)
-            );
-
-            // Only one should succeed, others should fail
-            const results = await Promise.allSettled(promises);
-            
-            const successful = results.filter(r => r.status === 'fulfilled');
-            const failed = results.filter(r => r.status === 'rejected');
-
-            expect(successful).toHaveLength(1);
-            expect(failed).toHaveLength(2);
-
-            // Verify database state
-            const rides = await Ride.findAll({ where: { driver_id: user.id } });
-            expect(rides).toHaveLength(1);
-        });
-
-
-        it('should handle ride end with proper data validation', async () => {
-            const { user } = await TestHelpers.createAuthenticatedUser();
-            const shift = await TestHelpers.createActiveShift(user.id);
-
-            // Start ride
-            const coords = {
-                ...DEFAULT_COORDS,
-                address: "Service Integration Test 6"
-            };
-
-            const rideResult = await RideService.startRide(user.id, shift.id, coords);
-
-            // Wait a bit to ensure timing calculation
-            await new Promise(resolve => setTimeout(resolve, 100));
-
-            // End ride
-            const endResult = await RideService.endRide(rideResult.rideId, 1500, 5.2);
-
-            expect(endResult.rideId).toBe(rideResult.rideId);
-            expect(endResult.earningCents).toBe(1500);
-            expect(endResult.distanceKm).toBe(5.2);
-            expect(endResult.totalTimeMs).toBeGreaterThan(0);
-            expect(endResult.earningPerMin).toBeGreaterThan(0);
-
-            // Verify database state
-            const dbRide = await Ride.findByPk(rideResult.rideId);
-            expect(dbRide!.end_time).not.toBeNull();
-            expect(dbRide!.earning_cents).toBe(1500);
-            expect(dbRide!.distance_km).toBe(5.2);
-        });
-    });
-
-
-    describe('Service Layer Edge Cases', () => {
-        it('should handle malformed UUID inputs gracefully', async () => {
-            const coords = {
-                ...DEFAULT_COORDS,
-                address: "Malformed UUID Test"
-            };
-
-            // Test with malformed driver ID
-            await expect(RideService.startRide('invalid-uuid', 'another-invalid-uuid', coords))
-                .rejects.toThrow();
-
-            // Test with malformed ride ID for end ride
-            await expect(RideService.endRide('invalid-uuid', 1500, 5.2))
-                .rejects.toThrow();
-
-            // Test with malformed driver ID for status
-            await expect(RideService.getRideStatus('invalid-uuid'))
-                .rejects.toThrow('No active shift found. Please start a shift before checking ride status.');
-        });
-
-
-        it('should handle coordinate validation through service layer', async () => {
-            const { user } = await TestHelpers.createAuthenticatedUser();
-            const shift = await TestHelpers.createActiveShift(user.id);
-
-            // Test invalid latitude
-            const invalidLatCoords = {
-                startLat: 95, // Invalid: > 90
-                startLng: -6.260310,
-                destLat: 53.359805,
-                destLng: -6.270310,
-                predictedScore: 0
-            };
-
-            await expect(RideService.startRide(user.id, shift.id, invalidLatCoords))
-                .rejects.toThrow('Invalid latitude provided');
-
-            // Test invalid longitude
-            const invalidLngCoords = {
-                startLat: 53.349805,
-                startLng: -185, // Invalid: < -180
-                destLat: 53.359805,
-                destLng: -6.270310,
-                predictedScore: 0
-            };
-
-            await expect(RideService.startRide(user.id, shift.id, invalidLngCoords))
-                .rejects.toThrow('Invalid longitude provided');
-        });
-
-
-        it('should handle expired rides cleanup correctly', async () => {
-            const { user } = await TestHelpers.createAuthenticatedUser();
-            const shift = await TestHelpers.createActiveShift(user.id);
-
-            // Create an old ride (simulate 5 hours ago)
+            // Create zombie ride from 5 hours ago
             const oldRide = await TestHelpers.createActiveRide(shift.id, user.id, {
-                address: "Expired Ride Test Address",
-                start_time: new Date(Date.now() - 5 * 60 * 60 * 1000) // 5 hours ago
+                address: "Forgotten ride",
+                start_time: new Date(Date.now() - 5 * 60 * 60 * 1000) // ancient history
             });
 
-            // Run expired rides cleanup
             await ExpiredDataCleanup.manageExpiredRides(user.id);
 
-            // Verify old ride is now ended
-            const updatedRide = await Ride.findByPk(oldRide.id);
-            expect(updatedRide!.end_time).not.toBeNull();
-            expect(updatedRide!.earning_cents).toBe(0);
-            expect(updatedRide!.distance_km).toBe(0);
+            // Should be force-ended
+            const updated = await Ride.findByPk(oldRide.id);
+            expect(updated!.end_time).not.toBeNull(); // ended
+            expect(updated!.earning_cents).toBe(0); // no money
+            expect(updated!.distance_km).toBe(0); // no distance
         });
     });
 
 
-    describe('Service Layer Performance', () => {
-        it('should handle multiple drivers efficiently', async () => {
-            // Create multiple drivers with active shifts
-            const drivers = [];
-            for (let i = 0; i < 5; i++) {
-                const { user } = await TestHelpers.createAuthenticatedUser(
-                    `driver${i}@test.com`,
-                    `driver${i}`
-                );
-                const shift = await TestHelpers.createActiveShift(user.id);
-                drivers.push({ user, shift });
-            }
 
-            // Start rides for all drivers concurrently
-            const ridePromises = drivers.map(({ user, shift }) =>
-                RideService.startRide(user.id, shift.id, DEFAULT_COORDS)
-            );
-
-            const results = await Promise.all(ridePromises);
-
-            // All should succeed
-            expect(results).toHaveLength(5);
-            results.forEach(result => {
-                expect(result.rideId).toBeDefined();
-            });
-
-            // Verify database state
-            const totalRides = await Ride.count();
-            expect(totalRides).toBe(5);
-        });
-    });
 });

@@ -1,6 +1,32 @@
+/**
+ * Represents the possible shift signal types.
+ * 
+ * - start: Beginning a new shift
+ * - pause: Taking a break during shift
+ * - continue: Resuming work after a pause
+ * - stop: Ending the shift
+ */
 export type Signal = 'start' | 'pause' | 'continue' | 'stop';
 
+/**
+ * Utility class for validating shift signal transitions.
+ * 
+ * Implements state machine logic to ensure signals follow
+ * valid sequences (e.g., can't pause without starting first).
+ */
 export class SignalValidation {
+
+    
+    /**
+     * Validates if a signal transition is allowed.
+     * 
+     * Uses a state machine approach to ensure signals follow logical order.
+     * For example, you can't 'continue' without first being 'paused'.
+     * 
+     * @param lastSignal - The most recent signal (null if no previous signal)
+     * @param newSignal - The signal attempting to be registered
+     * @returns True if the transition is valid, false otherwise
+     */
     static isValidTransition(lastSignal: Signal | null, newSignal: Signal): boolean {
         // Define valid transitions
         const validTransitions: { [key: string]: Signal[] } = {

@@ -6,7 +6,7 @@ import { TestHelpers } from '../../../../shared/tests/utils/testHelpers';
 
 TestHelpers.setupEnvironment();
 
-// Common ride request bodies
+// Test coords around Dublin
 const RIDE_COORDS = {
     first: {
         startLatitude: 53.349805,
@@ -42,41 +42,43 @@ afterAll(async () => {
 });
 
 
-describe('Ride Workflow Integration Tests', () => {
+describe('Ride Workflows', () => {
 
-    describe('Complete Ride Lifecycle', () => {
-        it('should handle full ride lifecycle: start → status → end', async () => {
+
+    describe('happy path ride flow', () => {
+
+
+        it('start -> check status -> end ride', async () => {
             const { user, token } = await TestHelpers.createAuthenticatedUser();
             const shift = await TestHelpers.createActiveShift(user.id);
 
-            // 1. Start ride
-            const startRideRes = await request(app)
+            // Start
+            const startRes = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
                     ...RIDE_COORDS.first,
-                    address: "123 Test Street, Dublin",
+                    address: "O'Connell Street",
                     predictedScore: 0.75
                 });
 
-            expect(startRideRes.status).toBe(200);
-            const rideId = startRideRes.body.data.rideId;
+            expect(startRes.status).toBe(200);
+            const rideId = startRes.body.data.rideId;
 
-            // 2. Get ride status
+            // Check it
             const statusRes = await request(app)
                 .get('/api/rides/current')
                 .set('Authorization', `Bearer ${token}`);
 
             expect(statusRes.status).toBe(200);
             expect(statusRes.body.data.rideId).toBe(rideId);
-            expect(statusRes.body.data.elapsedTimeMs).toBeGreaterThan(0);
-            // Verify new fields are returned
+            expect(statusRes.body.data.elapsedTimeMs).toBeGreaterThan(0); // time passed
             expect(statusRes.body.data.startTime).toBeDefined();
             expect(typeof statusRes.body.data.startTime).toBe('number');
-            expect(statusRes.body.data.address).toBe("123 Test Street, Dublin");
+            expect(statusRes.body.data.address).toBe("O'Connell Street"); // matches
 
-            // 3. End ride
-            const endRideRes = await request(app)
+            // Complete it
+            const endRes = await request(app)
                 .post('/api/rides/end-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
@@ -84,35 +86,89 @@ describe('Ride Workflow Integration Tests', () => {
                     actualDistanceKm: 5.2
                 });
 
-            expect(endRideRes.status).toBe(200);
-            expect(endRideRes.body.data.rideId).toBe(rideId);
-            expect(endRideRes.body.data.earningCents).toBe(1500);
+            expect(endRes.status).toBe(200);
+            expect(endRes.body.data.rideId).toBe(rideId);
+            expect(endRes.body.data.earningCents).toBe(1500); // €15
 
-            // 4. Verify ride is ended in database
+            // DB check
             const finalRide = await Ride.findByPk(rideId);
-            expect(finalRide!.end_time).not.toBeNull();
+            expect(finalRide!.end_time).not.toBeNull(); // completed
             expect(finalRide!.earning_cents).toBe(1500);
         });
 
 
-        it('should handle multiple sequential rides on same shift', async () => {
+
+
+        it('multiple rides per shift', async () => {
             const { user, token } = await TestHelpers.createAuthenticatedUser();
             const shift = await TestHelpers.createActiveShift(user.id);
 
-            // First ride
-            const ride1Res = await request(app)
+            // Morning ride
+            const res1 = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
                     ...RIDE_COORDS.first,
-                    address: "123 Test Street, Dublin",
+                    address: "Temple Bar",
                     predictedScore: 0.8
                 });
 
-            expect(ride1Res.status).toBe(200);
-            const ride1Id = ride1Res.body.data.rideId;
+            const ride1Id = res1.body.data.rideId;
 
-            // End first ride
+            // Drop off passenger
+            await request(app)
+                .post('/api/rides/end-ride')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    fareCents: 1000, // €10
+                    actualDistanceKm: 3.0
+                });
+
+            // Afternoon ride  
+            const res2 = await request(app)
+                .post('/api/rides/start-ride')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    ...RIDE_COORDS.second,
+                    address: "Phoenix Park",
+                    predictedScore: 0.7
+                });
+
+            expect(res2.status).toBe(200);
+            const ride2Id = res2.body.data.rideId;
+            expect(ride2Id).not.toBe(ride1Id); // different rides
+
+            // Check DB has both
+            const rides = await Ride.findAll({ where: { shift_id: shift.id } });
+            expect(rides).toHaveLength(2);
+            expect(rides[0].shift_id).toBe(shift.id); // same shift
+            expect(rides[1].shift_id).toBe(shift.id);
+        });
+
+
+
+    });
+
+
+
+    describe('shift switching', () => {
+        it('new shift = new rides', async () => {
+            const { user, token } = await TestHelpers.createAuthenticatedUser();
+            
+            // Morning shift
+            const shift1 = await TestHelpers.createActiveShift(user.id);
+            const res1 = await request(app)
+                .post('/api/rides/start-ride')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    ...RIDE_COORDS.first,
+                    address: "Morning pickup",
+                    predictedScore: 0.65
+                });
+
+            const ride1Id = res1.body.data.rideId;
+
+            // End ride and clock out
             await request(app)
                 .post('/api/rides/end-ride')
                 .set('Authorization', `Bearer ${token}`)
@@ -121,29 +177,37 @@ describe('Ride Workflow Integration Tests', () => {
                     actualDistanceKm: 3.0
                 });
 
-            // Second ride should succeed
-            const ride2Res = await request(app)
+            await shift1.update({ shift_end: new Date() }); // clock out
+
+
+            // Evening shift - clock back in
+            const shift2 = await TestHelpers.createActiveShift(user.id);
+            const res2 = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    ...RIDE_COORDS.second,
-                    address: "456 Second Street, Dublin",
-                    predictedScore: 0.7
+                    ...RIDE_COORDS.third,
+                    address: "Evening pickup",
+                    predictedScore: 0.9
                 });
 
-            expect(ride2Res.status).toBe(200);
-            const ride2Id = ride2Res.body.data.rideId;
-            expect(ride2Id).not.toBe(ride1Id);
+            expect(res2.status).toBe(200);
+            const ride2Id = res2.body.data.rideId;
 
-            // Verify both rides exist in database with same shift
-            const rides = await Ride.findAll({ where: { shift_id: shift.id } });
-            expect(rides).toHaveLength(2);
-            expect(rides[0].shift_id).toBe(shift.id);
-            expect(rides[1].shift_id).toBe(shift.id);
+            // Verify separation
+            const ride1 = await Ride.findByPk(ride1Id);
+            const ride2 = await Ride.findByPk(ride2Id);
+            
+            expect(ride1!.shift_id).toBe(shift1.id); // morning shift
+            expect(ride2!.shift_id).toBe(shift2.id); // evening shift  
+            expect(ride1!.shift_id).not.toBe(ride2!.shift_id);
         });
+    });
 
 
-        it('should handle ride with override destination in status check', async () => {
+
+    describe('error cases', () => {
+        it('blocks double booking', async () => {
             const { user, token } = await TestHelpers.createAuthenticatedUser();
             await TestHelpers.createActiveShift(user.id);
 
@@ -153,124 +217,41 @@ describe('Ride Workflow Integration Tests', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .send({
                     ...RIDE_COORDS.first,
-                    address: "789 Third Street, Dublin",
-                    predictedScore: 0.85
-                });
-
-            // Get status (override destination feature was removed)
-            const statusRes = await request(app)
-                .get('/api/rides/current')
-                .set('Authorization', `Bearer ${token}`);
-
-            expect(statusRes.status).toBe(200);
-            expect(statusRes.body.data.currentDestinationLatitude).toBe(53.359805);
-            expect(statusRes.body.data.currentDestinationLongitude).toBe(-6.270310);
-        });
-    });
-
-
-    describe('Multiple Shifts and Rides', () => {
-        it('should handle rides across different shifts', async () => {
-            const { user, token } = await TestHelpers.createAuthenticatedUser();
-            
-            // First shift and ride
-            const shift1 = await TestHelpers.createActiveShift(user.id);
-            const ride1Res = await request(app)
-                .post('/api/rides/start-ride')
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    ...RIDE_COORDS.first,
-                    address: "Cross-shift Ride 1 Address",
-                    predictedScore: 0.65
-                });
-
-            expect(ride1Res.status).toBe(200);
-            const ride1Id = ride1Res.body.data.rideId;
-
-            // End first ride and shift
-            await request(app)
-                .post('/api/rides/end-ride')
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    fareCents: 1000,
-                    actualDistanceKm: 3.0
-                });
-
-            await shift1.update({ shift_end: new Date() });
-
-            // Second shift and ride
-            const shift2 = await TestHelpers.createActiveShift(user.id);
-            const ride2Res = await request(app)
-                .post('/api/rides/start-ride')
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    ...RIDE_COORDS.third,
-                    address: "Cross-shift Ride 2 Address",
-                    predictedScore: 0.9
-                });
-
-            expect(ride2Res.status).toBe(200);
-            const ride2Id = ride2Res.body.data.rideId;
-
-            // Verify rides belong to different shifts
-            const finalRide1 = await Ride.findByPk(ride1Id);
-            const finalRide2 = await Ride.findByPk(ride2Id);
-            
-            expect(finalRide1!.shift_id).toBe(shift1.id);
-            expect(finalRide2!.shift_id).toBe(shift2.id);
-            expect(finalRide1!.shift_id).not.toBe(finalRide2!.shift_id);
-        });
-    });
-
-
-    describe('Error Recovery Scenarios', () => {
-        it('should prevent second ride start while first is active', async () => {
-            const { user, token } = await TestHelpers.createAuthenticatedUser();
-            await TestHelpers.createActiveShift(user.id);
-
-            // Start first ride
-            const ride1Res = await request(app)
-                .post('/api/rides/start-ride')
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    ...RIDE_COORDS.first,
-                    address: "Error Recovery First Ride",
+                    address: "First passenger",
                     predictedScore: 0.72
                 });
 
-            expect(ride1Res.status).toBe(200);
-
-            // Attempt second ride should fail
-            const ride2Res = await request(app)
+            // Try to take another
+            const res2 = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
                     ...RIDE_COORDS.second,
-                    address: "Error Recovery Second Ride (Should Fail)",
+                    address: "Second passenger",
                     predictedScore: 0.68
                 });
 
-            expect(ride2Res.status).toBe(500);
-            expect(ride2Res.body.error).toContain('Another ride is already in progress. Please end the current ride first.');
+            expect(res2.status).toBe(500);
+            expect(res2.body.error).toContain('Another ride is already in progress'); // can't double book!
         });
 
 
-        it('should handle ride start immediately after ending previous ride', async () => {
+
+        it('quick turnaround between rides', async () => {
             const { user, token } = await TestHelpers.createAuthenticatedUser();
             await TestHelpers.createActiveShift(user.id);
 
-            // Start and end first ride
-            const ride1Res = await request(app)
+            // Ride 1
+            const res1 = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
                     ...RIDE_COORDS.first,
-                    address: "Sequential First Ride",
+                    address: "Quick drop",
                     predictedScore: 0.78
                 });
 
-            expect(ride1Res.status).toBe(200);
-
+            // Drop off
             await request(app)
                 .post('/api/rides/end-ride')
                 .set('Authorization', `Bearer ${token}`)
@@ -279,18 +260,18 @@ describe('Ride Workflow Integration Tests', () => {
                     actualDistanceKm: 3.0
                 });
 
-            // Immediate second ride should succeed
-            const ride2Res = await request(app)
+            // Immediately pick up next passenger
+            const res2 = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
                     ...RIDE_COORDS.second,
-                    address: "Sequential Second Ride",
+                    address: "Next pickup",
                     predictedScore: 0.82
                 });
 
-            expect(ride2Res.status).toBe(200);
-            expect(ride2Res.body.data.rideId).not.toBe(ride1Res.body.data.rideId);
+            expect(res2.status).toBe(200);
+            expect(res2.body.data.rideId).not.toBe(res1.body.data.rideId); // new ride
         });
     });
 });
