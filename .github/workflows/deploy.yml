@@ -27,4 +27,4 @@ jobs:
           context: .
           file: apps/backend/Dockerfile
           push: true
-          tags: anush2712/taxi-backend:latest,anush2712/taxi-backend:v2.0
+          tags: anush2712/taxi-backend:latest
