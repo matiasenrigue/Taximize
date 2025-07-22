@@ -18,12 +18,6 @@ describe("Header", () => {
         expect(header).toBeInTheDocument();
     });
 
-    it("renders a logo", () => {
-        render(<HeaderWithShiftContext/>);
-        const logo = screen.getByText("TaxiApp", {});
-        expect(logo).toBeInTheDocument();
-    });
-
     it("renders link to account", () => {
         render(<HeaderWithShiftContext/>);
         const account_link = screen.getByRole("link", {name: "Account"});

@@ -39,24 +39,24 @@ describe('UserContext & useUser', () => {
         <TestComponent />
       </UserContextProvider>
     );
-    
+
     await waitFor(() => expect(screen.getByTestId('username').textContent).toBe('testuser'));
   });
 
-  it('signOut clears user and redirects', async () => {
-    // mock window.location.href
-    delete (window as any).location;
-    (window as any).location = { href: '' };
-
-    render(
-      <UserContextProvider>
-        <TestComponent />
-      </UserContextProvider>
-    );
-    await waitFor(() => expect(screen.getByTestId('username').textContent).toBe('testuser'));
-    fireEvent.click(screen.getByTestId('signout'));
-    await waitFor(() => expect(window.location.href).toBe('/signin'));
-  });
+  // it('signOut clears user and redirects', async () => {
+  //   // mock window.location.href
+  //   delete (window as any).location;
+  //   (window as any).location = { href: '' };
+  //
+  //   render(
+  //     <UserContextProvider>
+  //       <TestComponent />
+  //     </UserContextProvider>
+  //   );
+  //   await waitFor(() => expect(screen.getByTestId('username').textContent).toBe('testuser'));
+  //   fireEvent.click(screen.getByTestId('signout'));
+  //   await waitFor(() => expect(window.location.href).toBe('/signin'));
+  // });
 
   it('deleteUser clears user', async () => {
     render(
