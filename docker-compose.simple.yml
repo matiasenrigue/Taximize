@@ -16,7 +16,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: ./apps/backend/Dockerfile.production
+      dockerfile: ./apps/backend/Dockerfile.simple
     ports:
       - "5000:5000"
     environment:
