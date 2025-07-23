@@ -124,7 +124,7 @@ export const RideContextProvider = (props: PropsWithChildren) => {
             const {
                 success,
                 error,
-                rating
+                data
             } = response.data;
 
             if (!success) {
@@ -132,8 +132,8 @@ export const RideContextProvider = (props: PropsWithChildren) => {
                 return;
             }
 
-            const clampedRating = Math.max(1, Math.min(5, rating));
-            setRating(clampedRating);
+            const clampedRating = Math.max(1, Math.min(5, data.rating));
+            setRating(clampedRating ?? 3);
         }).catch((error) => {
             console.warn(error)
         });

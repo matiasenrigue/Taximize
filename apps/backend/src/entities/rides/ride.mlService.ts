@@ -33,11 +33,11 @@ export class RideMLService {
             });
             
             // Validate and convert score
-            const prediction = scoreResult.percentile / 100;
+            const prediction = scoreResult.predicted_score / 100;
             RideValidators.validatePredictionScore(prediction);
             
             const rating = this.convertPredictionToRating(prediction);
-            
+
             return { rating, zones };
             
         } catch (error) {
