@@ -16,6 +16,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   backend:
     build:
@@ -23,9 +24,6 @@ services:
       dockerfile: ./apps/backend/Dockerfile
     ports:
       - "5000:5000"
-    volumes:
-      - ./apps/backend:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=production
     env_file:
@@ -35,11 +33,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    restart: unless-stopped
 
   frontend:
     build:
@@ -47,15 +41,13 @@ services:
       dockerfile: ./apps/frontend/Dockerfile
     ports:
       - "80:3000"
-    volumes:
-      - ./apps/frontend:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=production
     networks:
       - app-network
     depends_on:
       - backend
+    restart: unless-stopped
 
   ml-api:
     build:
@@ -63,12 +55,11 @@ services:
       dockerfile: ./data/Dockerfile
     ports:
       - "5050:5050"
-    volumes:
-      - ./data:/app/data
     environment:
-      - FLASK_ENV=development
+      - FLASK_ENV=production
     networks:
       - app-network
+    restart: unless-stopped
 
 networks:
   app-network:
