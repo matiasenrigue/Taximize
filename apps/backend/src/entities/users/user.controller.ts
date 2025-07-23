@@ -4,13 +4,31 @@ import { Ride } from '../rides/ride.model';
 import { modelToResponse } from '../../shared/utils/caseTransformer';
 import { ResponseHandler } from '../../shared/utils/responseHandler';
 
+/**
+ * Controller for user-related operations.
+ * 
+ * Handles HTTP requests for user information and profile management.
+ * Currently provides endpoints for authenticated users to retrieve
+ * their own profile information.
+ */
 export class UserController {
-    // @desc    Get current user information
-    // @route   GET /api/users/me
-    // @access  Protected
+    /**
+     * Retrieves the current authenticated user's information.
+     * 
+     * Returns basic user profile data excluding sensitive information
+     * like passwords. The user object is pre-loaded by authentication
+     * middleware before this handler executes.
+     * 
+     * @route GET /api/users/me
+     * @access Protected (requires authentication)
+     * @param req - Express request with authenticated user attached
+     * @param res - Express response object
+     * @returns User profile data (id, username, email, timestamps)
+     * @throws 401 error if user is not authenticated
+     */
     static getCurrentUser = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         
-        // User was already fetched from the DB by the middleware
+        // User object is attached by authentication middleware, who fetched it from the database
         const user = req.user;
 
         if (!user) {
@@ -18,6 +36,7 @@ export class UserController {
             throw new Error('User authentication required');
         }
 
+        // Prepare safe user data (excluding password)
         const userData = {
             id: user.id,
             username: user.username,

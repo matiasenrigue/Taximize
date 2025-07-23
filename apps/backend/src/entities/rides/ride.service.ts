@@ -4,22 +4,22 @@ import { ShiftRepository } from '../shifts/shift.repository';
 import { ShiftCalculationUtils } from '../shifts/utils/ShiftCalculationUtils';
 import { ShiftSignal } from '../shift-signals/shiftSignal.model';
 import { RIDE_ERRORS } from './ride.constants';
-import { 
-    RideCoordinates, 
-    RideMetrics, 
-    StartRideResult, 
-    CanStartRideResult, 
-    RideStatus 
-} from './ride.types';
+import { RideCoordinates } from './ride.types';
 import { RideValidators } from './ride.validators';
 import { RideRepository } from './ride.repository';
 import { RideMLService } from './ride.mlService';
 
 
+/**
+ * Manages driver rides - lifecycle, eligibility checks, and ML scoring.
+ */
 export class RideService {
 
+
+    /**
+     * Checks if driver has an active ride.
+     */
     static async hasActiveRide(driverId: string): Promise<boolean> {
-        // Get active shift for driver first
         const activeShift = await ShiftRepository.findActiveByDriverId(driverId);
 
         if (!activeShift) return false;
@@ -28,15 +28,19 @@ export class RideService {
     }
 
 
-    static async canStartRide(driverId: string): Promise<CanStartRideResult> {
-        // Check if driver has active shift
+
+    /**
+     * Checks if driver can start a new ride.
+     * Validates: active shift, not paused, no ride in progress.
+     */
+    static async canStartRide(driverId: string): Promise<{ canStart: boolean; reason?: string }> {
         const activeShift = await ShiftRepository.findActiveByDriverId(driverId);
 
         if (!activeShift) {
             return { canStart: false, reason: RIDE_ERRORS.NO_ACTIVE_SHIFT };
         }
 
-        // Check if driver is paused
+        // Need most recent signal to check pause state
         const lastSignal = await ShiftSignal.findOne({
             where: { shift_id: activeShift.id },
             order: [['timestamp', 'DESC']]
@@ -46,7 +50,6 @@ export class RideService {
             return { canStart: false, reason: RIDE_ERRORS.PAUSED_SHIFT };
         }
 
-        // Check if driver already has an active ride
         const hasActive = await this.hasActiveRide(driverId);
         if (hasActive) {
             return { canStart: false, reason: RIDE_ERRORS.RIDE_IN_PROGRESS };
@@ -57,29 +60,37 @@ export class RideService {
 
 
 
-    static async evaluateRide(startLat: number, startLng: number, destLat: number, destLng: number): Promise<number> {
+    
+    /**
+     * Gets ML prediction score for ride coordinates.
+     * @returns 1-5 rating or null if ML unavailable
+     */
+    static async evaluateRide(startLat: number, startLng: number, destLat: number, destLng: number): Promise<number | null> {
         return RideMLService.evaluateRide(startLat, startLng, destLat, destLng);
     }
 
 
 
-    static async startRide(driverId: string, shiftId: string, coords: RideCoordinates): Promise<StartRideResult> {
-        // Validate coordinates
+    /**
+     * Starts a new ride for driver.
+     * @param coords - Start/dest coordinates with predicted score
+     * @throws If driver can't start ride or bad coordinates
+     */
+    static async startRide(driverId: string, shiftId: string, coords: RideCoordinates): Promise<{
+        rideId: string;
+        startTime: number;
+        predictedScore: number | null;
+    }> {
         RideValidators.validateCoordinates(coords);
 
-        // Check if driver can start ride
         const canStartResult = await this.canStartRide(driverId);
         if (!canStartResult.canStart) {
             throw new Error(canStartResult.reason || 'Cannot start ride');
         }
 
-        // Use predicted score from request
         const predictedScore = coords.predictedScore;
-
-        // Use provided timestamp or current time
         const startTime = coords.timestamp ? new Date(coords.timestamp) : new Date();
 
-        // Create new ride
         const ride = await RideRepository.create({
             shift_id: shiftId,
             driver_id: driverId,
@@ -99,13 +110,23 @@ export class RideService {
         return {
             rideId: ride.id,
             startTime: ride.start_time.getTime(),
-            predicted_score: predictedScore
+            predictedScore: predictedScore
         };
     }
 
 
-    static async endRide(rideId: string, fareCents: number, actualDistanceKm: number, timestamp?: number): Promise<RideMetrics> {
-        // Find the active ride
+    /**
+     * Ends ride and calculates final earnings.
+     * Also updates shift statistics.
+     * @throws If ride not found or already ended
+     */
+    static async endRide(rideId: string, fareCents: number, actualDistanceKm: number, timestamp?: number): Promise<{
+        rideId: string;
+        totalTimeMs: number;
+        distanceKm: number;
+        earningCents: number;
+        earningPerMin: number;
+    }> {
         const ride = await RideRepository.findById(rideId);
         
         if (!ride) {
@@ -116,12 +137,10 @@ export class RideService {
             throw new Error(RIDE_ERRORS.ALREADY_ENDED);
         }
 
-        // Use provided timestamp or current time
         const endTime = timestamp ? new Date(timestamp) : new Date();
         const totalTimeMs = endTime.getTime() - ride.start_time.getTime();
         const earningPerMin = Math.round((fareCents / (totalTimeMs / (1000 * 60))));
 
-        // Update the ride
         await RideRepository.update(ride, {
             end_time: endTime,
             earning_cents: fareCents,
@@ -129,7 +148,7 @@ export class RideService {
             distance_km: actualDistanceKm
         });
 
-        // Recalculate shift statistics for ride data only
+        // Need to update shift stats with this completed ride
         const shift = await Shift.findByPk(ride.shift_id);
         if (shift) {
             const rides = await RideRepository.findAllByShift(shift.id);
@@ -146,15 +165,22 @@ export class RideService {
     }
 
     
-    static async getRideStatus(driverId: string): Promise<RideStatus> {
-        // Get active shift for driver first
+    static async getRideStatus(driverId: string): Promise<{
+        rideId: string;
+        startLatitude: number;
+        startLongitude: number;
+        currentDestinationLatitude: number;
+        currentDestinationLongitude: number;
+        startTime: number;
+        address: string;
+        elapsedTimeMs: number;
+    }> {
         const activeShift = await ShiftRepository.findActiveByDriverId(driverId);
 
         if (!activeShift) {
             throw new Error(RIDE_ERRORS.NO_ACTIVE_SHIFT_STATUS);
         }
 
-        // Find active ride for driver
         const activeRide = await RideRepository.findActiveByShift(activeShift.id);
 
         if (!activeRide) {
@@ -164,7 +190,6 @@ export class RideService {
         const currentTime = new Date();
         const elapsedTimeMs = currentTime.getTime() - activeRide.start_time.getTime();
 
-        // Use original destination coordinates
         const destLat = activeRide.destination_latitude;
         const destLng = activeRide.destination_longitude;
 

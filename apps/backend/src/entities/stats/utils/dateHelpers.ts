@@ -33,6 +33,7 @@ export function getDayNumber(dayName: string): number {
     return days[dayName.toLowerCase()];
 }
 
+// Returns duration as "X minutes" or "X hour(s) Y minutes"
 export function formatDuration(startTime: Date, endTime: Date): string {
     const durationMs = endTime.getTime() - startTime.getTime();
     const minutes = Math.round(durationMs / 1000 / 60);
@@ -51,15 +52,18 @@ export function formatDuration(startTime: Date, endTime: Date): string {
     return `${hours} hour${hours > 1 ? 's' : ''} ${remainingMinutes} minutes`;
 }
 
+// Returns 3-letter weekday abbreviation: "Sun", "Mon", etc.
 export function getWeekdayLabel(date: Date): string {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     return days[date.getDay()];
 }
 
+// Returns date as "YYYY-MM-DD"
 export function formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
 }
 
+// Returns day of month as string: "1", "2", ... "31"
 export function getMonthDayLabel(date: Date): string {
     return date.getDate().toString();
 }
@@ -74,6 +78,7 @@ export function calculateDurationHours(startTime: Date, endTime: Date): number {
     return Math.round((durationMs / 1000 / 60 / 60) * 100) / 100; // Round to 2 decimal places
 }
 
+// Returns datetime as "YYYY-MM-DD HH:MM" (24-hour format)
 export function formatDateTimeCompact(date: Date): string {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');

@@ -1,39 +1,38 @@
 import { sequelize, Model, DataTypes } from '../../shared/config/db';
 
 export class Shift extends Model {
-    // Identity
+   
     public id!: string;
     public driver_id!: string;
     
-    // Time data
+    // Timing
     public shift_start!: Date;
     public shift_end!: Date | null;
     public total_duration_ms!: number | null;
     public planned_duration_ms!: number | null;
     
-    // Location data
+    // Location
     public shift_start_location_latitude!: number | null;
     public shift_start_location_longitude!: number | null;
     public shift_end_location_latitude!: number | null;
     public shift_end_location_longitude!: number | null;
 
-    // Pause metrics (calculated from pause data)
+    // Break stats (calculated from pause data on shift end)
     public work_time_ms!: number | null;
     public break_time_ms!: number | null;
     public num_breaks!: number | null;
     public avg_break_ms!: number | null;
 
-    // Ride metrics (calculated from ride data)
+    // Ride stats (calculated from ride data on shift end)
     public total_earnings_cents!: number | null;
     public total_distance_km!: number | null;
     public number_of_rides!: number | null;
 
-    // Timestamps
+    
     public created_at!: Date;
     public updated_at!: Date;
     public deleted_at!: Date | null;
 
-    // Paranoid model methods
     public restore!: () => Promise<void>;
 }
 
@@ -127,5 +126,6 @@ Shift.init(
         ]
     }
 );
+
 
 export default Shift; 

@@ -22,20 +22,25 @@ interface ShiftData {
     breakTimeMs: number;
     numBreaks: number;
     avgBreakMs: number;
-    totalEarningsCents?: number;
+    totalEarningsCents?: number; 
     totalDistanceKm?: number;
     numberOfRides?: number;
 }
 
+
+// 'full': Calculate all metrics (pauses and rides)
+// 'onlyRideData': Only calculate ride-related metrics
+// 'onlyPauseData': Only calculate pause-related metrics
 type UpdateMode = 'full' | 'onlyRideData' | 'onlyPauseData';
+
+
 
 export class ShiftCalculationUtils {
     
     /**
-     * Calculate pauses data for a shift
-     * @param shift - The shift instance
-     * @param pauses - Array of pauses for the shift
-     * @returns Calculated pause statistics
+     * Calculate break time stats for shift.
+     * Only counts pauses within shift boundaries.
+     * @returns PausesData object with break time stats
      */
     static async calculatePausesData(shift: Shift, pauses: Pause[]): Promise<PausesData> {
         if (!pauses || pauses.length === 0) {
@@ -46,12 +51,11 @@ export class ShiftCalculationUtils {
             };
         }
 
-        // Filter pauses that fall within the shift timeframe
+        // Only count pauses during this shift
         const validPauses = pauses.filter(pause => {
             const pauseStart = pause.pause_start;
             const pauseEnd = pause.pause_end;
             
-            // Only include pauses that are within shift boundaries
             return pauseStart >= shift.shift_start && 
                    (!shift.shift_end || pauseEnd <= shift.shift_end);
         });
@@ -60,11 +64,10 @@ export class ShiftCalculationUtils {
             return {
                 totalBreakTimeMs: 0,
                 numberOfBreaks: 0,
-                averageBreakDurationMs: 0 // avoid division by zero
+                averageBreakDurationMs: 0
             };
         }
 
-        // Calculate total break time
         const totalBreakTimeMs = validPauses.reduce((total, pause) => {
             return total + pause.duration_ms;
         }, 0);
@@ -79,11 +82,12 @@ export class ShiftCalculationUtils {
         };
     }
 
+
+
     /**
-     * Calculate rides data for a shift
-     * @param shift - The shift instance
-     * @param rides - Array of rides for the shift
-     * @returns Calculated ride statistics
+     * Calculate earnings and distance for shift.
+     * Excludes deleted rides and zero-earning rides.
+     * @returns RidesData object with earnings and distance stats
      */
     static async calculateRidesData(shift: Shift, rides: Ride[]): Promise<RidesData> {
         if (!rides || rides.length === 0) {
@@ -94,10 +98,9 @@ export class ShiftCalculationUtils {
             };
         }
 
-        // Filter non-deleted rides with earnings > 0
+        // Only paying rides count
         const validRides = rides.filter(ride => !ride.deleted_at && (ride.earning_cents || 0) > 0);
 
-        // Calculate totals
         const totalEarningsCents = validRides.reduce((total, ride) => {
             return total + (ride.earning_cents || 0);
         }, 0);
@@ -113,13 +116,12 @@ export class ShiftCalculationUtils {
         };
     }
 
+
+
     /**
-     * Fill shift data with calculated values
-     * @param shift - The shift instance to update
-     * @param mode - Update mode: 'full', 'onlyRideData', or 'onlyPauseData'
-     * @param pauses - Array of pauses (optional if mode is 'onlyRideData')
-     * @param rides - Array of rides (optional if mode is 'onlyPauseData')
-     * @returns Object with calculated data that should be updated
+     * Compute shift metrics based on mode.
+     * @param mode 'full' | 'onlyRideData' | 'onlyPauseData'
+     * @returns Calculated metrics object
      */
     static async fillData(
         shift: Shift, 
@@ -129,25 +131,22 @@ export class ShiftCalculationUtils {
     ): Promise<Partial<ShiftData>> {
         const updateData: Partial<ShiftData> = {};
 
-        // Calculate total duration if shift has ended
         if (shift.shift_end) {
             const totalDurationMs = shift.shift_end.getTime() - shift.shift_start.getTime();
             updateData.totalDurationMs = totalDurationMs;
         }
 
-        // Calculate pause data if not in 'onlyRideData' mode
         if (mode !== 'onlyRideData' && pauses) {
             const pauseData = await this.calculatePausesData(shift, pauses);
             updateData.breakTimeMs = pauseData.totalBreakTimeMs;
             updateData.numBreaks = pauseData.numberOfBreaks;
 
-            // Calculate work time if we have total duration
+            // Work time = total - breaks
             if (updateData.totalDurationMs !== undefined) {
                 updateData.workTimeMs = updateData.totalDurationMs - pauseData.totalBreakTimeMs;
             }
         }
 
-        // Calculate ride data if not in 'onlyPauseData' mode
         if (mode !== 'onlyPauseData' && rides) {
             const rideData = await this.calculateRidesData(shift, rides);
             updateData.totalEarningsCents = rideData.totalEarningsCents;
@@ -158,13 +157,12 @@ export class ShiftCalculationUtils {
         return updateData;
     }
 
+
+    
     /**
-     * Helper method to update shift with calculated data
-     * @param shift - The shift instance to update
-     * @param mode - Update mode
-     * @param pauses - Array of pauses
-     * @param rides - Array of rides
-     * @returns Updated shift instance
+     * Update shift record with calculated stats.
+     * Converts camelCase fields to snake_case for DB.
+     * @returns Updated Shift instance
      */
     static async updateShiftCalculations(
         shift: Shift,
@@ -174,19 +172,17 @@ export class ShiftCalculationUtils {
     ): Promise<Shift> {
         const calculatedData = await this.fillData(shift, mode, pauses, rides);
         
-        // Map the calculated data to the shift model fields
         const updateFields: any = {};
 
         for (const field in calculatedData) {
             const key = field as keyof ShiftData;
-            // field names in the model are snake_case
+            // DB uses snake_case
             if (calculatedData[key] !== undefined) {
                 updateFields[camelToSnake(field)] = calculatedData[key];
             }
         }
 
 
-        // Update the shift with calculated values
         await shift.update(updateFields);
         
         

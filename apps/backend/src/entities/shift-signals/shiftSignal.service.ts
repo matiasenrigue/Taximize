@@ -12,8 +12,27 @@ import { SignalValidation, Signal } from './utils/signalValidation';
 
 
 
+/**
+ * Service layer for managing shift signal operations.
+ * 
+ * This service handles the business logic for shift state transitions,
+ * ensuring signals follow valid state machine rules and coordinating
+ * with related services like rides, pauses, and shifts.
+ */
 abstract class ShiftSignalService {
 
+    /**
+     * Validates whether a driver can perform a specific signal transition.
+     * 
+     * Checks multiple conditions:
+     * - Driver must not have an active ride
+     * - The signal transition must follow valid state machine rules
+     * 
+     * @param driverId - The unique identifier of the driver
+     * @param newSignal - The signal type to validate ('start', 'stop', 'pause', 'continue')
+     * @returns Promise<boolean> - True if the signal is valid
+     * @throws Error if the signal transition is invalid
+     */
     static async isValidSignal(driverId: string, newSignal: string): Promise<boolean> {
         
         // Check if driver has active ride - if so, no signals can be received
@@ -35,6 +54,17 @@ abstract class ShiftSignalService {
     }
 
 
+    /**
+     * Records a shift signal in the database.
+     * 
+     * Creates a new ShiftSignal record associated with the driver's active shift.
+     * For pause signals, can optionally store the planned pause duration.
+     * 
+     * @param driverId - The unique identifier of the driver
+     * @param timestamp - Unix timestamp when the signal occurred
+     * @param signal - The signal type to register
+     * @param additionalData - Optional data (e.g., planned duration for pause signals)
+     */
     static async registerSignal(driverId: string, timestamp: number, signal: string, additionalData?: number): Promise<void> {
 
         const activeShift = await ShiftService.getActiveShift(driverId);
@@ -51,11 +81,31 @@ abstract class ShiftSignalService {
 
 
 
-    // ---------------------------------
-    // -- Individual signal handlers ---
-    // ---------------------------------
+    /**
+     * ---------------------------------
+     * -- Individual signal handlers ---
+     * ---------------------------------
+     * 
+     * The following methods handle specific signal types,
+     * each performing validation and executing appropriate business logic.
+     */
 
 
+
+    
+
+
+    /**
+     * Handles the start shift signal.
+     * 
+     * Creates a new shift for the driver and registers the start signal.
+     * Validates that the driver can start a shift (no active shift/ride).
+     * 
+     * @param driverId - The unique identifier of the driver
+     * @param timestamp - Unix timestamp when the shift starts
+     * @param duration - Optional planned shift duration in milliseconds
+     * @throws Error if driver already has an active shift or ride
+     */
     static async handleStartSignal(driverId: string, timestamp: number, duration?: number): Promise<void> {
         
         // Validate the signal
@@ -70,6 +120,19 @@ abstract class ShiftSignalService {
     }
 
 
+    /**
+     * Handles the stop/end shift signal.
+     * 
+     * Finalizes the active shift by:
+     * - Computing all shift statistics (duration, earnings, breaks, etc.)
+     * - Saving the shift data
+     * - Cleaning up all associated shift signals
+     * 
+     * @param driverId - The unique identifier of the driver
+     * @param timestamp - Unix timestamp when the shift ends
+     * @returns Shift summary with statistics (total duration, earnings, breaks, etc.)
+     * @throws Error if no active shift exists
+     */
     static async handleStopSignal(driverId: string, timestamp: number): Promise<any> {
         
         // Validate the signal
@@ -90,34 +153,57 @@ abstract class ShiftSignalService {
 
         return data;
 
-        // data: {
-            //     totalDuration: result.total_duration_ms,
-            //     passengerTime: result.work_time_ms,
-            //     pauseTime: result.break_time_ms,
-            //     idleTime: idleTime,
-            //     numBreaks: result.num_breaks,
-            //     averageBreak: result.avg_break_ms,
-            //     totalEarnings: totalEarningsCents
-            // }
+        // Return format:
+        // {
+        //     totalDuration: total shift duration in milliseconds
+        //     passengerTime: time spent with passengers in milliseconds
+        //     pauseTime: total break time in milliseconds
+        //     idleTime: time available but not with passengers
+        //     numBreaks: number of pause periods
+        //     averageBreak: average pause duration in milliseconds
+        //     totalEarnings: total earnings in cents
+        // }
     }
 
 
 
+    /**
+     * Handles the pause shift signal.
+     * 
+     * Marks the shift as paused without creating a separate pause record.
+     * The pause start time and duration are tracked via the shift signal itself.
+     * 
+     * @param driverId - The unique identifier of the driver
+     * @param timestamp - Unix timestamp when the pause starts
+     * @param pauseDuration - Optional planned pause duration in milliseconds
+     * @throws Error if no active shift exists or shift is already paused
+     */
     static async handlePauseSignal(driverId: string, timestamp: number, pauseDuration?: number): Promise<void> {
         
         // Validate the signal
         await this.isValidSignal(driverId, 'pause');
 
-        /** 
-         * No need to create a new Pause record: 
-         * PauseStart and PlannedDuration can be inferred from the ShiftSignal
-         */
+        // Note: Pause tracking is handled via shift signals rather than
+        // separate pause records. This simplifies the data model while
+        // maintaining full pause history through the signals.
 
         // Register the pause signal
         await this.registerSignal(driverId, timestamp, 'pause', pauseDuration);
     }
 
 
+    /**
+     * Handles the continue/resume shift signal.
+     * 
+     * Resumes a paused shift by:
+     * - Validating the shift is currently paused
+     * - Saving the completed pause period
+     * - Registering the continue signal
+     * 
+     * @param driverId - The unique identifier of the driver
+     * @param timestamp - Unix timestamp when the shift resumes
+     * @throws Error if no paused shift exists to continue
+     */
     static async handleContinueSignal(driverId: string, timestamp: number): Promise<void> {
         
         // Validate the signal

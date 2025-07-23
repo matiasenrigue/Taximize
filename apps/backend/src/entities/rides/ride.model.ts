@@ -2,39 +2,33 @@ import { sequelize, Model, DataTypes } from '../../shared/config/db';
 import { RIDE_CONSTANTS } from './ride.constants';
 
 export class Ride extends Model {
-    // Identity
+
     public id!: string;
     public shift_id!: string;
     public driver_id!: string;
-    
+
     // Location data
     public start_latitude!: number;
     public start_longitude!: number;
     public destination_latitude!: number;
     public destination_longitude!: number;
     public address!: string;
-    
+
     // Time data
     public start_time!: Date;
     public end_time!: Date | null;
-    
-    // Scoring
-    public predicted_score!: number;
-    
-    // Metrics (populated on ride end)
+
+    public predicted_score!: number | null; // ML-predicted score (1-5 scale)
+
     public earning_cents!: number | null;
     public earning_per_min!: number | null;
     public distance_km!: number | null;
     
-    // Timestamps
     public created_at!: Date;
     public updated_at!: Date;
     public deleted_at!: Date | null;
-    
-    // Instance methods
     public restore!: () => Promise<void>;
     
-    // Custom instance methods
     public isActive(): boolean {
         return this.end_time === null;
     }
@@ -87,8 +81,8 @@ Ride.init(
         },
         predicted_score: {
             type: DataTypes.SMALLINT,
-            allowNull: false,
-            defaultValue: 3,
+            allowNull: true,
+            defaultValue: null,
         },
         end_time: {
             type: DataTypes.DATE,

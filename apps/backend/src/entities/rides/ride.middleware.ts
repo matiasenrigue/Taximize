@@ -2,10 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { RideValidators } from './ride.validators';
 import { RIDE_CONSTANTS } from './ride.constants';
 
+
+
+/**
+ * Validate ride coordinates are present and within bounds.
+ */
 export const validateRideCoordinates = (req: Request, res: Response, next: NextFunction): void => {
     const { startLatitude, startLongitude, destinationLatitude, destinationLongitude } = req.body;
     
-    // Check required fields
     if (!startLatitude || !startLongitude || !destinationLatitude || !destinationLongitude) {
         res.status(400).json({ 
             success: false,
@@ -14,7 +18,6 @@ export const validateRideCoordinates = (req: Request, res: Response, next: NextF
         return;
     }
     
-    // Check types
     if (typeof startLatitude !== 'number' || typeof startLongitude !== 'number' || 
         typeof destinationLatitude !== 'number' || typeof destinationLongitude !== 'number') {
         res.status(400).json({ 
@@ -41,10 +44,14 @@ export const validateRideCoordinates = (req: Request, res: Response, next: NextF
     }
 };
 
+
+
+/**
+ * Validate data needed to start a ride.
+ */
 export const validateStartRideRequest = (req: Request, res: Response, next: NextFunction): void => {
     const { address, predictedScore, timestamp } = req.body;
     
-    // Validate address
     if (!address || typeof address !== 'string' || address.trim().length === 0) {
         res.status(400).json({ 
             success: false,
@@ -53,26 +60,27 @@ export const validateStartRideRequest = (req: Request, res: Response, next: Next
         return;
     }
     
-    // Validate predicted score
-    if (predictedScore === undefined || typeof predictedScore !== 'number') {
-        res.status(400).json({ 
-            success: false,
-            error: 'Invalid predicted score provided' 
-        });
-        return;
+    // Allow null for when ML service is down
+    if (predictedScore !== null && predictedScore !== undefined) {
+        if (typeof predictedScore !== 'number') {
+            res.status(400).json({ 
+                success: false,
+                error: 'Invalid predicted score provided' 
+            });
+            return;
+        }
+        
+        try {
+            RideValidators.validatePredictionScore(predictedScore);
+        } catch (error: any) {
+            res.status(400).json({ 
+                success: false,
+                error: error.message 
+            });
+            return;
+        }
     }
     
-    try {
-        RideValidators.validatePredictionScore(predictedScore);
-    } catch (error: any) {
-        res.status(400).json({ 
-            success: false,
-            error: error.message 
-        });
-        return;
-    }
-    
-    // Validate timestamp if provided
     if (timestamp !== undefined && typeof timestamp !== 'number') {
         res.status(400).json({ 
             success: false,
@@ -84,10 +92,15 @@ export const validateStartRideRequest = (req: Request, res: Response, next: Next
     next();
 };
 
+
+
+/**
+ * Check end ride data is valid.
+ * @throws 400 if missing fare/distance or negative values
+ */
 export const validateEndRideRequest = (req: Request, res: Response, next: NextFunction): void => {
     const { fareCents, actualDistanceKm, timestamp } = req.body;
     
-    // Validate required fields
     if (fareCents === undefined || actualDistanceKm === undefined) {
         res.status(400).json({ 
             success: false,
@@ -96,7 +109,6 @@ export const validateEndRideRequest = (req: Request, res: Response, next: NextFu
         return;
     }
     
-    // Validate field types
     if (typeof fareCents !== 'number' || typeof actualDistanceKm !== 'number') {
         res.status(400).json({ 
             success: false,
@@ -105,7 +117,7 @@ export const validateEndRideRequest = (req: Request, res: Response, next: NextFu
         return;
     }
     
-    // Validate positive values
+    // Can't have negative earnings or distance
     if (fareCents < 0 || actualDistanceKm < 0) {
         res.status(400).json({ 
             success: false,
@@ -114,7 +126,6 @@ export const validateEndRideRequest = (req: Request, res: Response, next: NextFu
         return;
     }
     
-    // Validate timestamp if provided
     if (timestamp !== undefined && typeof timestamp !== 'number') {
         res.status(400).json({ 
             success: false,

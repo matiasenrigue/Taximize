@@ -8,10 +8,20 @@ import { RideCoordinates } from './ride.types';
 import { RideValidators } from './ride.validators';
 import { RIDE_CONSTANTS } from './ride.constants';
 
+/**
+ * Handles ride API endpoints - evaluation, start, end, and status.
+ * All routes require authentication.
+ */
 export class RideController {
-    // @desc    Evaluate ride coordinates and get ML prediction score
-    // @route   POST /api/rides/evaluate-ride
-    // @access  Protected
+
+
+    /**
+     * Evaluates ride coordinates to get ML prediction score.
+     * 
+     * @route POST /api/rides/evaluate-ride
+     * @access Protected
+     * @returns Predicted rating (1-5 scale)
+     */
     static evaluateRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { startLatitude, startLongitude, destinationLatitude, destinationLongitude } = req.body;
         
@@ -25,9 +35,15 @@ export class RideController {
         ResponseHandler.success(res, { rating });
     });
 
-    // @desc    Start a new ride
-    // @route   POST /api/rides/start-ride  
-    // @access  Protected
+
+
+    /**
+     * Starts a new ride.
+     * 
+     * @route POST /api/rides/start-ride
+     * @access Protected
+     * @throws 400 if no active shift or bad coordinates
+     */
     static startRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { startLatitude, startLongitude, destinationLatitude, destinationLongitude, timestamp, address, predictedScore } = req.body;
         const driverId = req.driverId!; 
@@ -54,9 +70,14 @@ export class RideController {
         ResponseHandler.success(res, result, 'Ride started successfully');
     });
 
-    // @desc    Get current ride status  
-    // @route   GET /api/rides/current
-    // @access  Protected
+
+
+    /**
+     * Gets current ride status.
+     * 
+     * @route GET /api/rides/current
+     * @access Protected
+     */
     static getRideStatus = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const driverId = req.driverId!; 
 
@@ -68,15 +89,24 @@ export class RideController {
         }
     });
 
-    // @desc    End current ride
-    // @route   POST /api/rides/end-ride
-    // @access  Protected
+
+    
+    /**
+     * Ends active ride and calculates earnings.
+     * 
+     * @route POST /api/rides/end-ride
+     * @access Protected
+     * @param req.body.fareCents
+     * @param req.body.actualDistanceKm
+     * @returns Ride summary with final metrics (duration, earnings, distance
+     * @throws If no active ride or already ended
+     */
     static endRide = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         const { fareCents, actualDistanceKm, timestamp } = req.body;
         const driverId = req.driverId!; 
 
         try {
-            // First get the active ride to get the rideId
+            // Get active ride first, then end it
             const rideStatus = await RideService.getRideStatus(driverId);
             const result = await RideService.endRide(rideStatus.rideId, fareCents, actualDistanceKm, timestamp);
             

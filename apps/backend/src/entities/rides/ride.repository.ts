@@ -3,12 +3,21 @@ import { Ride } from './ride.model';
 import { RIDE_CONSTANTS } from './ride.constants';
 import { sequelize } from '../../shared/config/db';
 
+/**
+ * Database operations for rides.
+ */
 export class RideRepository {
     
+    /**
+     * Get ride by ID.
+     * @param includeDeleted - Include soft-deleted rides
+     */
     static async findById(id: string, includeDeleted = false): Promise<Ride | null> {
         return Ride.findByPk(id, { paranoid: !includeDeleted });
     }
     
+
+    /** Get active ride for shift. */
     static async findActiveByShift(shiftId: string): Promise<Ride | null> {
         return Ride.findOne({
             where: { 
@@ -19,6 +28,11 @@ export class RideRepository {
         });
     }
     
+  
+    /**
+     * Find expired rides (exceeded max duration).
+     * @param expiryThreshold - Rides started before this are expired
+     */
     static async findExpiredRidesForDriver(driverId: string, expiryThreshold: Date): Promise<Ride[]> {
         return Ride.findAll({
             where: {
@@ -28,39 +42,45 @@ export class RideRepository {
             }
         });
     }
+   
     
+    /** Get all driver's rides (newest first). */
     static async findByDriver(driverId: string): Promise<Ride[]> {
         return Ride.findAll({
             where: { driver_id: driverId },
             order: [['start_time', 'DESC']]
         });
     }
+   
     
+    /** Get all rides for a shift. */
     static async findAllByShift(shiftId: string): Promise<Ride[]> {
         return Ride.findAll({
             where: { shift_id: shiftId }
         });
     }
     
+
+    /** Create new ride. */
     static async create(data: Partial<Ride>): Promise<Ride> {
         return Ride.create(data);
     }
     
+
+    /** Update ride data. */
     static async update(ride: Ride, data: any): Promise<Ride> {
         await ride.update(data);
         return ride;
     }
     
-    /**
-     * Check if a driver has an active ride in their current shift
-     */
+    /** Check if shift has active ride. */
     static async hasActiveRideForShift(shiftId: string): Promise<boolean> {
         const activeRide = await this.findActiveByShift(shiftId);
         return !!activeRide;
     }
     
     /**
-     * Find rides within a date range for a driver
+     * Get rides within date range.
      */
     static async findRidesInDateRange(driverId: string, startDate: Date, endDate: Date): Promise<Ride[]> {
         return Ride.findAll({
@@ -74,9 +94,16 @@ export class RideRepository {
         });
     }
     
+
+    // Sources: 
+    //      https://www.grouparoo.com/blog/sql-dialect-differences
+    //      https://sequelize.org/docs/v6/other-topics/dialect-specific-things/
+    // Need to handle different SQL dialects to differentiate testing and production environments
+
     
     /**
-     * Find rides by day of week for a driver
+     * Find rides by day of week.
+     * @param dayOfWeek - 0=Sunday, 6=Saturday
      */
     static async findRidesByDayOfWeek(driverId: string, dayOfWeek: number): Promise<Ride[]> {
         const dialectType = sequelize.getDialect();
@@ -106,8 +133,10 @@ export class RideRepository {
         });
     }
     
+    
     /**
-     * Aggregate earnings by date for a driver
+     * Aggregate earnings by date.
+     * @returns Array of {date, totalCents}
      */
     static async aggregateEarningsByDate(driverId: string, startDate: Date, endDate: Date): Promise<any[]> {
         const dialectType = sequelize.getDialect();
