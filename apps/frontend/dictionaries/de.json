@@ -178,7 +178,8 @@
     "newPassword": "Neues Passwort",
     "newPasswordPlaceholder": "Geben Sie Ihr neues Passwort ein",
     "saveChanges": "Änderungen speichern",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "newPasswordPlaceholder": "Geben Sie Ihr neues Passwort ein"
   },
   "shiftSettings": {
     "shiftSettings": "Schichteinstellungen",
