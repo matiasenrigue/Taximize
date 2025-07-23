@@ -1,10 +1,13 @@
 import { Shift } from './shift.model';
 import { Op } from 'sequelize';
+import { Ride } from '../rides/ride.model';
 
 /**
  * Database operations for shifts.
  */
 export class ShiftRepository {
+
+
     /**
      * Find driver's active shift (shift_end is null).
      */
@@ -25,16 +28,17 @@ export class ShiftRepository {
         return await Shift.findByPk(shiftId);
     }
 
-
     
     /**
      * Get driver's shifts in date range.
+     * @param includeRides Whether to include associated rides
      * @returns Shifts sorted by start time (newest first)
      */
     static async findShiftsInDateRange(
         driverId: string, 
         startDate: Date, 
-        endDate: Date
+        endDate: Date,
+        includeRides: boolean = false
     ): Promise<Shift[]> {
         return await Shift.findAll({
             where: {
@@ -44,6 +48,11 @@ export class ShiftRepository {
                     [Op.lte]: endDate
                 }
             },
+            include: includeRides ? [{
+                model: Ride,
+                as: 'rides',
+                required: false
+            }] : [],
             order: [['shift_start', 'DESC']]
         });
     }

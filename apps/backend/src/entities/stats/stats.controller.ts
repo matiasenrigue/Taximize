@@ -6,6 +6,7 @@ import { isValidDayOfWeek } from './utils/dateHelpers';
 
 export class StatsController {
 
+
     // @desc    Get shifts for the last N days
     // @route   GET /api/stats/shifts-by-days
     // @access  Protected
@@ -28,6 +29,7 @@ export class StatsController {
         }
     });
 
+
     // @desc    Get rides by day of week
     // @route   GET /api/stats/rides-by-weekday
     // @access  Protected
@@ -47,6 +49,8 @@ export class StatsController {
             ResponseHandler.error(error, res, 'Failed to get rides by day of week');
         }
     });
+
+
 
     // @desc    Get earnings statistics
     // @route   GET /api/stats/earnings
@@ -93,6 +97,7 @@ export class StatsController {
         }
     });
 
+    
     
     // @desc    Get work time statistics
     // @route   GET /api/stats/worktime

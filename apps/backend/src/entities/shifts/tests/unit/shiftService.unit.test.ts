@@ -29,7 +29,7 @@ describe('ShiftService', () => {
             
             const result = await ShiftSignalService.isValidSignal(driverId, newSignal);
             expect(result).toBe(true); // new driver can start
-
+        });
 
         it('throws on invalid signal', async () => {
             const driverId = 'john-doe';
@@ -82,8 +82,8 @@ describe('ShiftService', () => {
             
             try {
                 await ShiftSignalService.handleContinueSignal(driver, ts);
-            } catch (error) {
-                expect(error.message).toContain('shift'); 
+            } catch (error: any) {
+                expect(error.message).toContain('Invalid signal'); 
             }
         });
     });

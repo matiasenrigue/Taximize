@@ -24,6 +24,7 @@ export function generateEarningsBreakdown(
     endDate: Date,
     earningsData: EarningsData[]
 ): Array<{ label: string; date: string; value: number }> {
+
     const dates = generateDateArray(startDate, endDate);
     const earningsMap = new Map(
         earningsData.map(item => [item.date, centsToDecimal(item.totalCents)])
@@ -36,10 +37,12 @@ export function generateEarningsBreakdown(
     }));
 }
 
+
 export function calculateTotalEarnings(earningsData: EarningsData[]): number {
     const totalCents = earningsData.reduce((sum, item) => sum + item.totalCents, 0);
     return centsToDecimal(totalCents);
 }
+
 
 export function groupRidesByDate(rides: any[]): Map<string, any[]> {
     const ridesByDate = new Map<string, any[]>();
@@ -55,6 +58,9 @@ export function groupRidesByDate(rides: any[]): Map<string, any[]> {
     return ridesByDate;
 }
 
+
+
+// Calculates time spent with passengers vs waiting between rides per day
 export function calculateWorkTimeByDate(rides: any[]): WorkTimeByDate {
     const ridesByDate = groupRidesByDate(rides);
     const workTimeByDate: WorkTimeByDate = {};
@@ -95,6 +101,9 @@ export function calculateWorkTimeByDate(rides: any[]): WorkTimeByDate {
     return workTimeByDate;
 }
 
+
+
+// Generates time breakdown with labels based on view type (weekly: "Mon", monthly: "15")
 export function generateWorkTimeBreakdown(
     view: 'weekly' | 'monthly',
     startDate: Date,

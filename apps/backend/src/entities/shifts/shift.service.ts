@@ -347,3 +347,6 @@ export class ShiftService {
             totalEarnings: totalEarnings
         };
     }
+}
+
+export default ShiftService;

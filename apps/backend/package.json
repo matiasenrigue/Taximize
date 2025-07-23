@@ -7,6 +7,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "cross-env NODE_ENV=test jest",
+    "test:failed": "npm test -- --onlyFailures",
+    "test:verbose": "npm test -- --verbose",
     "create-db": "ts-node --transpile-only src/shared/config/setup-db.ts"
   },
   "dependencies": {
