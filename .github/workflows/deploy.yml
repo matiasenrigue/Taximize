@@ -1,30 +1,54 @@
-name: Backend Docker Deploy
+name: Deploy to Server
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+      - docker/try-matias
+  workflow_dispatch:
 
 jobs:
-  docker:
+  deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: ⬇️ Checkout code
-        uses: actions/checkout@v3
-
-      - name: 🔧 Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: 🔐 Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: 🐳 Build & Push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/backend/Dockerfile
-          push: true
-          tags: anush2712/taxi-backend:latest
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: |
+          # Navigate to the project directory in /tmp
+          cd /tmp
+          
+          # Clone or update the repository
+          if [ -d "TaxiApp" ]; then
+            cd TaxiApp
+            git fetch origin
+            git checkout docker/try-matias
+            git pull origin docker/try-matias
+          else
+            git clone https://github.com/matiasenrigue/TaxiApp.git TaxiApp
+            cd TaxiApp
+            git checkout docker/try-matias
+          fi
+          
+          # Stop existing containers
+          docker compose -f docker-compose.prod.yml down || true
+          
+          # Build and start containers
+          docker compose -f docker-compose.prod.yml up -d --build
+          
+          # Wait for services to be ready
+          sleep 10
+          
+          # Run database setup if needed
+          docker compose -f docker-compose.prod.yml exec -T backend npm run create-db || true
+          
+          # Check deployment status
+          docker compose -f docker-compose.prod.yml ps

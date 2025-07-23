@@ -2,11 +2,21 @@ FROM node:20
 
 WORKDIR /app
 
-# copy base config
-COPY tsconfig.base.json ../tsconfig.base.json
+# Copy base config from build context root
+COPY tsconfig.base.json ./
 
+# Copy package files
 COPY apps/frontend/package*.json ./
 RUN npm install
 
+# Copy frontend source code
 COPY apps/frontend ./
-CMD ["npm","run","dev"] 
+
+# Build the Next.js application
+RUN npm run build
+
+# Expose port
+EXPOSE 3000
+
+# Start the production server
+CMD ["npm", "start"] 
