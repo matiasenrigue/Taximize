@@ -1,0 +1,22 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY data/data_models_api/combined_flask_app/requirements.txt ./requirements.txt
+
+# Upgrade pip and install Python dependencies
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the entire data directory
+COPY data/ ./data/
+
+# Expose the Flask port
+EXPOSE 5050
+
+# Set environment variable
+ENV PYTHONUNBUFFERED=1
+
+# Run the Flask app directly
+CMD ["python", "data/data_models_api/combined_flask_app/flask_app.py"]
