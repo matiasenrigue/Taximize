@@ -69,7 +69,8 @@
   "start-shift": {
     "title": "Schicht starten",
     "startShift": "Schicht starten",
-    "invalidDuration": "Bitte geben Sie die Dauer ein."
+    "invalidDuration": "Bitte geben Sie die Dauer ein.",
+    "duration": "Dauer"
   },
   "end-shift": {
     "title": "Schicht beendet",
@@ -136,16 +137,18 @@
     "ridesHistory": "Fahrtenverlauf"
   },
   "preferences": {
+    "account": "Account",
     "preferences": "Einstellungen",
     "colorScheme": "Farbschema",
     "language": "Sprache",
-    "geolocation": "Geolocation",
+    "geolocation": "Standort",
     "breakWarnings": "Pause Warnungen",
     "light": "Hell",
     "dark": "Dunkel",
     "system": "System"
   },
   "profile": {
+    "account": "Konto",
     "profile": "Profil",
     "personalInformation": "Persönliche Informationen",
     "username": "Benutzername",

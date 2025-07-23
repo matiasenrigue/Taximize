@@ -51,7 +51,7 @@ export const useWorktimeStatistics = () => {
             setWorktimeStatistics(response.data.data); 
         } catch (err) {
             setWorktimeError(err);
-            console.error("Failed to fetch worktime statistics:", err);
+            console.warn("Failed to fetch worktime statistics:", err);
         } finally {
             setIsWorktimeLoading(false);
         }

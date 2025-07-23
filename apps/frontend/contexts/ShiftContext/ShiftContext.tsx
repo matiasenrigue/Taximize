@@ -1,6 +1,15 @@
 "use client";
 
-import React, {createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef, useState} from "react";
+import React, {
+    createContext,
+    Dispatch,
+    PropsWithChildren, SetStateAction,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState
+} from "react";
 import moment from "moment";
 import {formatDuration} from "../../lib/formatDuration/formatDuration";
 import {BREAK_MODAL_TIMEOUT, DEFAULT_BREAK_DURATION, DEFAULT_SHIFT_DURATION} from "../../constants/constants";
@@ -28,6 +37,8 @@ interface ShiftContextType {
     totalDuration: number;
     totalEarnings: number;
     loadRide: boolean;
+    showBreakWarnings: boolean;
+    setShowBreakWarnings: Dispatch<SetStateAction<boolean>>
 }
 
 const ShiftContext = createContext<ShiftContextType|null>(null);
@@ -47,6 +58,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const [duration, setDuration] = useState<number>(DEFAULT_SHIFT_DURATION);
     const [startTime, setStartTime] = useState<number|null>(null);
 
+    const [showBreakWarnings, setShowBreakWarnings] = useState<boolean>(true);
     const [lastBreakTime, setLastBreakTime] = useState<number|null>(null);
     const [breakDuration, setBreakDuration] = useState<number>(DEFAULT_BREAK_DURATION);
     const [totalBreakDuration, setTotalBreakDuration] = useState<number>(0);
@@ -55,6 +67,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     // shift statistics
     const [totalDuration, setTotalDuration] = useState<number>(0);
     const [totalEarnings, setTotalEarnings] = useState<number>(0);
+
 
     // initialize shift
     useEffect(() => {
@@ -273,11 +286,11 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     // returns true, if it is time for a break
     const checkBreakTime = useCallback((): boolean => {
-        if (!isLoaded || !isShift || isPaused || !lastBreakTime)
+        if (!showBreakWarnings || !isLoaded || !isShift || isPaused || !lastBreakTime)
             return false;
         const time = moment.now() - lastBreakTime;
         return (time >= BREAK_MODAL_TIMEOUT);
-    }, [isLoaded, lastBreakTime, isShift, isPaused]);
+    }, [isLoaded, lastBreakTime, isShift, isPaused, showBreakWarnings]);
 
     // returns true, if the shift time is over
     const checkIsShiftOver = useCallback((): boolean => {
@@ -313,6 +326,8 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             totalDuration,
             totalEarnings,
             loadRide,
+            showBreakWarnings,
+            setShowBreakWarnings
         }}>
             <BreakModal ref={breakModalRef}/>
             {children}

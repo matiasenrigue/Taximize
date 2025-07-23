@@ -43,7 +43,7 @@ export default function Profile() {
     }
      if (error) {
         const errorMessage = error || 'Failed to fetch user data';
-        console.error(errorMessage);
+        console.warn(errorMessage);
     }
 
     // manage the sign out modal visibility
@@ -81,7 +81,7 @@ export default function Profile() {
         <div className={styles.page}>
              <div className={styles.container}>
                 <div className={styles.backButtonContainer}>
-                    <BackButton href="/account" pageName="Account" />
+                    <BackButton href="/account" pageName={t("account")} />
                 </div>
                  <h2 className={styles.title}>{t('profile')}</h2>
                     <div className={styles.profileInfo}>

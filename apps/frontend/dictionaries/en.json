@@ -72,7 +72,8 @@
   "start-shift": {
     "title": "Start Shift",
     "startShift": "Start Shift",
-    "invalidDuration": "Please enter a duration."
+    "invalidDuration": "Please enter a duration.",
+    "duration": "Duration"
   },
   "end-shift": {
     "title": "Shift finished",
@@ -139,6 +140,7 @@
     "ridesHistory": "Rides History"
   },
   "preferences": {
+    "account": "Account",
     "preferences": "Preferences",
     "colorScheme": "Color Scheme",
     "language": "Language",
@@ -149,18 +151,19 @@
     "system": "System"
   },
   "profile": {
-  "profile": "Profile",
-  "personalInformation": "Personal Information",
-  "username": "Username",
-  "email": "Email",
-  "manageAccount": "Manage Account",
-  "changePassword": "Change Password",
-  "deleteAccount": "Delete Account",
-  "signout": "Sign Out",
-  "signOutWarning": "Are you sure you want to sign out?",
-  "deleteAccountWarning": "Are you sure you want to delete your account?",
-  "cancel": "Cancel",
-  "confirm": "Confirm"
+    "account": "Account",
+    "profile": "Profile",
+    "personalInformation": "Personal Information",
+    "username": "Username",
+    "email": "Email",
+    "manageAccount": "Manage Account",
+    "changePassword": "Change Password",
+    "deleteAccount": "Delete Account",
+    "signout": "Sign Out",
+    "signOutWarning": "Are you sure you want to sign out?",
+    "deleteAccountWarning": "Are you sure you want to delete your account?",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
   },
   "changeUsername": {
     "changeUsername": "Change Username",

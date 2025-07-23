@@ -1,6 +1,6 @@
 "use client" 
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, {createContext, useContext, useState, ReactNode, useEffect} from 'react';
 import api from "../../lib/axios";
 
 export interface User {
@@ -28,19 +28,18 @@ export const UserContextProvider: React.FC<{ children: ReactNode }> = ({ childre
     // Refresh user data from the API
     const refreshUser = async () => {
         try {
-            const response = await api.get("/users/user/me");
-            if (response.data.success) {
+            const response = await api.get("/users/me");
+            if (response.data.success)
                 setUser(response.data.data);
-            } else {
+            else
                 setUser(null);
-            }
         } catch (error) {
-            console.error("Failed to fetch user data:", error);
+            console.warn("Failed to fetch user data:", error);
             setUser(null);
         }
     };
     // Initial fetch of user data when the context is created
-    React.useEffect(() => {
+    useEffect(() => {
         refreshUser();
     }, []);
 

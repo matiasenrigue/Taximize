@@ -42,7 +42,7 @@ export default function Signup() {
         }
         ).catch((err) => {
             // when the status is not 200, the response will contain an error message
-            console.error("Signup error:", err);
+            console.warn("Signup error:", err);
             if (err.response?.data?.error) {
                 setMsg({type: "error", text: err.response.data.error});
             } else {

@@ -47,7 +47,7 @@ export default function Signin() {
                 }
             }).catch((err) => {
                 // when the status is not 200, the response will contain an error message
-                console.error("Signin error:", err);
+                console.warn("Signin error:", err);
                 if (err.response?.data?.error) {
                     setMsg({ type: "error", text: err.response.data.error });
                 } else {

@@ -157,6 +157,8 @@ export const RideContextProvider = (props: PropsWithChildren) => {
 
         api.post("/rides/start-ride", {
             timestamp,
+            address: destination.name,
+            predictedScore: rating,
             "startLatitude": userLocation.lat,
             "startLongitude": userLocation.lng,
             "destinationLatitude": destination.lat,
@@ -185,7 +187,7 @@ export const RideContextProvider = (props: PropsWithChildren) => {
         }).catch((error) => {
             console.warn(error)
         });
-    }, [startTaximeter, destination, userLocation, isOnRide]);
+    }, [startTaximeter, destination, userLocation, isOnRide, rating]);
 
     // end the current ride
     const endRide = useCallback((editedFare: number = fare) => {

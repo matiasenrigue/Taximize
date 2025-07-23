@@ -34,7 +34,7 @@ export default function StartShift() {
                 direction={"column"}
                 align={"start"}>
                 <div>
-                    <Label>Duration</Label>
+                    <Label>{t("duration")}</Label>
                     <TimeInput
                         defaultValue={DEFAULT_SHIFT_DURATION}
                         invalid={!isValid}

@@ -52,7 +52,7 @@ export const useEarningStatistics = () => {
             setEarningsStatistics(response.data.data); 
         } catch (err) {
             setEarningsError(err);
-            console.error("Failed to fetch statistics:", err);
+            console.warn("Failed to fetch statistics:", err);
         } finally {
             setIsEarningsLoading(false);
         }

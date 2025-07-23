@@ -9,13 +9,15 @@ import { useRouter, usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useTheme } from "next-themes";  
 import BackButton from "../../../../components/BackButton/BackButton";
+import {useShift} from "../../../../contexts/ShiftContext/ShiftContext";
 
 export default function Preferences() {
     const t = useTranslations('preferences');
     const locale = useLocale();
-    const { setTheme } = useTheme();
+    const { theme, setTheme } = useTheme();
     const router = useRouter();
     const pathname = usePathname();
+    const {showBreakWarnings, setShowBreakWarnings} = useShift();
 
     const handleLanguageChange = (language: string) => {
         const newPath = pathname.replace(`/${locale}`, `/${language}`);
@@ -28,40 +30,52 @@ export default function Preferences() {
                 <div className={styles.backButtonContainer}>
                     <BackButton href="/account" pageName="Account" />
                 </div>
-                <h2 className={styles.title}>Preferences</h2>
+                <h2 className={styles.title}>{t('preferences')}</h2>
                 <div className={styles.preferenceList}>
                     <div className={styles.label}>
-                        <label>{t('colorScheme')}</label>
+                        <label htmlFor={"select-colorScheme"}>{t('colorScheme')}</label>
                     </div>
                     <div className={styles.select}>
                         <Select
+                            id={"select-colorScheme"}
                             onChange={(value) => setTheme(value as string)}>
-                            <Option value="light">{t('light')}</Option>
-                            <Option value="dark">{t('dark')}</Option>
-                            <Option value="system">{t('system')}</Option>
+                            <Option
+                                value="light"
+                                selected={theme === "light"}>{t('light')}</Option>
+                            <Option
+                                value="dark"
+                                selected={theme === "dark"}>{t('dark')}</Option>
+                            <Option
+                                value="system"
+                                selected={theme === "system"}>{t('system')}</Option>
                         </Select>
                     </div>
                     
                     <div className={styles.label}>
-                    <label>Language</label>
+                    <label htmlFor={"select-language"}>{t('language')}</label>
                     </div>
                     <div className={styles.select}>
-                        <Select onChange={handleLanguageChange}>
-                            <Option value="en">English</Option>
-                            <Option value="de">Deutsch</Option>
+                        <Select
+                            id={"select-language"}
+                            onChange={handleLanguageChange}>
+                            <Option
+                                value="en"
+                                selected={locale === "en"}>English</Option>
+                            <Option
+                                value="de"
+                                selected={locale === "de"}>Deutsch</Option>
                         </Select>
                     </div>
                     <div className={styles.label}>
-                        <label>{t('geolocation')}</label>
+                        <label htmlFor={"switch-breakWarnings"}>
+                            {t('breakWarnings')}
+                        </label>
                     </div>
                     <div className={styles.switch}>
-                        <Switch />
-                    </div>
-                    <div className={styles.label}>
-                        <label>{t('breakWarnings')}</label>
-                    </div>
-                    <div className={styles.switch}>
-                        <Switch />
+                        <Switch
+                            id={"switch-breakWarnings"}
+                            checked={showBreakWarnings}
+                            onChange={(e) => setShowBreakWarnings(e.target.checked)}/>
                     </div>
                 </div>
             </div>

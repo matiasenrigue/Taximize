@@ -66,20 +66,18 @@ api.interceptors.response.use(
           }
         } catch (refreshError) {
           // Refresh failed
-          console.error('Token refresh failed');
+          console.warn('Token refresh failed');
           clearAllTokens();
           return Promise.reject(refreshError);
         }
       } else if (error.response.status === 403) {
         // Handle forbidden access
-        console.error('Forbidden access');
+        console.warn('Forbidden access');
         window.location.href = '/';
-      } else {
-        console.error('An error occurred:', error.response.data);
       }
     } else {
       // Handle network errors or other issues
-      console.error('Network error or no response received:', error.message);
+      console.warn('Network error or no response received:', error.message);
     }
     return Promise.reject(error);
   }
