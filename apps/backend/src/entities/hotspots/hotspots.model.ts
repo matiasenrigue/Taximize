@@ -1,5 +1,9 @@
 import { sequelize, Model, DataTypes } from '../../shared/config/db';
 
+/**
+ * Stores hotspot prediction data with timestamps.
+ * Used for caching ML predictions to reduce API calls.
+ */
 export class Hotspots extends Model {
     public id!: string;
     public data!: any; 

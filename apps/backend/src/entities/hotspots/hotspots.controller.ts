@@ -2,11 +2,20 @@ import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { HotspotsService } from './hotspots.service';
 
+/**
+ * Handles HTTP requests for taxi hotspot predictions.
+ * Provides real-time ML-based predictions for high-demand pickup zones.
+ */
 export class HotspotsController {
         
-    // @desc   Get the Hotspots data
-    // @route  GET /api/hotspots/
-    // @access Protected
+    /**
+     * Get hotspot predictions for current time.
+     * Returns cached data if recent (< 1 hour), otherwise fetches new predictions.
+     * 
+     * @route GET /api/hotspots/
+     * @access Protected
+     * @returns Zone predictions with location IDs and trip counts
+     */
     static getHotspots = asyncHandler(async (req: Request, res: Response) => {
         try {
             // Get hotspots data - service handles whether to fetch new or return cached

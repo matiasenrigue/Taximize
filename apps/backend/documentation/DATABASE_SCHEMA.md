@@ -34,6 +34,9 @@ erDiagram
         integer num_breaks
         bigint avg_break_ms
         bigint planned_duration_ms
+        integer total_earnings_cents
+        double total_distance_km
+        integer number_of_rides
         timestamp created_at "NOT NULL"
         timestamp updated_at "NOT NULL"
         timestamp deleted_at "soft delete"
@@ -69,7 +72,7 @@ erDiagram
         double destination_longitude "NOT NULL"
         string address "NOT NULL"
         timestamp start_time "NOT NULL"
-        smallint predicted_score "NOT NULL, DEFAULT 3"
+        smallint predicted_score "DEFAULT NULL"
         timestamp end_time "NULL = active"
         integer earning_cents
         integer earning_per_min
@@ -119,11 +122,18 @@ erDiagram
 | Table | Column | Default | Description |
 |-------|--------|---------|-------------|
 | all tables | id | UUIDV4 | Auto-generated UUID |
-| rides | predicted_score | 3 | Default prediction score |
+| rides | predicted_score | NULL | Default prediction score |
 | all tables | created_at | CURRENT_TIMESTAMP | Set on insert |
 | all tables | updated_at | CURRENT_TIMESTAMP | Updated on modification |
 
-### Indexes
+### Indexes (Currently Implemented)
+| Table | Index Name | Columns | Type | Purpose |
+|-------|------------|---------|------|---------|
+| shifts | one_active_shift_per_driver | driver_id | UNIQUE (WHERE shift_end IS NULL) | Ensures only one active shift per driver |
+| rides | one_active_ride_per_shift | shift_id | UNIQUE (WHERE end_time IS NULL) | Ensures only one active ride per shift |
+
+### Indexes (Recommended for Performance)
+The following indexes are recommended but not yet implemented in the models:
 | Table | Index Name | Columns | Type | Purpose |
 |-------|------------|---------|------|---------|
 | shifts | idx_shifts_driver_id | driver_id | BTREE | Foreign key lookups |
@@ -148,6 +158,7 @@ erDiagram
 - All tables have `created_at` and `updated_at` columns
 - `updated_at` is automatically updated on record modification
 - Sequelize options: `timestamps: true, underscored: true`
+- Note: Models use camelCase internally (e.g., `createdAt`) but database columns use snake_case (e.g., `created_at`)
 
 ### Password Security
 - **Table**: `users`
