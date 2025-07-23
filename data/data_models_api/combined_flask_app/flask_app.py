@@ -14,10 +14,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "s
 from scoring_utils import load_reference_files, score_trip
 
 # ==== hotspot imports ====
-CURRENT_DIR = os.path.dirname(__file__)
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 HOTSPOT_UTILS_PATH = os.path.abspath(os.path.join(CURRENT_DIR, "..", "hotspot_model"))
 sys.path.insert(0, HOTSPOT_UTILS_PATH)
-from utils import generate_features_for_time, zone_name_to_id
+from utils import generate_features_for_time, zone_name_to_id, get_multiple_proxy_lags
 import feature_engineering
 
 app = Flask(__name__)
@@ -163,6 +163,11 @@ def predict_hotspots():
 
         if df.empty:
             return jsonify({"error": "Feature generation failed."}), 500
+        
+        # Add lag features
+        lag_data = get_multiple_proxy_lags(pickup_time)
+        for col in ["trip_count_1h_ago", "trip_count_2h_ago", "rolling_avg_2h"]:
+            df[col] = df["pickup_zone"].map(lag_data[col]).fillna(0)
 
         # Save pickup_zone before transformations
         if "pickup_zone" not in df.columns:
@@ -176,6 +181,37 @@ def predict_hotspots():
 
         df = feature_engineering.apply_target_encoding(df, encoding_dir)
         df = feature_engineering.align_with_model_features(df)
+        print(df.head())
+        print(df.columns)
+        
+        print("="*60)
+        print("Debug Info: DataFrame to model before prediction")
+        print(f"Shape: {df.shape}")
+        print("First 5 rows:")
+        print(df.head())
+        print("\nColumn names:", list(df.columns))
+
+        # Show column statistics for each feature
+        for col in df.columns:
+            col_vals = df[col]
+            unique_vals = np.unique(col_vals)
+            print(f"Column: {col}")
+            print(f"  unique: {unique_vals[:10]}{' ...' if len(unique_vals)>10 else ''}")
+            print(f"  min: {col_vals.min()}, max: {col_vals.max()}, mean: {col_vals.mean()}, std: {col_vals.std()}")
+            print(f"  NaNs: {col_vals.isna().sum()}")
+            print("-"*20)
+
+        # Summary of columns with constant value
+        constant_cols = [col for col in df.columns if df[col].nunique() == 1]
+        print("\nConstant columns:", constant_cols)
+
+        # Print number of unique values in lag features
+        for lag in ['trip_count_1h_ago', 'trip_count_2h_ago', 'rolling_avg_2h']:
+            if lag in df.columns:
+                print(f"{lag}: unique={df[lag].unique()}, min={df[lag].min()}, max={df[lag].max()}")
+
+        print("="*60)
+        
 
         preds = np.expm1(model.predict(df))
 
