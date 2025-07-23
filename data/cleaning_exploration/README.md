@@ -122,6 +122,10 @@ Final iterations focused on optimizing a production-ready scoring pipeline. This
   - Enables distance calculations and zone clustering
   - Powers the hotspot detection algorithms
 
+- **`generate_historical_lags.ipynb`** 🕓  
+  Generates **proxy lag features** for hotspot prediction by computing zone-level trip counts from 1–2 hours prior using past months' data (e.g., July 2023).  
+  These lag values simulate real-time signals (`trip_count_1h_ago`, `rolling_avg_2h`) and are used as input features during both training and prediction for the hotspot model.
+
 ---
 
 ## 📝 Key Insights & Technical Notes
