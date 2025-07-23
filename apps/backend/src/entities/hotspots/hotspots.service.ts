@@ -2,8 +2,16 @@ import { Hotspots } from './hotspots.model';
 import { getHotspotPredictions } from '../../shared/utils/dataApiClient';
 import moment from 'moment';
 
+/**
+ * Manages hotspot prediction data with intelligent caching.
+ * Fetches ML predictions from Flask API and caches for efficiency.
+ */
 export class HotspotsService {
     
+    /**
+     * Checks if cached hotspot data is recent (within 1 hour).
+     * @returns Hotspot data if recent, null otherwise
+     */
     static async isHotspotDataRecent(): Promise<any | null> {
         const now: Date = new Date();
         const lastHour: Date = new Date(now.getTime() - 60 * 60 * 1000);
@@ -25,10 +33,14 @@ export class HotspotsService {
     };
 
 
+    /**
+     * Calls Flask ML API to get hotspot predictions.
+     * @returns Transformed hotspot data or null on failure
+     */
     static async hotspotsApiCall(): Promise<any | null> { 
         try {
             // Get current time in UTC (Flask API will convert to NYC time)
-            // Code: https://stackoverflow.com/questions/33599768/what-is-the-yyyy-mm-ddthhmmss-sssz-date-timezone-formatting-and-how-can-i-rep
+            // Format ref: https://stackoverflow.com/questions/33599768/what-is-the-yyyy-mm-ddthhmmss-sssz-date-timezone-formatting-and-how-can-i-rep
             const formattedTime = moment.utc().toISOString();
             const formattedTimeWithoutMs = formattedTime.split('.')[0] + 'Z';
             
@@ -52,6 +64,10 @@ export class HotspotsService {
     };
 
 
+    /**
+     * Fetches fresh hotspot predictions with retry logic.
+     * @returns Hotspot data on success, false on failure
+     */
     static async fetchNewHotspotsData(): Promise<any | boolean> {
 
         let attempts = 0;
@@ -81,6 +97,10 @@ export class HotspotsService {
     };
 
 
+    /**
+     * Retrieves most recent cached hotspot data.
+     * @returns Cached data or false if none exists
+     */
     static async retrieveCachedHotspotsData(): Promise<any | boolean> {
         
         const cachedHotspots: Hotspots[] = await Hotspots.findAll({
@@ -93,6 +113,12 @@ export class HotspotsService {
     };
 
 
+    /**
+     * Main entry point for hotspot data.
+     * Uses cached data if recent, otherwise fetches new predictions.
+     * Falls back to stale cache if API unavailable.
+     * @throws Error if no data available
+     */
     static async getHotspotsData(): Promise<any> {
         const recentData = await this.isHotspotDataRecent();
         

@@ -8,6 +8,8 @@ Think of it as a smart heat map that tells drivers where they're most likely to 
 
 ## The Caching Strategy
 
+> ⚠️ **Important**: This is a first-implementation compromise. See [Caching Strategy: A Pragmatic First Implementation](#caching-strategy-a-pragmatic-first-implementation) for limitations and why we knowingly ship with this "not perfect" stategy
+
 Here's the thing - ML predictions are expensive to compute, but they don't change every second. So we built a smart caching layer:
 
 - **Fresh data window**: 1 hour
@@ -113,9 +115,45 @@ Or on total failure:
 }
 ```
 
-## Future Considerations
+## Caching Strategy: A Pragmatic First Implementation
 
-The 1-hour cache window is a balance between freshness and API load. During rush hours, predictions might change faster. During quiet times, they're stable for hours. The window could be made dynamic based on time of day.
+### Why We Use Stale Cache as Fallback
+
+We're fully aware that serving potentially days-old hotspot predictions when the ML API fails isn't ideal. In fact, it goes against the whole point of "real-time" predictions. 
+
+### The Current Reality vs. The Ideal
+
+**Current Implementation:**
+- 1-hour cache window (way too long for rush hour dynamics)
+- Falls back to ANY cached data when ML API fails
+- No distinction between weekday/weekend patterns
+- No time-of-day awareness in cache invalidation
+
+**What It Should Be:**
+- 10-minute cache windows during peak hours (or less!)
+- 30-minute windows during off-peak
+- Different cache strategies for different times/days
+- Hard cutoff for stale data (e.g., never show data > X hours old)
+- Graceful degradation with clear user messaging about data freshness
+
+### Why We Shipped It This Way
+
+1. **MVP Philosophy**: Get something working first, optimize later
+2. **API Costs**: The ML service has rate limits and computational costs
+3. **User Experience**: An imperfect suggestion beats a loading spinner
+4. **Feedback Loop**: We need real driver feedback to tune the cache windows
+
+### The Path Forward
+
+This caching strategy is explicitly a v1 compromise. In production, hotspot predictions that don't represent real-time conditions can actually harm driver earnings by sending them to zones that *were* busy but aren't anymore. 
+
+Future iterations should:
+- Implement sliding cache windows based on demand patterns
+- Add data freshness indicators in the API response
+- Consider pre-computing predictions for common time slots
+- Build fallback predictions based on historical averages rather than stale specific predictions
+
+## Future Considerations
 
 The 5-retry limit prevents infinite loops but ensures temporary network issues don't break the feature. It's a magic number that works well in practice.
 

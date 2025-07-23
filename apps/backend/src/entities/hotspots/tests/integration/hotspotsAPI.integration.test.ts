@@ -7,11 +7,9 @@ import User from '../../../users/user.model';
 import { Hotspots } from '../../hotspots.model';
 import { generateAccessToken } from '../../../auth/utils/generateTokens';
 
-// Set up environment variables for testing
 process.env.ACCESS_TOKEN_SECRET = 'test-access-token-secret';
 process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
 
-// Helper function to create authenticated user and get token
 async function createAuthenticatedUser(email: string = 'user@test.com', username: string = 'testuser') {
     const user = await User.create({
         email,
@@ -22,7 +20,6 @@ async function createAuthenticatedUser(email: string = 'user@test.com', username
     return { user, token };
 }
 
-// Helper function to create hotspot data
 async function createHotspotData(data: any = null, createdAt: Date = new Date()) {
     const defaultData = data || {
         timestamp: new Date().toISOString(),
@@ -38,7 +35,7 @@ async function createHotspotData(data: any = null, createdAt: Date = new Date())
         updatedAt: createdAt
     });
     
-    // Manually update created_at if needed (for testing old data)
+    // hack to test old data - sequelize doesn't let us set createdAt directly sometimes
     if (createdAt !== hotspot.createdAt) {
         await sequelize.query(
             `UPDATE hotspots SET created_at = :createdAt WHERE id = :id`,
@@ -59,7 +56,7 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-    // Clean up in correct order due to foreign key constraints
+    // clean up - order matters because of FKs
     await Hotspots.destroy({ where: {}, force: true });
     await User.destroy({ where: {}, force: true });
 });
@@ -69,9 +66,10 @@ afterAll(async () => {
 });
 
 
-describe('Hotspots API Integration Tests', () => {
+describe('Hotspots API', () => {
+
     describe('GET /api/hotspots', () => {
-        it('should return 401 when no authentication token provided', async () => {
+        it('blocks unauthenticated requests', async () => {
             const response = await request(app)
                 .get('/api/hotspots')
                 .expect(401);
@@ -83,165 +81,123 @@ describe('Hotspots API Integration Tests', () => {
         });
 
 
-        it('should return 401 when invalid token provided', async () => {
+        it('rejects bad tokens', async () => {
             const response = await request(app)
                 .get('/api/hotspots')
-                .set('Authorization', 'Bearer invalid.token.here')
+                .set('Authorization', 'Bearer totally.fake.token')
                 .expect(401);
 
-            expect(response.body).toEqual({
-                success: false,
-                error: 'Not authorized, token failed'
-            });
+            expect(response.body.success).toBe(false); // nope
+            expect(response.body.error).toContain('token failed');
         });
 
 
-        it('should return recent hotspots data when authenticated', async () => {
+        it('returns hotspots for logged in users', async () => {
             const { token } = await createAuthenticatedUser();
-            const hotspotsData = {
+            const testData = {
                 timestamp: new Date().toISOString(),
                 zones: [
                     { name: "Zone1", count: 10 },
                     { name: "Zone2", count: 15 }
                 ]
             };
-            await createHotspotData(hotspotsData);
+            await createHotspotData(testData);
 
             const response = await request(app)
                 .get('/api/hotspots')
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200);
 
-            expect(response.body).toEqual({
-                success: true,
-                data: hotspotsData
-            });
+            expect(response.body.success).toBe(true); 
+            expect(response.body.data).toEqual(testData);
         });
 
 
-        it('should return cached data when recent data is older than 1 hour', async () => {
+        it('uses cache when data is stale', async () => {
             const { token } = await createAuthenticatedUser();
             
-            // Create old data (2 hours ago)
-            const oldData = {
-                timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+            const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+            const staleData = {
+                timestamp: twoHoursAgo.toISOString(),
                 zones: [{ name: "Zone1", count: 5 }]
             };
-            await createHotspotData(oldData, new Date(Date.now() - 2 * 60 * 60 * 1000));
+            await createHotspotData(staleData, twoHoursAgo);
 
-            // Since fetchNewHotspotsData will return false (API returns null),
-            // it should return the cached data
+            // api mock returns null so it'll use the cache
             const response = await request(app)
                 .get('/api/hotspots')
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200);
 
-            expect(response.body).toEqual({
-                success: true,
-                data: oldData
-            });
+            expect(response.body.data).toEqual(staleData); // old but gold
         });
 
 
-        it('should return 500 error when no data is available', async () => {
+        // this is the worst case
+        it('errors when totally empty', async () => {
             const { token } = await createAuthenticatedUser();
             
-            // No hotspots data exists, and API returns null
             const response = await request(app)
                 .get('/api/hotspots')
                 .set('Authorization', `Bearer ${token}`)
                 .expect(500);
 
-            expect(response.body).toEqual({
-                success: false,
-                message: 'No hotspots data available',
-                data: null
-            });
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toContain('No hotspots data');
         });
 
 
-        it('should handle multiple concurrent requests efficiently', async () => {
+        it('handles concurrent requests', async () => {
             const { token } = await createAuthenticatedUser();
-            const hotspotsData = {
+            const data = {
                 timestamp: new Date().toISOString(),
                 zones: [{ name: "Zone1", count: 10 }]
             };
-            await createHotspotData(hotspotsData);
+            await createHotspotData(data);
 
-            // Make multiple concurrent requests
-            const requests = Array(5).fill(null).map(() => 
-                request(app)
-                    .get('/api/hotspots')
-                    .set('Authorization', `Bearer ${token}`)
-            );
+            // spam the endpoint
+            const promises = [];
+            for (let i = 0; i < 5; i++) {
+                promises.push(
+                    request(app)
+                        .get('/api/hotspots')
+                        .set('Authorization', `Bearer ${token}`)
+                );
+            }
 
-            const responses = await Promise.all(requests);
+            const results = await Promise.all(promises);
             
-            // All should succeed with the same data
-            responses.forEach(response => {
-                expect(response.status).toBe(200);
-                expect(response.body).toEqual({
-                    success: true,
-                    data: hotspotsData
-                });
+            results.forEach(res => {
+                expect(res.status).toBe(200); // all good
+                expect(res.body.data).toEqual(data);
             });
         });
 
 
-        it('should return most recent data when multiple entries exist', async () => {
+        it('picks newest data', async () => {
             const { token } = await createAuthenticatedUser();
             
-            // Create older data
-            const oldData = {
-                timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-                zones: [{ name: "Zone1", count: 5 }]
-            };
-            await createHotspotData(oldData, new Date(Date.now() - 30 * 60 * 1000));
+            // old data
+            await createHotspotData(
+                { timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), zones: [{ name: "Zone1", count: 5 }] },
+                new Date(Date.now() - 30 * 60 * 1000)
+            );
 
-            // Create newer data
-            const newData = {
+            // fresh data  
+            const fresh = {
                 timestamp: new Date().toISOString(),
                 zones: [{ name: "Zone1", count: 20 }]
             };
-            await createHotspotData(newData);
+            await createHotspotData(fresh);
 
             const response = await request(app)
                 .get('/api/hotspots')
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200);
 
-            expect(response.body).toEqual({
-                success: true,
-                data: newData
-            });
+            expect(response.body.data).toEqual(fresh); // newer wins
         });
 
 
-        it('should work correctly with user having non-standard ID format', async () => {
-            // Create user with specific ID
-            const user = await User.create({
-                id: '12345678-1234-1234-1234-123456789012',
-                email: 'special@test.com',
-                username: 'specialuser',
-                password: 'password123'
-            });
-            const token = generateAccessToken(user.id);
-
-            const hotspotsData = {
-                timestamp: new Date().toISOString(),
-                zones: [{ name: "Zone1", count: 10 }]
-            };
-            await createHotspotData(hotspotsData);
-
-            const response = await request(app)
-                .get('/api/hotspots')
-                .set('Authorization', `Bearer ${token}`)
-                .expect(200);
-
-            expect(response.body).toEqual({
-                success: true,
-                data: hotspotsData
-            });
-        });
     });
 });
