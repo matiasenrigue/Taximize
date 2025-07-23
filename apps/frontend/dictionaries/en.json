@@ -181,7 +181,8 @@
     "newPassword": "New Password",
     "newPasswordPlaceholder": "Enter your new password",
     "saveChanges": "Save Changes",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "newPasswordPlaceholder": "Enter your new password"
   },
   "shiftSettings": {
     "shiftSettings": "Shift Settings",

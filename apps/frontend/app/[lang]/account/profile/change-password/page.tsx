@@ -37,13 +37,13 @@ export default function ChangePassword() {
         <div className={styles.page}>
             <div className={styles.container}>
                 <div className={styles.profileInfo}>
-                <h2 className={styles.title}>{t('changeUsername')}</h2>
+                <h2 className={styles.title}>{t('changePassword')}</h2>
                         <section className={styles.section}>
                             <div>
                                 <Input
                                     type="text"
                                     value={newPassword}
-                                    placeholder={t('newUsernamePlaceholder')}
+                                    placeholder={t('newPasswordPlaceholder')}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                 />
                                 <div className={styles.modalActions}>
