@@ -10,6 +10,10 @@ COPY apps/frontend ./apps/frontend/
 WORKDIR /app/apps/frontend
 RUN npm install
 
+# Move test files out of the way for build
+RUN mv jest.setup.ts jest.setup.ts.bak || true
+RUN mv jest.config.js jest.config.js.bak || true
+
 # Build the Next.js application
 RUN npm run build
 
