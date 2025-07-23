@@ -15,10 +15,8 @@ interface ScoringRequest {
 }
 
 interface ScoringResponse {
-  score: number;
-  weighted_score: number;
-  percentile: number;
-  features?: Record<string, any>;
+  predicted_score: number;
+  final_score: number;
 }
 
 

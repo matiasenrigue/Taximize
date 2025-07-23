@@ -29,10 +29,11 @@ export class HotspotsService {
         try {
             // Get current time in UTC (Flask API will convert to NYC time)
             // Code: https://stackoverflow.com/questions/33599768/what-is-the-yyyy-mm-ddthhmmss-sssz-date-timezone-formatting-and-how-can-i-rep
-            const formattedTime = moment.utc().toISOString();                        
+            const formattedTime = moment.utc().toISOString();
+            const formattedTimeWithoutMs = formattedTime.split('.')[0] + 'Z';
             
             // Get hotspot predictions from Flask API
-            const predictions = await getHotspotPredictions(formattedTime);
+            const predictions = await getHotspotPredictions(formattedTimeWithoutMs);
             
             // Transform the data to match expected format
             const transformedData = {

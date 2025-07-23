@@ -46,11 +46,12 @@ export class RideMLService {
                 pickup_datetime: formatDateTimeForScoring(new Date())
             });
             
-            const prediction = scoreResult.percentile / 100;
+            // Validate and convert score
+            const prediction = scoreResult.predicted_score / 100;
             RideValidators.validatePredictionScore(prediction);
             
             const rating = this.convertPredictionToRating(prediction);
-            
+
             return { rating, zones };
             
         } catch (error) {
