@@ -1,6 +1,7 @@
 import { Signal } from '../../utils/signalValidation';
 
 export class SignalValidationTestUtils {
+    
     private static driverStates: Map<string, Signal | null> = new Map();
 
     static resetDriverState(driverId: string): void {

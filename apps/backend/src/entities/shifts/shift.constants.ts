@@ -1,12 +1,7 @@
 export const SHIFT_CONSTANTS = {
 
-    // Time limits
     MAX_SHIFT_DURATION_MS: 12 * 60 * 60 * 1000, // 12 hours
 
-    // Metrics calculation
-    CENTS_TO_DOLLARS: 100,
-
-    // Default values
     DEFAULT_PLANNED_DURATION_MS: 8 * 60 * 60 * 1000, // 8 hours
     
 };

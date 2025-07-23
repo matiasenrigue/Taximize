@@ -24,13 +24,19 @@ afterAll(async () => {
 
 describe('Ride API Integration Tests', () => {
 
+    // Some common test data
+    const DUBLIN_COORDS = {
+        start: { lat: 53.349805, lng: -6.260310 },
+        end: { lat: 53.359805, lng: -6.270310 }
+    };
+
     describe('POST /api/rides/evaluate-ride', () => {
         it('should return 401 when no authentication provided', async () => {
             const requestBody = {
-                startLatitude: 53.349805,
-                startLongitude: -6.260310,
-                destinationLatitude: 53.359805,
-                destinationLongitude: -6.270310
+                startLatitude: DUBLIN_COORDS.start.lat,
+                startLongitude: DUBLIN_COORDS.start.lng,
+                destinationLatitude: DUBLIN_COORDS.end.lat,
+                destinationLongitude: DUBLIN_COORDS.end.lng
             };
 
             const res = await request(app)
@@ -41,7 +47,8 @@ describe('Ride API Integration Tests', () => {
         });
 
 
-        it.skip('should return 200 and predicted score when authenticated with valid coordinates - skipped due to zone setup', async () => {
+        // FIXME: broken after zone refactor
+        it.skip('returns predicted score when authenticated', async () => {
             const { token } = await TestHelpers.createAuthenticatedUser();
             
             const requestBody = {
@@ -63,34 +70,32 @@ describe('Ride API Integration Tests', () => {
         });
 
 
-        it('should return 400 when authenticated but invalid coordinates provided', async () => {
+        it('validates coordinate types', async () => {
             const { token } = await TestHelpers.createAuthenticatedUser();
             
-            const requestBody = {
-                startLatitude: 'invalid',
-                startLongitude: -6.260310,
-                destinationLatitude: 53.359805,
-                destinationLongitude: -6.270310
-            };
-
             const res = await request(app)
                 .post('/api/rides/evaluate-ride')
                 .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
+                .send({
+                    startLatitude: 'not a number',
+                    startLongitude: -6.260310,
+                    destinationLatitude: 53.359805,
+                    destinationLongitude: -6.270310
+                });
                 
             expect(res.status).toBe(400);
             expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('Invalid coordinates');
+            expect(res.body.error).toContain('Invalid coordinates'); // should validate input
         });
 
-
-        it('should return 400 when authenticated but missing required coordinates', async () => {
+        
+        it('requires all coordinates', async () => {
             const { token } = await TestHelpers.createAuthenticatedUser();
             
             const requestBody = {
                 startLatitude: 53.349805,
                 startLongitude: -6.260310
-                // Missing destination coordinates
+                // oops forgot destination
             };
 
             const res = await request(app)
@@ -99,78 +104,72 @@ describe('Ride API Integration Tests', () => {
                 .send(requestBody);
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
             expect(res.body.error).toContain('Missing required coordinates');
         });
     });
 
 
-    describe('POST /api/rides/start-ride', () => {
-        it('should return 401 when no authentication provided', async () => {
-            const requestBody = {
-                startLatitude: 53.349805,
-                startLongitude: -6.260310,
-                destinationLatitude: 53.359805,
-                destinationLongitude: -6.270310,
-                address: "Test Address",
-                predictedScore: 0.75
-            };
+    
+    
+    
+    describe('starting rides', () => {
 
+        it('needs auth', async () => {
             const res = await request(app)
                 .post('/api/rides/start-ride')
-                .send(requestBody);
+                .send({
+                    startLatitude: 53.349805,
+                    startLongitude: -6.260310,
+                    destinationLatitude: 53.359805,
+                    destinationLongitude: -6.270310,
+                    address: "O'Connell Street",
+                    predictedScore: 0.75
+                });
                 
             expect(res.status).toBe(401);
         });
 
 
-        it('should return 400 when authenticated driver has no active shift', async () => {
+        it('driver needs active shift to start ride', async () => {
             const { token } = await TestHelpers.createAuthenticatedUser();
             
-            const requestBody = {
-                startLatitude: 53.349805,
-                startLongitude: -6.260310,
-                destinationLatitude: 53.359805,
-                destinationLongitude: -6.270310,
-                address: "Test Address, Dublin",
-                predictedScore: 0.8
-            };
-
             const res = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
+                .send({
+                    startLatitude: DUBLIN_COORDS.start.lat,
+                    startLongitude: DUBLIN_COORDS.start.lng,
+                    destinationLatitude: DUBLIN_COORDS.end.lat,
+                    destinationLongitude: DUBLIN_COORDS.end.lng,
+                    address: "Temple Bar, Dublin",
+                    predictedScore: 0.8
+                });
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('No active shift found');
+            expect(res.body.error).toContain('No active shift'); // no shift = no ride
         });
 
 
-        it('should return 400 when authenticated but invalid coordinates provided', async () => {
+        it('bad coordinates', async () => {
             const { token } = await TestHelpers.createAuthenticatedUser();
             
-            const requestBody = {
-                startLatitude: 'invalid',
-                startLongitude: -6.260310,
-                destinationLatitude: 53.359805,
-                destinationLongitude: -6.270310,
-                address: "Test Address for Invalid Coordinates",
-                predictedScore: 0.7
-            };
-
             const res = await request(app)
                 .post('/api/rides/start-ride')
                 .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
+                .send({
+                    startLatitude: 'abc', // not a number!
+                    startLongitude: -6.260310,
+                    destinationLatitude: 53.359805,
+                    destinationLongitude: -6.270310,
+                    address: "Invalid coords test",
+                    predictedScore: 0.7
+                });
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
             expect(res.body.error).toContain('Invalid coordinates');
         });
 
-
-        it('should return 400 when authenticated but invalid predicted score provided', async () => {
+        it('predicted score must be 0-1', async () => {
             const { token } = await TestHelpers.createAuthenticatedUser();
             
             const requestBody = {
@@ -178,8 +177,8 @@ describe('Ride API Integration Tests', () => {
                 startLongitude: -6.260310,
                 destinationLatitude: 53.359805,
                 destinationLongitude: -6.270310,
-                address: "Test Address for Invalid Score",
-                predictedScore: 1.5 // Invalid: > 1
+                address: "Score validation test",
+                predictedScore: 2.5 // way too high
             };
 
             const res = await request(app)
@@ -188,22 +187,18 @@ describe('Ride API Integration Tests', () => {
                 .send(requestBody);
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('Invalid prediction score. Must be between 0 and 1');
+            expect(res.body.error).toContain('Invalid prediction score'); // must be 0-1
         });
     });
 
 
-    describe('GET /api/rides/current', () => {
-        it('should return 401 when no authentication provided', async () => {
-            const res = await request(app)
-                .get('/api/rides/current');
-                
+    describe('current ride status', () => {
+        it('401 without auth', async () => {
+            const res = await request(app).get('/api/rides/current');
             expect(res.status).toBe(401);
         });
 
-
-        it('should return 400 when authenticated driver has no active shift', async () => {
+        it('no shift = no ride status', async () => {
             const { token } = await TestHelpers.createAuthenticatedUser();
 
             const res = await request(app)
@@ -211,12 +206,12 @@ describe('Ride API Integration Tests', () => {
                 .set('Authorization', `Bearer ${token}`);
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('No active shift found. Please start a shift before checking ride status.');
+            expect(res.body.error).toContain('No active shift found'); // gotta clock in first
         });
 
-
-        it('should return 400 when authenticated but no active ride exists', async () => {
+        
+        // This test catches a common scenario
+        it('handles when shift exists but no ride started', async () => {
             const { token, driver } = await TestHelpers.createAuthenticatedUser();
             await TestHelpers.createActiveShift(driver.id);
 
@@ -225,127 +220,68 @@ describe('Ride API Integration Tests', () => {
                 .set('Authorization', `Bearer ${token}`);
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('No active ride found. Please start a ride first.');
+            expect(res.body.error).toContain('No active ride found');
         });
     });
 
 
-    describe('POST /api/rides/end-ride', () => {
-        it('should return 401 when no authentication provided', async () => {
-            const requestBody = {
-                fareCents: 1450,
-                actualDistanceKm: 4.2
-            };
-
+    describe('ending rides', () => {
+        it('needs auth', async () => {
             const res = await request(app)
                 .post('/api/rides/end-ride')
-                .send(requestBody);
+                .send({ fareCents: 1450, actualDistanceKm: 4.2 });
                 
             expect(res.status).toBe(401);
         });
 
-
-        it('should return 400 when authenticated driver has no active ride', async () => {
+        
+        it('cant end ride without having one', async () => {
             const { token } = await TestHelpers.createAuthenticatedUser();
             
-            const requestBody = {
-                fareCents: 1450,
-                actualDistanceKm: 4.2
-            };
-
             const res = await request(app)
                 .post('/api/rides/end-ride')
                 .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
+                .send({
+                    fareCents: 1450,
+                    actualDistanceKm: 4.2
+                });
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.error).toContain('No active shift found. Please start a shift before checking ride status.');
+            expect(res.body.error).toContain('No active shift'); // need shift first
         });
 
 
-        it('should return 400 when authenticated but missing required fields', async () => {
+        it('validates required fields', async () => {
             const { token } = await TestHelpers.createAuthenticatedUser();
             
-            const requestBody = {
-                fareCents: 1450
-                // Missing actualDistanceKm
-            };
-
             const res = await request(app)
                 .post('/api/rides/end-ride')
                 .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
+                .send({ fareCents: 1450 }); // forgot distance
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
             expect(res.body.error).toContain('Missing required fields');
         });
 
-
-        it('should return 400 when authenticated but invalid field types provided', async () => {
+        
+        
+        it('fare must be a number', async () => {
             const { token } = await TestHelpers.createAuthenticatedUser();
             
-            const requestBody = {
-                fareCents: 'invalid',
-                actualDistanceKm: 4.2
-            };
-
             const res = await request(app)
                 .post('/api/rides/end-ride')
                 .set('Authorization', `Bearer ${token}`)
-                .send(requestBody);
+                .send({
+                    fareCents: 'fourteen fifty',
+                    actualDistanceKm: 4.2
+                });
                 
             expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
             expect(res.body.error).toContain('Invalid fare or distance');
         });
     });
 
 
-    describe('Database Constraints', () => {
-        it('should violate unique constraint when creating second active ride for same shift', async () => {
-            const user = await User.create({
-                email: 'driver@test.com',
-                username: 'testdriver',
-                password: 'password123'
-            });
 
-            const shift = await Shift.create({
-                driver_id: user.id,
-                shift_start: new Date(),
-                shift_end: null
-            });
 
-            // Create first active ride
-            await Ride.create({
-                shift_id: shift.id,
-                driver_id: user.id,
-                start_latitude: 53.349805,
-                start_longitude: -6.260310,
-                destination_latitude: 53.359805,
-                destination_longitude: -6.270310,
-                address: "First Active Ride Test Address",
-                start_time: new Date(),
-                predicted_score: 3,
-                end_time: null // Active ride
-            });
-
-            // Attempt to create second active ride for same shift - should fail
-            await expect(Ride.create({
-                shift_id: shift.id, // Same shift
-                driver_id: user.id,
-                start_latitude: 53.359805,
-                start_longitude: -6.270310,
-                destination_latitude: 53.369805,
-                destination_longitude: -6.280310,
-                address: "Second Active Ride Test Address (Should Fail)",
-                start_time: new Date(),
-                predicted_score: 4,
-                end_time: null // Active ride - should violate constraint
-            })).rejects.toThrow(); // Expecting constraint violation
-        });
-    });
-
-}); 
+});

@@ -1,15 +1,32 @@
 import zoneData from '../zone_coordinates_processed.json';
 
+/**
+ * Represents a geographic zone in NYC.
+ * 
+ * Each zone corresponds to a specific area (like neighborhoods or districts)
+ * and contains polygon data for geographic boundary detection.
+ */
 interface Zone {
+    /** Unique identifier for the zone */
     id: number;
+    
+    /** Human-readable name of the zone */
     name: string;
+    
+    /** Borough the zone belongs to */
     borough: string;
+    
+    /** Central point of the zone */
     centroid: {
         lat: number;
         lon: number;
     };
+    
+    /** Array of polygons defining the zone boundaries */
     polygons: Array<{
+        /** Outer boundary coordinates [longitude, latitude] */
         exterior: Array<[number, number]>;
+        /** Optional inner boundaries (holes) within the polygon */
         holes?: Array<Array<[number, number]>>;
     }>;
 }

@@ -1,3 +1,4 @@
+// Formats cents to USD string: 2500 -> "$25.00"
 export function formatCurrency(cents: number): string {
     const dollars = cents / 100;
     return `$${dollars.toFixed(2)}`;

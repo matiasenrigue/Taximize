@@ -11,6 +11,8 @@ The entity follows a simple two-component structure:
 - **`pause.model.ts`** - Sequelize model representing pause records in the database
 - **`pause.service.ts`** - Business logic for creating and retrieving pause information
 
+Note: This entity doesn't have its own controller or routes because pause operations are handled indirectly through the shift signals system. Pauses are created automatically when processing continue signals, rather than through direct API calls.
+
 ## How It Works
 
 ### Pause Detection

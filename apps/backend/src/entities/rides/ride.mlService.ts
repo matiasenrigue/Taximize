@@ -1,18 +1,33 @@
 import { getZonesForRide } from './utils/zoneDetector';
 import { scoreTripXGB, formatDateTimeForScoring } from '../../shared/utils/dataApiClient';
 import { RIDE_CONSTANTS } from './ride.constants';
-import { RideCoordinates, RideEvaluation } from './ride.types';
+import { RideCoordinates } from './ride.types';
 import { RideValidators } from './ride.validators';
 
+/**
+ * ML-based ride scoring using zones and time data.
+ * Falls back gracefully when ML is unavailable.
+ */
 export class RideMLService {
     
-    static async evaluateRideScore(coords: Partial<RideCoordinates>): Promise<RideEvaluation> {
+
+    /**
+     * Score ride using ML and zone detection.
+     * @returns Rating (1-5) and zones, or default if ML down
+     * @throws If missing coords or can't determine zones
+     */
+    static async evaluateRideScore(coords: Partial<RideCoordinates>): Promise<{
+        rating: number | null;
+        zones: {
+            originZone: string | null;
+            destinationZone: string | null;
+        };
+    }> {
 
         if (!coords.startLat || !coords.startLng || !coords.destLat || !coords.destLng) {
             throw new Error('Missing required coordinates for evaluation');
         }
 
-        // Get zones
         const zones = getZonesForRide(
             coords.startLat, 
             coords.startLng, 
@@ -25,7 +40,6 @@ export class RideMLService {
         }
         
         try {
-            // Call ML API
             const scoreResult = await scoreTripXGB({
                 pickup_zone: zones.originZone,
                 dropoff_zone: zones.destinationZone,
@@ -34,6 +48,7 @@ export class RideMLService {
             
             // Validate and convert score
             const prediction = scoreResult.predicted_score / 100;
+
             RideValidators.validatePredictionScore(prediction);
             
             const rating = this.convertPredictionToRating(prediction);
@@ -49,10 +64,11 @@ export class RideMLService {
         }
     }
     
+    /**
+     * Convert ML score (0-1) to user rating (1-5).
+     * Maps: 0->1, 0.25->2, 0.5->3, 0.75->4, 1->5
+     */
     private static convertPredictionToRating(prediction: number): number {
-        // Convert 0-1 scale to 1-5 rating scale
-        // Formula: rating = 1 + (prediction * 4)
-        // This maps: 0 -> 1, 0.25 -> 2, 0.5 -> 3, 0.75 -> 4, 1 -> 5
         const rating = Math.round(1 + (prediction * 4));
         return Math.max(
             RIDE_CONSTANTS.PREDICTION_SCALE.RATING_MIN,
@@ -61,12 +77,11 @@ export class RideMLService {
     }
     
     /**
-     * Evaluates ride coordinates and returns a rating
-     * This is a simplified interface that validates coordinates before evaluation
+     * Simple interface for ride evaluation.
+     * @returns Rating (1-5) or null
      */
-    static async evaluateRide(startLat: number, startLng: number, destLat: number, destLng: number): Promise<number> {
+    static async evaluateRide(startLat: number, startLng: number, destLat: number, destLng: number): Promise<number | null> {
 
-        // Validate coordinates
         RideValidators.validateCoordinates({ startLat, startLng, destLat, destLng });
         
         const evaluation = await this.evaluateRideScore({ 
