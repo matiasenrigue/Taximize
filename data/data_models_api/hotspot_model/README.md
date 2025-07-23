@@ -17,6 +17,7 @@ This folder contains all code, data, and model artifacts used for **predicting h
 | `zone_coordinates.csv`               | Lookup table for latitude and longitude of each taxi zone. Supports spatial merging and mapping. |
 | `zone_stats_with_all_densities.csv`  | Precomputed zone-level data including POI densities and interaction terms, used during feature generation. |
 | `models/`                            | Directory (not shown here) for storing trained model files (e.g., LightGBM `.txt`, XGBoost `.json`) for inference. |
+| `historical_lags.csv`                       | 	Precomputed zone-hour-level demand from previous months, used to simulate real-time lag features (e.g., trip count 1 hour ago). |
 | `__pycache__/`                       | Auto-generated cache from Python interpreter (safe to ignore). |
 | `README.md`                       | Documentation for the hotspot prediction module, including file descriptions, model usage, and feature overview.  |
 
@@ -38,7 +39,7 @@ This folder contains all code, data, and model artifacts used for **predicting h
 
 - Input: pickup hour and day
 - Load model + `model_features.pkl`
-- Use latest zone stats and POI data
+- Use lagged trip counts from historical_lags.csv and POI data from zone_stats_with_all_densities.csv
 - Predict demand scores per zone
 - Return top hotspots to frontend
 

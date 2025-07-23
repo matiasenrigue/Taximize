@@ -7,15 +7,20 @@ This directory contains all the preprocessing, initial modeling, and evaluation 
 Our data pipeline transforms raw NYC taxi trip records into a sophisticated scoring model that predicts ride profitability. The journey spans from **5.6 million raw records** (Jan-Feb Combined) to a production-ready scoring system that achieves **R² = 0.43** in predicting fare per minute.
 
 ### 🔗 Data Access
-Please note that due to limitations of github we are choosing to not upload the raw/cleaned csv if you want to reproduce these results **please test locally** and download the data following this link:
+> ⏳ The full raw TLC trip data contains over 38 million records.
+> 
+> ✅ We’ve filtered and cleaned this data into monthly CSVs (~2.5–3 million records each), removing outliers, invalid entries, and low-quality trips. These cleaned files are available for download below.
 
-**[📁 Download Dataset](https://drive.google.com/drive/folders/1Gk9p-tLLZkTv9fjC7BxSy8Wdx8TOYUx5?usp=drive_link)**
+**[📁 Download Dataset](https://drive.google.com/drive/folders/1JuuN3IfcRUsqt4WrW0GaQ9qSjGV2AMmd?usp=drive_link)**
+> 
+> ⚠️ Due to GitHub file size restrictions, we do not include the raw or cleaned CSVs in this repository.
+To reproduce our results locally, please download the monthly files and place them in the expected folder (see Getting Started section for path details).
 
 ---
 
 ## 📁 Directory Structure
 
-### `Data_Cleaning&_Intital_Exploartion` 🧹
+### `Data_Cleaning&_Initial_Exploration` 🧹
 
 Focused on preparing and understanding the core dataset. This phase processes **5.6M+ raw records** into clean, analysis-ready data.
 
@@ -41,7 +46,7 @@ Focused on preparing and understanding the core dataset. This phase processes **
 
 ---
 
-### `Inital_Models` 🧪
+### `Initial_Models` 🧪
 
 Early iterations testing modeling approaches and feature utility. This phase explores different prediction targets and validation strategies.
 
@@ -121,6 +126,10 @@ Final iterations focused on optimizing a production-ready scoring pipeline. This
   - Used for spatial feature engineering
   - Enables distance calculations and zone clustering
   - Powers the hotspot detection algorithms
+
+- **`generate_historical_lags.ipynb`** 🕓  
+  Generates **proxy lag features** for hotspot prediction by computing zone-level trip counts from 1–2 hours prior using past months' data (e.g., July 2023).  
+  These lag values simulate real-time signals (`trip_count_1h_ago`, `rolling_avg_2h`) and are used as input features during prediction for the hotspot model.
 
 ---
 
