@@ -21,7 +21,7 @@ Scoring_model/
 │ │ ├── hotness_table_july.csv
 │ │ ├── duration_variability_july.csv
 │ │ ├── scoring_weights_july.json
-│ │ └── scaler_july.pkl
+│ │ └── scaler_july.json
 
 ```
 ## What Each File In a Monthly Model Folder Does
@@ -34,7 +34,7 @@ Each month (e.g., `july/`) contains:
 | `hotness_table_july.csv`        | Lookup table with average trip density ("hotness") by time and zone      |
 | `duration_variability_july.csv` | Lookup table of historical trip time variability by route and time       |
 | `scoring_weights_july.json`     | Combined feature weights from both models for final score calculation    |
-| `scaler_july.pkl`               | MinMaxScaler object used to normalize scores to a 0–1 range              |
+| `scaler_july.json`              | MinMaxScaler object used to normalize scores to a 0–1 range              |
 
 
 # Local Testing
@@ -78,6 +78,6 @@ final_score: Normalized value between 0-1 (safe to display in UI)
 
 Scores are based on dropoff zone hotness, duration variability, boroughs, and time of day features.
 
-Normalization is done using MinMaxScaler trained on realistic predicted scores (excluding outliers)
+Normalization is performed using the 5th and 95th percentiles of predicted scores to reduce the impact of outliers and improve score spread across the 0–1 range.
 
 Each month has its own trained models and metadata

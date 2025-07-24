@@ -11,11 +11,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 # Load zone → borough map (used for encoding)
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Load zone → borough map
-ZONE_COORDINATES_PATH = os.path.normpath(os.path.join(BASE_DIR, "..", "..", "cleaning_exploration", "zone_coordinates.csv"))
-
+ZONE_COORDINATES_PATH = os.path.join("Data", "zone_coordinates.csv")
 
 try:
     zones_df = pd.read_csv(ZONE_COORDINATES_PATH, encoding="ISO-8859-1")
@@ -38,7 +34,7 @@ def load_reference_files(month_abbr):
     if not month_folder:
         raise ValueError(f"Invalid month abbreviation: {month_abbr}")
 
-    base_path = os.path.join(BASE_DIR, "models", month_folder)
+    base_path = os.path.join("Models", month_folder)
 
     try:
         with open(os.path.join(base_path, f"model_{month_folder}_xgb.pkl"), "rb") as f:
@@ -47,8 +43,9 @@ def load_reference_files(month_abbr):
             lgb_model = pickle.load(f)
         with open(os.path.join(base_path, f"scoring_weights_{month_folder}.json"), "r") as f:
             final_weights = json.load(f)
-        with open(os.path.join(base_path, f"scaler_{month_folder}.pkl"), "rb") as f:
-            scaler = pickle.load(f)
+        with open(os.path.join(base_path, f"scaler_{month_folder}.json"), "r") as f:
+            scaler = json.load(f)
+
 
         hotness_df = pd.read_csv(
         os.path.join(base_path, f"hotness_table_{month_folder}.csv")
@@ -59,9 +56,8 @@ def load_reference_files(month_abbr):
         os.path.join(base_path, f"duration_variability_{month_folder}.csv")
         ).rename(columns=lambda x: x.strip())
         
-        # Load expected model columns (used to align input feature vector)
-        expected_columns_xgb = joblib.load(os.path.join(BASE_DIR, "models", "expected_columns", "expected_columns_xgb.pkl"))
-        expected_columns_lgb = joblib.load(os.path.join(BASE_DIR, "models", "expected_columns", "expected_columns_lgb.pkl"))
+        expected_columns_xgb = joblib.load("models/expected_columns/expected_columns_xgb.pkl")
+        expected_columns_lgb = joblib.load("models/expected_columns/expected_columns_lgb.pkl")
 
         return {
             "xgb_model": xgb_model,
@@ -156,10 +152,14 @@ def prepare_input(pickup_zone, dropoff_zone, pickup_datetime_str, model_type, re
 def score_input(input_df, model, scaler):
     raw_score = model.predict(input_df)[0]
 
-    # Clip raw score to avoid exploding beyond scaler range
-    raw_score_clipped = np.clip(raw_score, scaler.data_min_[0], scaler.data_max_[0])
+    # Use stored percentile-based range
+    p_min = scaler["min"]
+    p_max = scaler["max"]
 
-    norm_score = scaler.transform([[raw_score_clipped]])[0][0]
+    clipped = np.clip(raw_score, p_min, p_max)
+    norm_score = (clipped - p_min) / (p_max - p_min)
+    norm_score = np.clip(norm_score, 0, 1)
+
     return raw_score, norm_score
 
 
@@ -182,12 +182,14 @@ def score_trip(pickup_zone, dropoff_zone, pickup_datetime, model, weights, scale
 
     try:
         predicted_score, final_score = score_input(input_df, model, scaler)
-        print("Scaler min/max:", scaler.data_min_, scaler.data_max_)
+        print(f"Scaler min/max: {scaler['min']} – {scaler['max']}")
         return {
             "predicted_score": round(float(predicted_score), 2),
-            "final_score": round(float(final_score), 3)
+            "final_score": round(float(final_score), 4)
         }
     except Exception as e:
         print("Scoring failed:", e)
         return None
+
+
 

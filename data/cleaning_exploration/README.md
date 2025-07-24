@@ -89,7 +89,9 @@ Final iterations focused on optimizing a production-ready scoring pipeline. This
     - 📍 `dropoff_zone_hotness`: 6.4% (demand intensity)
     - ✈️ `is_airport_trip`: 6.4% (airport flag)
   - Outputs both raw score and normalized final score
-
+- **`train_monthly_models.ipynb`**
+    For a cleaner more useable notebook this is the version that is used to train all the monthly models and save the files accordingly
+    
 - **`og_scoring_Model.ipynb`**  
   Initial dual-model approach:
   - Trained separate regression models for feature extraction
