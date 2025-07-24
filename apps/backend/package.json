@@ -9,8 +9,8 @@
     "test": "cross-env NODE_ENV=test jest",
     "test:failed": "npm test -- --onlyFailures",
     "test:verbose": "npm test -- --verbose",
-    "create-db": "ts-node --transpile-only src/shared/config/setup-db.ts",
-    "sync-db": "ts-node --transpile-only src/scripts/sync-db.ts"
+    "create-db": "ts-node --transpile-only src/shared/config/scripts/setup-db.ts",
+    "sync-db": "ts-node --transpile-only src/shared/config/scripts/sync-db.ts"
   },
   "dependencies": {
     "axios": "^1.10.0",

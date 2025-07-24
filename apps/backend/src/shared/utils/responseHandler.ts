@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { modelToResponse } from './caseTransformer';
 
 export class ResponseHandler {
+    
     /**
      * Send a success response
      */
