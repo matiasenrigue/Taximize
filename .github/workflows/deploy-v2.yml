@@ -32,5 +32,6 @@ jobs:
           # Make deployment script executable
           chmod +x deploy-v2.sh
           
-          # Run deployment v2
+          # Run deployment v2 with sudo password
+          export SUDO_PASSWORD=${{ secrets.SERVER_PASSWORD }}
           ./deploy-v2.sh
