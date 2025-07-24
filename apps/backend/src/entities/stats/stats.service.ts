@@ -112,7 +112,8 @@ export class StatsService {
                     driver_id: driverId
                 },
                 required: false
-            }]
+            }],
+            limit: 1000
         });
         
         // Map shifts with their rides filtered by day of week

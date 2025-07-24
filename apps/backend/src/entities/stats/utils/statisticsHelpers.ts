@@ -62,35 +62,44 @@ export function groupRidesByDate(rides: any[]): Map<string, any[]> {
 
 // Calculates time spent with passengers vs waiting between rides per day
 export function calculateWorkTimeByDate(rides: any[]): WorkTimeByDate {
-    const ridesByDate = groupRidesByDate(rides);
     const workTimeByDate: WorkTimeByDate = {};
     
+    // Group rides by date and process in single pass
+    const ridesByDate = new Map<string, any[]>();
+    
+    rides.forEach(ride => {
+        const dateStr = formatDate(new Date(ride.start_time));
+        if (!ridesByDate.has(dateStr)) {
+            ridesByDate.set(dateStr, []);
+        }
+        ridesByDate.get(dateStr)!.push(ride);
+    });
+    
     ridesByDate.forEach((dayRides, date) => {
-        let totalWithPassengerTime = 0;
-        let totalEmptyTime = 0;
-        
         // Sort rides by start time
         dayRides.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
         
-        // Calculate time with passengers
-        dayRides.forEach(ride => {
-            if (ride.start_time && ride.end_time) {
-                totalWithPassengerTime += calculateDurationHours(
-                    new Date(ride.start_time),
-                    new Date(ride.end_time)
-                );
-            }
-        });
+        let totalWithPassengerTime = 0;
+        let totalEmptyTime = 0;
+        let previousRideEnd: Date | null = null;
         
-        // Calculate empty time between rides
-        for (let i = 1; i < dayRides.length; i++) {
-            const previousRideEnd = new Date(dayRides[i - 1].end_time);
-            const currentRideStart = new Date(dayRides[i].start_time);
+        // Single pass to calculate both passenger time and empty time
+        dayRides.forEach((ride, index) => {
+            const rideStart = new Date(ride.start_time);
+            const rideEnd = ride.end_time ? new Date(ride.end_time) : null;
             
-            if (previousRideEnd < currentRideStart) {
-                totalEmptyTime += calculateDurationHours(previousRideEnd, currentRideStart);
+            // Calculate passenger time
+            if (rideEnd) {
+                totalWithPassengerTime += calculateDurationHours(rideStart, rideEnd);
             }
-        }
+            
+            // Calculate empty time from previous ride
+            if (previousRideEnd && previousRideEnd < rideStart) {
+                totalEmptyTime += calculateDurationHours(previousRideEnd, rideStart);
+            }
+            
+            previousRideEnd = rideEnd;
+        });
         
         workTimeByDate[date] = {
             withPassengerTime: Math.round(totalWithPassengerTime * 100) / 100,

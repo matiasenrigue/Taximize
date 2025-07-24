@@ -1,6 +1,7 @@
 import { Shift } from './shift.model';
 import { Op } from 'sequelize';
 import { Ride } from '../rides/ride.model';
+import { SHIFT_CONSTANTS } from './shift.constants';
 
 /**
  * Database operations for shifts.
@@ -53,7 +54,8 @@ export class ShiftRepository {
                 as: 'rides',
                 required: false
             }] : [],
-            order: [['shift_start', 'DESC']]
+            order: [['shift_start', 'DESC']],
+            limit: SHIFT_CONSTANTS.QUERY_LIMITS.DEFAULT
         });
     }
 

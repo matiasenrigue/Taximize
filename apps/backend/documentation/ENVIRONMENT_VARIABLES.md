@@ -39,6 +39,48 @@ This document describes all environment variables required for the backend appli
 - **Example**: `my_app_database`
 - **Required**: Yes
 
+## Database Connection Pooling
+
+### DB_POOL_MAX
+- **Type**: `number`
+- **Description**: Maximum number of connections in the pool
+- **Default**: `20`
+- **Example**: `20`
+- **Required**: No
+- **Used in**: `src/shared/config/db.ts:18`
+
+### DB_POOL_MIN
+- **Type**: `number`
+- **Description**: Minimum number of connections in the pool
+- **Default**: `5`
+- **Example**: `5`
+- **Required**: No
+- **Used in**: `src/shared/config/db.ts:19`
+
+### DB_POOL_ACQUIRE
+- **Type**: `number`
+- **Description**: Maximum time (ms) to wait for a connection before throwing error
+- **Default**: `60000` (60 seconds)
+- **Example**: `60000`
+- **Required**: No
+- **Used in**: `src/shared/config/db.ts:20`
+
+### DB_POOL_IDLE
+- **Type**: `number`
+- **Description**: Maximum time (ms) that a connection can be idle before release
+- **Default**: `10000` (10 seconds)
+- **Example**: `10000`
+- **Required**: No
+- **Used in**: `src/shared/config/db.ts:21`
+
+### DB_POOL_EVICT
+- **Type**: `number`
+- **Description**: Time interval (ms) to run eviction checks on idle connections
+- **Default**: `1000` (1 second)
+- **Example**: `1000`
+- **Required**: No
+- **Used in**: `src/shared/config/db.ts:22`
+
 ## Server Configuration
 
 ### PORT
@@ -115,6 +157,13 @@ DATABASE_PASSWORD=strong_password_here
 DATABASE_NAME=my_app_database
 DATABASE_URL=postgres://db_user:strong_password_here@localhost:5432/my_app_database  # Default PostgreSQL port
 
+# Database Connection Pooling (Optional - uses defaults if not set)
+# DB_POOL_MAX=20
+# DB_POOL_MIN=5
+# DB_POOL_ACQUIRE=60000
+# DB_POOL_IDLE=10000
+# DB_POOL_EVICT=1000
+
 # Server Configuration
 PORT=5000
 NODE_ENV=development
@@ -136,6 +185,13 @@ DATABASE_USERNAME=db_user
 DATABASE_PASSWORD=strong_password_here
 DATABASE_NAME=my_app_database
 DATABASE_URL=postgres://db_user:strong_password_here@db_host:5432/my_app_database  # Replace db_host
+
+# Database Connection Pooling (Recommended for production)
+DB_POOL_MAX=20
+DB_POOL_MIN=5
+DB_POOL_ACQUIRE=60000
+DB_POOL_IDLE=10000
+DB_POOL_EVICT=1000
 
 # Server Configuration
 PORT=5000

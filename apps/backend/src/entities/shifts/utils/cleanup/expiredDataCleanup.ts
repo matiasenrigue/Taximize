@@ -18,16 +18,21 @@ export class ExpiredDataCleanup {
         
         const expiredRides = await RideRepository.findExpiredRidesForDriver(driverId, fourHoursAgo);
         
-        for (const ride of expiredRides) {
-            await RideRepository.update(ride, {
-                end_time: new Date(),
-                earning_cents: 0,
-                earning_per_min: 0,
-                distance_km: 0
-            });
-        }
-        
         if (expiredRides.length > 0) {
+            const rideIds = expiredRides.map(ride => ride.id);
+            
+            await RideRepository.bulkUpdate(
+                {
+                    end_time: new Date(),
+                    earning_cents: 0,
+                    earning_per_min: 0,
+                    distance_km: 0
+                },
+                {
+                    where: { id: rideIds }
+                }
+            );
+            
             console.log(`Ended ${expiredRides.length} expired rides for driver ${driverId}`);
         }
     }

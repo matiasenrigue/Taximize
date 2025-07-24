@@ -14,6 +14,13 @@ export const sequelize = isTest
             dialect: 'postgres',
             protocol: 'postgres',
             logging: false,
+            pool: {
+                max: parseInt(process.env.DB_POOL_MAX || '20'),
+                min: parseInt(process.env.DB_POOL_MIN || '5'),
+                acquire: parseInt(process.env.DB_POOL_ACQUIRE || '60000'),
+                idle: parseInt(process.env.DB_POOL_IDLE || '10000'),
+                evict: parseInt(process.env.DB_POOL_EVICT || '1000')
+            }
         });
 
 const connectDB = async () => {
