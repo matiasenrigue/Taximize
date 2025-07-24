@@ -6,6 +6,7 @@ export const initializeAssociations = () => {
     const { Pause } = require('../../entities/shift-pauses/pause.model');
     const { Ride } = require('../../entities/rides/ride.model');
     const User = require('../../entities/users/user.model').default;
+    const Hotspots = require('../../entities/hotspots/hotspots.model').default;
 
     // Define associations directly here to avoid circular dependencies
     // Shift has many signals
