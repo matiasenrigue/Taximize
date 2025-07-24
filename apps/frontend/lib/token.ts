@@ -15,7 +15,7 @@ export const getToken = () => {
 export const setToken = (token: string) => {
   setCookie('accessToken', token, {
     httpOnly: false, // Access token needs to be accessible by JavaScript for axios
-    secure: process.env.NODE_ENV === 'production',
+    secure: false,
     sameSite: 'strict',
     path: '/',
     maxAge: 15 * 60 // 15 minutes in seconds
