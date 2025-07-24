@@ -6,7 +6,7 @@ test_cases = [
     {
         "pickup_zone": "Midtown Center",
         "dropoff_zone": "SoHo",
-        "pickup_datetime": "07/19/2025 6:00:00 PM"
+        "pickup_datetime": "07/24/2025 3:00:00 PM"
     },
     {
         "pickup_zone": "Upper West Side South",
@@ -21,7 +21,7 @@ test_cases = [
     {
         "pickup_zone": "JFK Airport",
         "dropoff_zone": "Upper East Side South",
-        "pickup_datetime": "07/23/2025 9:00:00 AM"
+        "pickup_datetime": "07/25/2025 9:00:00 AM"
     }
 ]
 
