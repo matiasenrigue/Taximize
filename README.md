@@ -29,6 +29,7 @@ A comprehensive full-stack application designed for taxi drivers to efficiently 
 - **Framework**: Express.js 5.1.0
 - **Language**: TypeScript
 - **Database**: PostgreSQL with Sequelize ORM
+- **Cache**: Redis for performance optimization
 - **Authentication**: JWT with bcrypt
 - **Testing**: Jest & Supertest
 - **Security**: Helmet.js, CORS, rate limiting
@@ -86,6 +87,7 @@ A comprehensive full-stack application designed for taxi drivers to efficiently 
 
 - Node.js 18+ and npm 9+
 - PostgreSQL 14+
+- Redis 7+ (optional, for caching)
 - Docker and Docker Compose (optional, for containerized setup)
 - Google Maps API key (for frontend map features)
 
@@ -109,6 +111,7 @@ Create `.env` files in both frontend and backend directories:
 **Backend** (`apps/backend/.env`):
 ```env
 DATABASE_URL=postgresql://username:password@localhost:5432/taxi_driver_db
+REDIS_URL=redis://localhost:6379
 JWT_SECRET=your-jwt-secret-key
 JWT_REFRESH_SECRET=your-jwt-refresh-secret
 PORT=3001

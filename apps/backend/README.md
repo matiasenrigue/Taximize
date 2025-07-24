@@ -7,6 +7,7 @@ A Node.js/TypeScript backend built with Express.js following entity-based archit
 - **Runtime**: Node.js with TypeScript
 - **Framework**: Express.js v5
 - **Database**: PostgreSQL/SQLite with Sequelize ORM
+- **Cache**: Redis for performance optimization
 - **Authentication**: JWT tokens
 - **Testing**: Jest with TDD approach
 - **Additional**: ML service integration, WebSocket support
@@ -211,6 +212,7 @@ npm run test:watch    # Watch mode for TDD
 ### Prerequisites
 - Node.js >= 18
 - PostgreSQL or SQLite
+- Redis (optional, for caching)
 - npm or yarn
 
 ### Installation
@@ -243,6 +245,7 @@ npm run typecheck
 ### Environment Variables
 Key variables to configure:
 - `DATABASE_URL`: PostgreSQL connection string
+- `REDIS_URL`: Redis connection string (optional, defaults to redis://localhost:6379)
 - `JWT_SECRET`: Secret for JWT signing
 - `ML_SERVICE_URL`: Machine learning service endpoint
 - `NODE_ENV`: development | production | test
