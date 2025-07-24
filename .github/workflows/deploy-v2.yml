@@ -8,8 +8,48 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Build backend
+      run: |
+        cd apps/backend
+        npm run build
+    
+    - name: Build frontend  
+      run: |
+        cd apps/frontend
+        npm run build
+    
+    - name: Run backend tests
+      run: |
+        cd apps/backend
+        npm test
+      env:
+        NODE_ENV: test
+    
+    - name: Run frontend tests
+      run: |
+        cd apps/frontend
+        npm test
+      env:
+        NODE_ENV: test
+    
   deploy:
     runs-on: ubuntu-latest
+    needs: test  # Only run if tests pass
     
     steps:
     - name: Checkout code
@@ -32,5 +72,6 @@ jobs:
           # Make deployment script executable
           chmod +x deploy-v2.sh
           
-          # Run deployment v2
+          # Run deployment v2 with sudo password
+          export SUDO_PASSWORD=${{ secrets.SERVER_PASSWORD }}
           ./deploy-v2.sh
