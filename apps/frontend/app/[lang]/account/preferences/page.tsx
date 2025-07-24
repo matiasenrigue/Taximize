@@ -33,11 +33,10 @@ export default function Preferences() {
                 <h2 className={styles.title}>{t('preferences')}</h2>
                 <div className={styles.preferenceList}>
                     <div className={styles.label}>
-                        <label htmlFor={"select-colorScheme"}>{t('colorScheme')}</label>
+                        <label>{t('colorScheme')}</label>
                     </div>
                     <div className={styles.select}>
                         <Select
-                            id={"select-colorScheme"}
                             onChange={(value) => setTheme(value as string)}>
                             <Option
                                 value="light"
@@ -52,11 +51,10 @@ export default function Preferences() {
                     </div>
                     
                     <div className={styles.label}>
-                    <label htmlFor={"select-language"}>{t('language')}</label>
+                    <label>{t('language')}</label>
                     </div>
                     <div className={styles.select}>
                         <Select
-                            id={"select-language"}
                             onChange={handleLanguageChange}>
                             <Option
                                 value="en"
