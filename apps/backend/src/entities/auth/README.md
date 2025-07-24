@@ -37,6 +37,12 @@ The Authentication module handles user registration, login, and token management
    - Generates new access token
    - Returns new access token to client
 
+4. **User Logout**
+   - Requires authenticated user (protected endpoint)
+   - Clears the refresh token cookie
+   - Returns success confirmation
+   - Client should discard access token
+
 ### Token Strategy
 
 The module implements a dual-token approach:

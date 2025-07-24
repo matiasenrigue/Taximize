@@ -23,7 +23,13 @@ export const RIDE_CONSTANTS = {
     },
     
     /** Default rating when ML prediction is unavailable */
-    DEFAULT_RATING: null // Indicates ML service is not available
+    DEFAULT_RATING: null, // Indicates ML service is not available
+    
+    /** Pagination limits for queries */
+    QUERY_LIMITS: {
+        DEFAULT: 1000,
+        MAX: 5000
+    }
 };
 
 /**

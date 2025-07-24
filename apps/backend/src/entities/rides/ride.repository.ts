@@ -39,7 +39,8 @@ export class RideRepository {
                 driver_id: driverId,
                 start_time: { [Op.lt]: expiryThreshold },
                 end_time: null
-            }
+            },
+            limit: RIDE_CONSTANTS.QUERY_LIMITS.DEFAULT
         });
     }
    
@@ -48,7 +49,8 @@ export class RideRepository {
     static async findByDriver(driverId: string): Promise<Ride[]> {
         return Ride.findAll({
             where: { driver_id: driverId },
-            order: [['start_time', 'DESC']]
+            order: [['start_time', 'DESC']],
+            limit: RIDE_CONSTANTS.QUERY_LIMITS.DEFAULT
         });
     }
    
@@ -56,7 +58,8 @@ export class RideRepository {
     /** Get all rides for a shift. */
     static async findAllByShift(shiftId: string): Promise<Ride[]> {
         return Ride.findAll({
-            where: { shift_id: shiftId }
+            where: { shift_id: shiftId },
+            limit: RIDE_CONSTANTS.QUERY_LIMITS.DEFAULT
         });
     }
     
@@ -73,6 +76,17 @@ export class RideRepository {
         return ride;
     }
     
+
+    /**
+     * Bulk update multiple rides.
+     * @param data - Fields to update
+     * @param options - Where clause and other options
+     */
+    static async bulkUpdate(data: any, options: any): Promise<[number, Ride[]]> {
+        return Ride.update(data, options);
+    }
+    
+
     /** Check if shift has active ride. */
     static async hasActiveRideForShift(shiftId: string): Promise<boolean> {
         const activeRide = await this.findActiveByShift(shiftId);
@@ -90,7 +104,8 @@ export class RideRepository {
                     [Op.between]: [startDate, endDate]
                 }
             },
-            order: [['start_time', 'ASC']]
+            order: [['start_time', 'ASC']],
+            limit: RIDE_CONSTANTS.QUERY_LIMITS.DEFAULT
         });
     }
     

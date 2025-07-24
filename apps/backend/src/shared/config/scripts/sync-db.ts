@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { sequelize } from '../shared/config/db';
-import { initializeAssociations } from '../shared/config/associations';
+import { sequelize } from '../db';
+import { initializeAssociations } from '../associations';
 
 async function syncDatabase() {
     try {

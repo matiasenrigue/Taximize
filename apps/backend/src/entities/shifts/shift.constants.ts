@@ -4,6 +4,10 @@ export const SHIFT_CONSTANTS = {
 
     DEFAULT_PLANNED_DURATION_MS: 8 * 60 * 60 * 1000, // 8 hours
     
+    QUERY_LIMITS: {
+        DEFAULT: 1000,
+        MAX: 5000
+    }
 };
 
 export const SHIFT_ERRORS = {

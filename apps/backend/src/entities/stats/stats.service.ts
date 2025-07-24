@@ -17,6 +17,7 @@ import {
     calculateWorkTimeByDate,
     generateWorkTimeBreakdown 
 } from './utils/statisticsHelpers';
+import { redisClient } from '../../shared/config/redis';
 
 export class StatsService {
     
@@ -112,7 +113,8 @@ export class StatsService {
                     driver_id: driverId
                 },
                 required: false
-            }]
+            }],
+            limit: 1000
         });
         
         // Map shifts with their rides filtered by day of week
@@ -157,6 +159,15 @@ export class StatsService {
         startDate: Date, 
         endDate: Date
     ): Promise<any> {
+        // Generate cache key
+        const cacheKey = `stats:earnings:${driverId}:${view}:${formatDate(startDate)}:${formatDate(endDate)}`;
+        
+        // Check cache first
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return JSON.parse(cached);
+        }
+        
         // Get aggregated earnings data
         const earningsData = await RideRepository.aggregateEarningsByDate(
             driverId,
@@ -170,13 +181,18 @@ export class StatsService {
         // Generate breakdown
         const breakdown = generateEarningsBreakdown(view, startDate, endDate, earningsData);
         
-        return {
+        const result = {
             totalEarnings,
             view,
             startDate: formatDate(startDate),
             endDate: formatDate(endDate),
             breakdown
         };
+        
+        // Cache for 5 minutes
+        await redisClient.setEx(cacheKey, 300, JSON.stringify(result));
+        
+        return result;
     }
 
     // Calculates work hours split between active rides and waiting time
@@ -186,6 +202,15 @@ export class StatsService {
         startDate: Date,
         endDate: Date
     ): Promise<any> {
+        // Generate cache key
+        const cacheKey = `stats:worktime:${driverId}:${view}:${formatDate(startDate)}:${formatDate(endDate)}`;
+        
+        // Check cache first
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return JSON.parse(cached);
+        }
+        
         // Get all shifts in the date range with their associated rides
         const shifts = await ShiftRepository.findShiftsInDateRange(driverId, startDate, endDate, true);
         
@@ -198,11 +223,16 @@ export class StatsService {
         // Generate breakdown
         const breakdown = generateWorkTimeBreakdown(view, startDate, endDate, workTimeByDate);
         
-        return {
+        const result = {
             view,
             startDate: formatDate(startDate),
             endDate: formatDate(endDate),
             breakdown
         };
+        
+        // Cache for 5 minutes
+        await redisClient.setEx(cacheKey, 300, JSON.stringify(result));
+        
+        return result;
     }
 }
