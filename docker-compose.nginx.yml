@@ -38,6 +38,7 @@ services:
       - app-network
     depends_on:
       - db
+      - redis
     restart: unless-stopped
 
   frontend:
@@ -64,8 +65,20 @@ services:
       - app-network
     restart: unless-stopped
 
+  redis:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
 networks:
   app-network:
 
 volumes:
   postgres_data:
+  redis_data:
