@@ -5,8 +5,9 @@ Core utilities, configurations, and middleware shared across the backend applica
 ## Structure
 
 ### `/config`
-Database configuration and initialization
-- `db.ts` - Sequelize database connection
+Database and caching configuration
+- `db.ts` - Sequelize database connection with pooling
+- `redis.ts` - Redis client for caching (optional)
 - `associations.ts` - Model associations
 - `scripts/` - Database setup and sync scripts
 
@@ -30,4 +31,5 @@ Utility functions
 ### `/tests/utils`
 Testing utilities
 - `testHelpers.ts` - Test data generators and helper functions
+
 

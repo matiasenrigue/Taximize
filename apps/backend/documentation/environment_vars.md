@@ -146,6 +146,18 @@ This document describes all environment variables required for the backend appli
 - **Required**: No (has default)
 - **Used in**: `src/shared/utils/dataApiClient.ts:3`
 
+## Caching Configuration
+
+### REDIS_URL
+- **Type**: `string`
+- **Description**: Redis connection URL for caching
+- **Default**: `redis://localhost:6379`
+- **Example**: `redis://localhost:6379`
+- **Production**: `redis://redis:6379` (Docker service name)
+- **Required**: No (app works without Redis)
+- **Used in**: `src/shared/config/redis.ts:18`
+- **Note**: If Redis is unavailable, caching is disabled but app continues to work
+
 ## Environment File Examples
 
 ### Development (.env)
@@ -175,6 +187,9 @@ REFRESH_TOKEN_SECRET=your_generated_refresh_token_secret_here
 # External Services
 CLIENT_URL=http://localhost:3000
 DATA_API_URL=http://localhost:5050  # Replace with your ML API port
+
+# Caching (Optional)
+REDIS_URL=redis://localhost:6379
 ```
 
 ### Production (.env.production)
@@ -204,6 +219,9 @@ REFRESH_TOKEN_SECRET=your_production_refresh_token_secret_here
 # External Services
 CLIENT_URL=http://your-production-domain.com
 DATA_API_URL=http://ml-api-service:5050  # Replace with your ML API service name and port
+
+# Caching
+REDIS_URL=redis://redis:6379  # Use Docker service name in production
 ```
 
 

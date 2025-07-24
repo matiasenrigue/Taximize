@@ -3,6 +3,7 @@ import { scoreTripXGB, formatDateTimeForScoring } from '../../shared/utils/dataA
 import { RIDE_CONSTANTS } from './ride.constants';
 import { RideCoordinates } from './ride.types';
 import { RideValidators } from './ride.validators';
+import { redisClient } from '../../shared/config/redis';
 
 /**
  * ML-based ride scoring using zones and time data.
@@ -40,6 +41,17 @@ export class RideMLService {
         }
         
         try {
+            // Cache key based on zones and hour of day (predictions vary by time)
+            const hourOfDay = new Date().getHours();
+            const cacheKey = `ml:prediction:${zones.originZone}:${zones.destinationZone}:${hourOfDay}`;
+            
+            // Check cache first
+            const cached = await redisClient.get(cacheKey);
+            if (cached) {
+                const rating = parseInt(cached);
+                return { rating, zones };
+            }
+            
             const scoreResult = await scoreTripXGB({
                 pickup_zone: zones.originZone,
                 dropoff_zone: zones.destinationZone,
@@ -52,6 +64,9 @@ export class RideMLService {
             RideValidators.validatePredictionScore(prediction);
             
             const rating = this.convertPredictionToRating(prediction);
+
+            // Cache for 1 hour (predictions change by hour)
+            await redisClient.setEx(cacheKey, 3600, rating.toString());
 
             return { rating, zones };
             
