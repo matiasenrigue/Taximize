@@ -106,3 +106,21 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
         throw new Error('Invalid refresh token');
     }
 });
+
+
+// @desc    Logout user
+// @route   POST /api/auth/logout
+// @access  Private
+export const logout = asyncHandler(async (req: Request, res: Response) => {
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/api/auth/refresh',
+    });
+
+    res.status(200).json({
+        success: true,
+        message: 'User logged out successfully',
+    });
+});

@@ -1,5 +1,7 @@
 # Database Schema Documentation
 
+This application uses PostgreSQL as its database management system, leveraging its robust features for data integrity, performance, and advanced data types like JSONB.
+
 ## Entity Relationship Diagram
 
 ```mermaid

@@ -13,9 +13,22 @@ Complete API reference documentation including:
 - ML-powered hotspot predictions
 - Analytics and statistics
 
-### [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md)
+### [database_schema.md](./database_schema.md)
 PostgreSQL database schema documentation including:
 - Table structures
 - Relationships
 - Indexes and constraints
+
+### [testing.md](./testing.md)
+Testing strategy and results including:
+- Test-Driven Development (TDD) methodology
+- Four-phase testing approach
+- Test coverage and results
+
+### [security.md](./security.md)
+Comprehensive security documentation including:
+- Current security implementation
+- Critical vulnerabilities and issues
+- Security best practices
+- Recommendations and compliance guidelines
 
