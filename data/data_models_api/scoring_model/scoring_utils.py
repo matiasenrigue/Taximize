@@ -34,7 +34,45 @@ def load_reference_files(month_abbr):
     if not month_folder:
         raise ValueError(f"Invalid month abbreviation: {month_abbr}")
 
-    base_path = os.path.join("data", "data_models_api", "scoring_model", "models", month_folder)
+    # Debug: Print current working directory and path construction
+    print(f"DEBUG: Current working directory: {os.getcwd()}")
+    print(f"DEBUG: __file__ location: {__file__}")
+    print(f"DEBUG: Month abbreviation: {month_abbr}")
+    print(f"DEBUG: Month folder: {month_folder}")
+    
+    # Try multiple possible paths, prioritizing relative to this file
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    possible_paths = [
+        # First, try relative to this script file (works both locally and in Docker)
+        os.path.join(script_dir, "models", month_folder),
+        os.path.join(script_dir, "Models", month_folder),  # Capital M version
+        # Then try from working directory (for Docker)
+        os.path.join("data", "data_models_api", "scoring_model", "models", month_folder),
+        os.path.join("data", "data_models_api", "scoring_model", "Models", month_folder),  # Capital M
+        # Legacy paths
+        os.path.join("models", month_folder),  # Original relative path
+        os.path.join("Models", month_folder),  # Capital M version
+    ]
+    
+    base_path = None
+    for path in possible_paths:
+        print(f"DEBUG: Checking path: {path}")
+        test_file = os.path.join(path, f"model_{month_folder}_xgb.pkl")
+        if os.path.exists(test_file):
+            print(f"DEBUG: Found models at: {path}")
+            base_path = path
+            break
+        else:
+            print(f"DEBUG: Path not found: {test_file}")
+    
+    if base_path is None:
+        print(f"DEBUG: No valid path found. Listing directory contents:")
+        print(f"DEBUG: Script directory: {script_dir}")
+        print(f"DEBUG: Contents of script directory: {os.listdir(script_dir)}")
+        print(f"DEBUG: Contents of current directory: {os.listdir('.')}")
+        if os.path.exists("data"):
+            print(f"DEBUG: Contents of data/: {os.listdir('data')}")
+        raise FileNotFoundError(f"Could not find models directory for month: {month_folder}")
 
     try:
         with open(os.path.join(base_path, f"model_{month_folder}_xgb.pkl"), "rb") as f:
@@ -56,8 +94,13 @@ def load_reference_files(month_abbr):
         os.path.join(base_path, f"duration_variability_{month_folder}.csv")
         ).rename(columns=lambda x: x.strip())
         
-        expected_columns_xgb = joblib.load(os.path.join("data", "data_models_api", "scoring_model", "models", "expected_columns", "expected_columns_xgb.pkl"))
-        expected_columns_lgb = joblib.load(os.path.join("data", "data_models_api", "scoring_model", "models", "expected_columns", "expected_columns_lgb.pkl"))
+        # Use the parent directory of base_path for expected_columns
+        models_parent = os.path.dirname(base_path)
+        expected_columns_path = os.path.join(models_parent, "expected_columns")
+        print(f"DEBUG: Looking for expected_columns at: {expected_columns_path}")
+        
+        expected_columns_xgb = joblib.load(os.path.join(expected_columns_path, "expected_columns_xgb.pkl"))
+        expected_columns_lgb = joblib.load(os.path.join(expected_columns_path, "expected_columns_lgb.pkl"))
 
         return {
             "xgb_model": xgb_model,
