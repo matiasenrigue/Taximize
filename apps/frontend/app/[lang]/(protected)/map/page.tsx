@@ -17,7 +17,8 @@ import {LocationSearchbar} from "../../../../components/LocationSearchbar/Locati
 import {TaxiMeter} from "../../../../components/TaxiMeter/TaxiMeter";
 import {FlexGroup} from "../../../../components/FlexGroup/FlexGroup";
 import {useRide} from "../../../../contexts/RideContext/RideContext";
-import {MenuOption, OptionsMenu} from "../../../../components/OptionsMenu/OptionsMenu";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPause, faStop} from "@fortawesome/free-solid-svg-icons";
 import {StartBreakModal} from "../../../../components/modals/BreakModalHandler/StartBreakModal";
 import {LocationUnavailable} from "./LocationUnavailable";
 import {GOOGLE_MAPS_API_KEY} from "../../../../constants/constants";
@@ -69,6 +70,23 @@ export default function MapPage() {
                         placeholder={t("locationSearchPlaceholder")}/>
                 </div>
 
+                {!isOnRide && (
+                    <div className={styles.shift_controls_container}>
+                        <Button
+                            theme="secondary"
+                            onClick={openPauseModal}>
+                            <FontAwesomeIcon icon={faPause} />
+                            {t("pauseShift")}
+                        </Button>
+                        <Button
+                            theme="primary"
+                            onClick={endShift}>
+                            <FontAwesomeIcon icon={faStop} />
+                            {t("endShift")}
+                        </Button>
+                    </div>
+                )}
+
                 <div className={styles.button_container}>
                         {isOnRide && <TaxiMeter/>}
                         <FlexGroup
@@ -86,14 +104,6 @@ export default function MapPage() {
                                     onClick={() => startModalRef.current?.open()}>
                                     {t("startRide")}
                                 </Button>)}
-                            {!isOnRide && <OptionsMenu>
-                                <MenuOption onClick={openPauseModal}>
-                                    {t("pauseShift")}
-                                </MenuOption>
-                                <MenuOption onClick={endShift}>
-                                    {t("endShift")}
-                                </MenuOption>
-                            </OptionsMenu>}
                         </FlexGroup>
                 </div>
             </div>

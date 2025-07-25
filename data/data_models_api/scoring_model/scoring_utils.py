@@ -46,14 +46,19 @@ def load_reference_files(month_abbr):
         # First, try relative to this script file (works both locally and in Docker)
         os.path.join(script_dir, "models", month_folder),
         os.path.join(script_dir, "Models", month_folder),  # Capital M version
-        
+
         os.path.join(script_dir, month_folder),
-        # Then try from working directory (for Docker)
+        
+        os.path.join("/app", "data", "data_models_api", "scoring_model", "models", month_folder),
+        os.path.join("/app", "data", "data_models_api", "scoring_model", month_folder),
+
         os.path.join("data", "data_models_api", "scoring_model", "models", month_folder),
         os.path.join("data", "data_models_api", "scoring_model", "Models", month_folder),  # Capital M
-        # Legacy paths
+        os.path.join("data", "data_models_api", "scoring_model", month_folder),
+
         os.path.join("models", month_folder),  # Original relative path
         os.path.join("Models", month_folder),  # Capital M version
+        month_folder  
     ]
     
     base_path = None
@@ -96,10 +101,35 @@ def load_reference_files(month_abbr):
         os.path.join(base_path, f"duration_variability_{month_folder}.csv")
         ).rename(columns=lambda x: x.strip())
         
-        # Use the parent directory of base_path for expected_columns
-        models_parent = os.path.dirname(base_path)
-        expected_columns_path = os.path.join(models_parent, "expected_columns")
-        print(f"DEBUG: Looking for expected_columns at: {expected_columns_path}")
+        # Try multiple paths for expected_columns
+        possible_expected_paths = [
+            # In models directory
+            os.path.join(script_dir, "models", "expected_columns"),
+            # As sibling to month folder
+            os.path.join(os.path.dirname(base_path), "expected_columns"),
+            # In script directory directly
+            os.path.join(script_dir, "expected_columns"),
+            # Absolute Docker paths
+            os.path.join("/app", "data", "data_models_api", "scoring_model", "models", "expected_columns"),
+            os.path.join("/app", "data", "data_models_api", "scoring_model", "expected_columns"),
+            # From working directory
+            os.path.join("data", "data_models_api", "scoring_model", "models", "expected_columns"),
+            os.path.join("data", "data_models_api", "scoring_model", "expected_columns"),
+            # Legacy paths
+            os.path.join("models", "expected_columns"),
+            "expected_columns"
+        ]
+        
+        expected_columns_path = None
+        for path in possible_expected_paths:
+            print(f"DEBUG: Checking expected_columns path: {path}")
+            if os.path.exists(os.path.join(path, "expected_columns_xgb.pkl")):
+                expected_columns_path = path
+                print(f"DEBUG: Found expected_columns at: {path}")
+                break
+        
+        if expected_columns_path is None:
+            raise FileNotFoundError("Could not find expected_columns directory")
         
         expected_columns_xgb = joblib.load(os.path.join(expected_columns_path, "expected_columns_xgb.pkl"))
         expected_columns_lgb = joblib.load(os.path.join(expected_columns_path, "expected_columns_lgb.pkl"))

@@ -20,7 +20,16 @@
     z-index: 100;
     top: 16px;
     left: 16px;
+    right: 240px; /* Make room for shift control buttons */
+}
+
+.shift_controls_container {
+    position: absolute;
+    z-index: 100;
+    top: 16px;
     right: 16px;
+    display: flex;
+    gap: 8px;
 }
 
 .button_container {
