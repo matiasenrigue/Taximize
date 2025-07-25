@@ -158,7 +158,7 @@ export const RideContextProvider = (props: PropsWithChildren) => {
         api.post("/rides/start-ride", {
             timestamp,
             address: destination.name,
-            predictedScore: rating,
+            predictedScore: .5,
             "startLatitude": userLocation.lat,
             "startLongitude": userLocation.lng,
             "destinationLatitude": destination.lat,
