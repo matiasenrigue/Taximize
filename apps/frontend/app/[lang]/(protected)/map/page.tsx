@@ -13,7 +13,7 @@ import {
     useUserLocationContext
 } from "../../../../contexts/UserLocationContext/UserLocationContext";
 import {APIProvider} from "@vis.gl/react-google-maps";
-import {LocationSearchbar} from "../../../../components/LocationSearchbar";
+import {LocationSearchbar} from "../../../../components/LocationSearchbar/LocationSearchbar";
 import {TaxiMeter} from "../../../../components/TaxiMeter/TaxiMeter";
 import {FlexGroup} from "../../../../components/FlexGroup/FlexGroup";
 import {useRide} from "../../../../contexts/RideContext/RideContext";

@@ -1,6 +1,7 @@
 "use client";
 import styles from "./page.module.css";
-import { Select, Option } from "../../../../../components/Select/Select";
+import { Select } from "../../../../../components/Select/Select";
+import { Option } from "../../../../../components/Select/Option";
 import { useTranslations } from "next-intl";
 import {
     BarChart,
@@ -121,9 +122,17 @@ export default function StatisticsPage() {
                 <div className={styles.chartHeader}>
                     <h3>{t('worktimeTitle')}</h3>
                     <div className={styles.select}>
-                        <Select onChange={(value) => setWorktimeView(value as 'weekly' | 'monthly')}>
-                            <Option value="weekly" selected={worktimeView === 'weekly'}>{t('weekly')}</Option>
-                            <Option value="monthly" selected={worktimeView === 'monthly'}>{t('monthly')}</Option>
+                        <Select
+                            defaultValue={worktimeView}
+                            onChange={(e) => {
+                                setWorktimeView(e.target.value as 'weekly' | 'monthly')
+                            }}>
+                            <Option value="weekly">
+                                {t('weekly')}
+                            </Option>
+                            <Option value="monthly">
+                                {t('monthly')}
+                            </Option>
                         </Select>
                     </div>
                 </div>
@@ -159,9 +168,19 @@ export default function StatisticsPage() {
                 <div className={styles.chartHeader}>
                     <h3>{t('earningsTitle')}</h3>
                     <div className={styles.select}>
-                        <Select onChange={(value) => setEarningsView(value as 'weekly' | 'monthly')}>
-                            <Option value="weekly" selected={earningsView === 'weekly'}>{t('weekly')}</Option>
-                            <Option value="monthly" selected={earningsView === 'monthly'}>{t('monthly')}</Option>
+                        <Select
+                            defaultValue={earningsView}
+                            onChange={(e) => {
+                                setEarningsView(e.target.value as "weekly" | "monthly")
+                            }}>
+                            <Option
+                                value="weekly">
+                                {t('weekly')}
+                            </Option>
+                            <Option
+                                value="monthly">
+                                {t('monthly')}
+                            </Option>
                         </Select>
                     </div>
                 </div>

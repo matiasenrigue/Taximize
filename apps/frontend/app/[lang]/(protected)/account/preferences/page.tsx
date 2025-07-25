@@ -1,27 +1,31 @@
 "use client"
 
-import React, {useTransition} from "react";
+import React, {ChangeEvent, useTransition} from "react";
 import styles from "./page.module.css";
-import { useTranslations } from "next-intl";
-import { Select, Option } from "../../../../../components/Select/Select";
+import {useLocale, useTranslations} from "next-intl";
+import { Select } from "../../../../../components/Select/Select";
+import { Option } from "../../../../../components/Select/Option";
 import { Switch } from "../../../../../components/Switch/Switch";
 import { useRouter, usePathname } from "../../../../../i18n/navigation";
 import { useTheme } from "next-themes";
 import BackButton from "../../../../../components/BackButton/BackButton";
 import {useShift} from "../../../../../contexts/ShiftContext/ShiftContext";
 import {useParams} from "next/navigation";
+import api from "../../../../../lib/axios";
 
 export default function Preferences() {
     const t = useTranslations('preferences');
-    const { setTheme } = useTheme();
+    const { theme, setTheme } = useTheme();
     const router = useRouter();
     const pathname = usePathname();
     const params = useParams();
     const [,startTransition] = useTransition();
+    const locale = useLocale();
 
     const {showBreakWarnings, setShowBreakWarnings} = useShift();
 
-    const handleLanguageChange = (newLocale: string) => {
+    const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>) => {
+        const newLocale = e.target.value;
         startTransition(() => {
             router.replace(
                 // @ts-expect-error -- TypeScript will validate that only known `params`
@@ -29,8 +33,23 @@ export default function Preferences() {
                 // always match for the current route, we can skip runtime checks.
                 {pathname, params},
                 {locale: newLocale}
-            )
+            );
         });
+        api.put('/users/preferences', { language: newLocale })
+            .catch(console.warn);
+    };
+
+    const handleThemeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        setTheme(value as string);
+        api.put('/users/preferences', { theme: value })
+            .catch(console.error);
+    };
+
+    const handleBreakWarningsChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setShowBreakWarnings(e.target.checked);
+        api.put('/users/preferences', { breakWarnings: e.target.checked })
+            .catch(console.error);
     };
 
     return (
@@ -46,26 +65,23 @@ export default function Preferences() {
                     </div>
                     <div className={styles.select}>
                         <Select
-                            onChange={(value) => setTheme(value as string)}>
-                            <Option
-                                value="light">{t('light')}</Option>
-                            <Option
-                                value="dark">{t('dark')}</Option>
-                            <Option
-                                value="system">{t('system')}</Option>
+                            onChange={handleThemeChange}
+                            defaultValue={theme}>
+                            <Option value="light">{t('light')}</Option>
+                            <Option value="dark">{t('dark')}</Option>
+                            <Option value="system">{t('system')}</Option>
                         </Select>
                     </div>
                     
                     <div className={styles.label}>
-                    <label>{t('language')}</label>
+                        <label>{t('language')}</label>
                     </div>
                     <div className={styles.select}>
                         <Select
-                            onChange={handleLanguageChange}>
-                            <Option
-                                value="en">English</Option>
-                            <Option
-                                value="de">Deutsch</Option>
+                            onChange={handleLanguageChange}
+                            defaultValue={locale}>
+                            <Option value="en">English</Option>
+                            <Option value="de">Deutsch</Option>
                         </Select>
                     </div>
                     <div className={styles.label}>
@@ -77,7 +93,7 @@ export default function Preferences() {
                         <Switch
                             id={"switch-breakWarnings"}
                             checked={showBreakWarnings}
-                            onChange={(e) => setShowBreakWarnings(e.target.checked)}/>
+                            onChange={handleBreakWarningsChange}/>
                     </div>
                 </div>
             </div>

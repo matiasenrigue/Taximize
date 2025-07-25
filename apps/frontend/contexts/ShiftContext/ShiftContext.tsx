@@ -171,19 +171,19 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             }
 
             const {
-                totalDuration,
+                totalDurationMs,
                 passengerTime,
                 pauseTime,
                 idleTime,
                 numBreaks,
                 averageBreak,
-                totalEarnings
+                totalEarningsCents
             } = data;
 
             setIsShift(false);
             setIsShiftOver(true);
-            setTotalDuration(totalDuration);
-            setTotalEarnings(totalEarnings);
+            setTotalDuration(totalDurationMs);
+            setTotalEarnings(totalEarningsCents);
             router.push('/end-shift');
         }).catch((error) => {
             console.warn(error);
