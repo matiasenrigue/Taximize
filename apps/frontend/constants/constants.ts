@@ -9,6 +9,14 @@ export const HOUR_IN_MILLISECONDS = 60 * MINUTE_IN_MILLISECONDS;
 export const MAP_ID_LIGHT = "f1310920ec56c7b65c64dec9";
 export const MAP_CENTER = {lat: 40.7831, lng: -73.9712};
 
+// fake location options
+export const FAKE_LOCATIONS = {
+    manhattan: {lat: 40.7831, lng: -73.9712}, // Central Manhattan (Upper East Side)
+    jfk: {lat: 40.6413, lng: -73.7781}, // JFK Airport
+    lga: {lat: 40.7769, lng: -73.8740}, // LaGuardia Airport
+    brooklyn: {lat: 40.6782, lng: -73.9442} // Brooklyn (Park Slope residential area)
+};
+
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const FLOAT_REGEX = /^-?(?:\d+|\d*\.\d*)?$/;
 

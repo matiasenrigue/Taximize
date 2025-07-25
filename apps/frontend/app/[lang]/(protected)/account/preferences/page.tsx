@@ -23,6 +23,19 @@ export default function Preferences() {
     const locale = useLocale();
 
     const {showBreakWarnings, setShowBreakWarnings} = useShift();
+    const [useRealGeolocation, setUseRealGeolocation] = React.useState<boolean>(() => {
+        if (typeof window !== 'undefined') {
+            const stored = localStorage.getItem('useRealGeolocation');
+            return stored === 'true';
+        }
+        return false;
+    });
+    const [fakeLocationId, setFakeLocationId] = React.useState<string>(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('fakeLocationId') || 'manhattan';
+        }
+        return 'manhattan';
+    });
 
     const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const newLocale = e.target.value;
@@ -50,6 +63,18 @@ export default function Preferences() {
         setShowBreakWarnings(e.target.checked);
         api.put('/users/preferences', { breakWarnings: e.target.checked })
             .catch(console.error);
+    };
+
+    const handleGeolocationChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const useReal = e.target.checked;
+        setUseRealGeolocation(useReal);
+        localStorage.setItem('useRealGeolocation', useReal.toString());
+    };
+
+    const handleFakeLocationChange = (e: ChangeEvent<HTMLSelectElement>) => {
+        const locationId = e.target.value;
+        setFakeLocationId(locationId);
+        localStorage.setItem('fakeLocationId', locationId);
     };
 
     return (
@@ -95,6 +120,36 @@ export default function Preferences() {
                             checked={showBreakWarnings}
                             onChange={handleBreakWarningsChange}/>
                     </div>
+                    
+                    <div className={styles.label}>
+                        <label htmlFor={"switch-geolocation"}>
+                            {t('realGeolocation')}
+                        </label>
+                    </div>
+                    <div className={styles.switch}>
+                        <Switch
+                            id={"switch-geolocation"}
+                            checked={useRealGeolocation}
+                            onChange={handleGeolocationChange}/>
+                    </div>
+                    
+                    {!useRealGeolocation && (
+                        <>
+                            <div className={styles.label}>
+                                <label>{t('fakeLocation')}</label>
+                            </div>
+                            <div className={styles.select}>
+                                <Select
+                                    onChange={handleFakeLocationChange}
+                                    defaultValue={fakeLocationId}>
+                                    <Option value="manhattan">{t('manhattan')}</Option>
+                                    <Option value="jfk">{t('jfkAirport')}</Option>
+                                    <Option value="lga">{t('laGuardiaAirport')}</Option>
+                                    <Option value="brooklyn">{t('brooklynResidential')}</Option>
+                                </Select>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
