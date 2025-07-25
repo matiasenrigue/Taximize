@@ -12,7 +12,8 @@ jest.mock('../../utils/zoneDetector', () => ({
 
 jest.mock('../../../../shared/utils/dataApiClient', () => ({
     scoreTripXGB: jest.fn().mockResolvedValue({
-        predicted_score: 73
+        predicted_score: 73,
+        final_score: 0.73
     }),
     formatDateTimeForScoring: jest.fn().mockReturnValue('2024-01-01 12:00:00')
 }));
