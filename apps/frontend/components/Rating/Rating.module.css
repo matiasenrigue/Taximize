@@ -7,14 +7,11 @@
 }
 
 .star {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    border: solid 2px var(--color-border);
-    border-radius: 50%;
+    font-size: 24px;
+    color: var(--color-border);
+    transition: color 0.2s ease;
 }
 
 .star_filled {
-    background-color: var(--color-primary);
-    border: none;
+    color: var(--color-primary);
 }

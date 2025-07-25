@@ -1,5 +1,7 @@
 import styles from "./Rating.module.css";
 import clsx from "clsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
 
 interface RatingProps {
     maxRating?: number;
@@ -15,12 +17,14 @@ export const Rating = (props: RatingProps) => {
     return (
         <div className={styles.container}>
             {Array.from({length: maxRating}).map((_, i) => (
-                <div
+                <FontAwesomeIcon
                     key={i}
+                    icon={faStar}
                     className={clsx(
                         styles.star,
                         i < rating && styles.star_filled
-                    )}/>
+                    )}
+                />
             ))}
         </div>
     );
