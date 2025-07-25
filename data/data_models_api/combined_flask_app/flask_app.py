@@ -95,6 +95,12 @@ def score_lgbm():
             borough_map=resources["borough_map"],
             expected_columns=resources["expected_columns"]
         )
+
+        #debugging output
+        print("DEBUG input to score_trip:", data)
+        print("Returned result:", result)
+
+        
         if result:
             return jsonify(result), 200
         else:

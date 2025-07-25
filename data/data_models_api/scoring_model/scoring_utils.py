@@ -222,7 +222,20 @@ def score_trip(pickup_zone, dropoff_zone, pickup_datetime, model, weights, scale
     if err:
         print("Error during feature prep:", err)
         return None
-
+    
+     #  Add  DEBUG block
+    print("\n DEBUG INFO")
+    print("Pickup zone:", pickup_zone)
+    print("Dropoff zone:", dropoff_zone)
+    print("Pickup datetime:", pickup_datetime)
+    print("Prepared input row:")
+    print(input_df.head(1).to_dict(orient='records'))
+    if "dropoff_zone_hotness" in input_df.columns:
+        print("Hotness:", input_df['dropoff_zone_hotness'].iloc[0])
+    if "trip_duration_variability" in input_df.columns:
+        print("Duration variability:", input_df['trip_duration_variability'].iloc[0])
+    #  End DEBUG block
+    
     try:
         predicted_score, final_score = score_input(input_df, model, scaler)
         print(f"Scaler min/max: {scaler['min']} – {scaler['max']}")
