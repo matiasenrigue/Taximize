@@ -7,7 +7,7 @@ export default function Home() {
 
     useEffect(() => {
         router.push("/map");
-    }, []);
+    }, [router]);
 
     return null;
 }

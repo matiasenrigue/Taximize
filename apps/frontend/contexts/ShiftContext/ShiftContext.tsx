@@ -50,7 +50,6 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
 
     const breakModalRef = useRef<ModalHandle>(null!);
     const router = useRouter();
-    const pathname = usePathname();
 
     const [isShift, setIsShift] = useState<boolean>(false);
     const [isShiftOver, setIsShiftOver] = useState<boolean>(false);
@@ -104,6 +103,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
                 return;
 
             setIsShift(isOnShift);
+            setIsShiftOver(false);
             setLoadRide(isOnRide);
             setDuration(duration);
             setBreakDuration(pauseDuration);
@@ -144,6 +144,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             setStartTime(timestamp);
             setLastBreakTime(timestamp);
             setIsShift(true);
+            setIsShiftOver(false);
             router.push('/map');
         }).catch((error) => {
             console.warn(error);
@@ -180,6 +181,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             } = data;
 
             setIsShift(false);
+            setIsShiftOver(true);
             setTotalDuration(totalDuration);
             setTotalEarnings(totalEarnings);
             router.push('/end-shift');
