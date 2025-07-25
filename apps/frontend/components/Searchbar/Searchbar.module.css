@@ -5,6 +5,7 @@
     align-items: center;
     max-width: 400px;
     background-color: var(--color-surface);
+    color: var(--color-on-surface);
     border: solid 1px var(--color-border);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -59,5 +60,6 @@
     height: 100%;
     padding: 12px 0;
     border: none;
+    color: unset;
     outline: none;
 }

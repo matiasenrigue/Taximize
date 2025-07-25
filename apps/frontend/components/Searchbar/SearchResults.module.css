@@ -2,6 +2,7 @@
     padding: var(--padding-xs);
     transform: translate(0, var(--padding-sm));
     background-color: var(--color-surface);
+    color: var(--color-on-surface);
     border: solid 1px var(--color-border);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -13,6 +14,7 @@
     width: 100%;
     background-color: unset;
     border: none;
+    color: var(--color-on-surface);
     border-radius: var(--border-radius);
     padding: var(--padding-sm);
     text-align: left;

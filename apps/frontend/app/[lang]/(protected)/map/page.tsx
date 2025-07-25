@@ -70,23 +70,6 @@ export default function MapPage() {
                         placeholder={t("locationSearchPlaceholder")}/>
                 </div>
 
-                {!isOnRide && (
-                    <div className={styles.shift_controls_container}>
-                        <Button
-                            theme="secondary"
-                            onClick={openPauseModal}>
-                            <FontAwesomeIcon icon={faPause} />
-                            {t("pauseShift")}
-                        </Button>
-                        <Button
-                            theme="primary"
-                            onClick={endShift}>
-                            <FontAwesomeIcon icon={faStop} />
-                            {t("endShift")}
-                        </Button>
-                    </div>
-                )}
-
                 <div className={styles.button_container}>
                         {isOnRide && <TaxiMeter/>}
                         <FlexGroup
@@ -98,12 +81,30 @@ export default function MapPage() {
                                         elevated={true}
                                         onClick={() => endModalRef.current?.open()}>
                                         {t("endRide")}
-                            </Button>
+                                </Button>
                                 : (destination && isRouteAvailable && <Button
                                     elevated={true}
                                     onClick={() => startModalRef.current?.open()}>
                                     {t("startRide")}
                                 </Button>)}
+                            {!isOnRide && <>
+                                <Button
+                                    theme="primary"
+                                    onClick={openPauseModal}>
+                                    <span className={styles.button_icon}>
+                                        <FontAwesomeIcon icon={faPause}/>
+                                    </span>
+                                    {t("pauseShift")}
+                                </Button>
+                                <Button
+                                    theme="primary"
+                                    onClick={endShift}>
+                                    <span className={styles.button_icon}>
+                                        <FontAwesomeIcon icon={faStop}/>
+                                    </span>
+                                    {t("endShift")}
+                                </Button>
+                            </>}
                         </FlexGroup>
                 </div>
             </div>
