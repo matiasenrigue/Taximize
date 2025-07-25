@@ -208,12 +208,12 @@ abstract class ShiftSignalService {
         
         // Validate the signal
         await this.isValidSignal(driverId, 'continue');
-        
-        // Save the pause period
-        await PauseService.saveShiftPause(driverId);
 
         // Register the continue signal
         await this.registerSignal(driverId, timestamp, 'continue');
+
+        // Save the pause period
+        await PauseService.saveShiftPause(driverId);
     }
 
 }
