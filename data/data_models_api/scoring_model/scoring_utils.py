@@ -46,6 +46,8 @@ def load_reference_files(month_abbr):
         # First, try relative to this script file (works both locally and in Docker)
         os.path.join(script_dir, "models", month_folder),
         os.path.join(script_dir, "Models", month_folder),  # Capital M version
+        
+        os.path.join(script_dir, month_folder),
         # Then try from working directory (for Docker)
         os.path.join("data", "data_models_api", "scoring_model", "models", month_folder),
         os.path.join("data", "data_models_api", "scoring_model", "Models", month_folder),  # Capital M
