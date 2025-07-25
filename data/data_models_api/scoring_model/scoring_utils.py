@@ -34,7 +34,7 @@ def load_reference_files(month_abbr):
     if not month_folder:
         raise ValueError(f"Invalid month abbreviation: {month_abbr}")
 
-    base_path = os.path.join("Models", month_folder)
+    base_path = os.path.join("models", month_folder)
 
     try:
         with open(os.path.join(base_path, f"model_{month_folder}_xgb.pkl"), "rb") as f:
