@@ -10,11 +10,12 @@ import { useLocale } from "next-intl";
 import { useTheme } from "next-themes";
 import BackButton from "../../../../../components/BackButton/BackButton";
 import {useShift} from "../../../../../contexts/ShiftContext/ShiftContext";
+import api from "../../../../../lib/axios";
 
 export default function Preferences() {
     const t = useTranslations('preferences');
     const locale = useLocale();
-    const { setTheme } = useTheme();
+    const { theme, setTheme } = useTheme();
     const router = useRouter();
     const pathname = usePathname();
     const {showBreakWarnings, setShowBreakWarnings} = useShift();
@@ -22,6 +23,7 @@ export default function Preferences() {
     const handleLanguageChange = useCallback((language: string) => {
         const newPath = pathname.replace(`/${locale}`, `/${language}`);
         router.push(newPath);
+        api.put('/users/preferences', { language }).catch(console.error);
     }, [pathname, locale, router]);
 
     return (
@@ -37,13 +39,19 @@ export default function Preferences() {
                     </div>
                     <div className={styles.select}>
                         <Select
-                            onChange={(value) => setTheme(value as string)}>
+                            onChange={(value) => {
+                                setTheme(value as string);
+                                api.put('/users/preferences', { theme: value }).catch(console.error);
+                            }}>
                             <Option
-                                value="light">{t('light')}</Option>
+                                value="light"
+                                selected={theme === "light"}>{t('light')}</Option>
                             <Option
-                                value="dark">{t('dark')}</Option>
+                                value="dark"
+                                selected={theme === "dark"}>{t('dark')}</Option>
                             <Option
-                                value="system">{t('system')}</Option>
+                                value="system"
+                                selected={theme === "system"}>{t('system')}</Option>
                         </Select>
                     </div>
                     
@@ -70,7 +78,10 @@ export default function Preferences() {
                         <Switch
                             id={"switch-breakWarnings"}
                             checked={showBreakWarnings}
-                            onChange={(e) => setShowBreakWarnings(e.target.checked)}/>
+                            onChange={(e) => {
+                                setShowBreakWarnings(e.target.checked);
+                                api.put('/users/preferences', { breakWarnings: e.target.checked }).catch(console.error);
+                            }}/>
                     </div>
                 </div>
             </div>

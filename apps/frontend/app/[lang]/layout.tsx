@@ -15,6 +15,7 @@ import {BreakModalHandler} from "../../components/modals/BreakModalHandler/Break
 import {ShiftEndModalHandler} from "../../components/modals/ShiftEndModalHandler/ShiftEndModalHandler";
 import { UserContextProvider } from "../../contexts/UserContext/UserContext";
 import {UserLocationContextProvider} from "../../contexts/UserLocationContext/UserLocationContext";
+import { PreferencesLoader } from "../../components/PreferencesLoader/PreferencesLoader";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -75,6 +76,7 @@ export default async function RootLayout({
                                   <ShiftContextProvider>
                                       <RideContextProvider>
 
+                                          <PreferencesLoader />
                                           <BreakModalHandler/>
                                           <ShiftEndModalHandler/>
 

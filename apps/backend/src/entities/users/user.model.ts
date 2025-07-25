@@ -21,6 +21,13 @@ export class User extends Model {
     
     /** Hashed password (never stored in plain text) */
     public password!: string;
+    
+    /** User preferences (theme, language, break warnings) */
+    public preferences!: {
+        theme?: string;
+        language?: string;
+        breakWarnings?: boolean;
+    };
 
     /**
      * Instance method to verify passwords.
@@ -59,6 +66,11 @@ User.init(
             type: DataTypes.STRING,
             allowNull: false,
             validate: { len: [8, 100] }
+        },
+        preferences: {
+            type: DataTypes.JSON,
+            allowNull: true,
+            defaultValue: {}
         },
     },
     {
