@@ -34,7 +34,7 @@ def load_reference_files(month_abbr):
     if not month_folder:
         raise ValueError(f"Invalid month abbreviation: {month_abbr}")
 
-    base_path = os.path.join("models", month_folder)
+    base_path = os.path.join("data", "data_models_api", "scoring_model", "models", month_folder)
 
     try:
         with open(os.path.join(base_path, f"model_{month_folder}_xgb.pkl"), "rb") as f:
@@ -56,8 +56,8 @@ def load_reference_files(month_abbr):
         os.path.join(base_path, f"duration_variability_{month_folder}.csv")
         ).rename(columns=lambda x: x.strip())
         
-        expected_columns_xgb = joblib.load("models/expected_columns/expected_columns_xgb.pkl")
-        expected_columns_lgb = joblib.load("models/expected_columns/expected_columns_lgb.pkl")
+        expected_columns_xgb = joblib.load(os.path.join("data", "data_models_api", "scoring_model", "models", "expected_columns", "expected_columns_xgb.pkl"))
+        expected_columns_lgb = joblib.load(os.path.join("data", "data_models_api", "scoring_model", "models", "expected_columns", "expected_columns_lgb.pkl"))
 
         return {
             "xgb_model": xgb_model,
