@@ -12,6 +12,7 @@ import {DEFAULT_SHIFT_DURATION} from "../../../../constants/constants";
 import {ErrorMessage} from "../../../../components/ErrorMessage/ErrorMessage";
 import {Label} from "../../../../components/Label/Label";
 import {Heading} from "../../../../components/Heading/Heading";
+import {SmartShiftAssistant} from "../../../../components/SmartShiftAssistant/SmartShiftAssistant";
 
 export default function StartShift() {
     const router = useRouter();
@@ -48,8 +49,8 @@ export default function StartShift() {
                     onClick={() => startShift(duration)}>
                     {t("startShift")}
                 </Button>
-
             </FlexGroup>
+            <SmartShiftAssistant />
         </div>
     );
 };

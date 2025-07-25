@@ -1,0 +1,90 @@
+.container {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.indicator {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+}
+
+.indicator.good {
+  background-color: #22c55e;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
+}
+
+.indicator.okay {
+  background-color: #f59e0b;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+}
+
+.indicator.bad {
+  background-color: #ef4444;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+}
+
+.messageContainer {
+  flex: 1;
+}
+
+.message {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.nextTime {
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.timeDetail {
+  margin-left: 4px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .container {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .indicator {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .indicator.good {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+  }
+  
+  .indicator.okay {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+  }
+  
+  .indicator.bad {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+  }
+}
