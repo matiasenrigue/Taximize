@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - docker/try-matias
   workflow_dispatch:
 
 jobs:
@@ -66,8 +65,8 @@ jobs:
           # Navigate to the project directory in /tmp
           cd /tmp/TaxiApp
           
-          # Pull latest changes
-          git pull origin docker/try-matias
+          # Pull latest changes from main
+          git pull origin main
           
           # Make deployment script executable
           chmod +x deploy-v2.sh
