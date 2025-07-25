@@ -48,4 +48,57 @@ export class UserController {
         ResponseHandler.success(res, userData);
     });
 
+
+    /**
+     * Retrieves the current user's preferences.
+     * 
+     * @route GET /api/users/preferences
+     * @access Protected (requires authentication)
+     * @param req - Express request with authenticated user attached
+     * @param res - Express response object
+     * @returns User preferences object
+     */
+    static getPreferences = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        const user = req.user;
+
+        if (!user) {
+            res.status(401);
+            throw new Error('User authentication required');
+        }
+
+        ResponseHandler.success(res, user.preferences || {});
+    });
+
+
+    
+    /**
+     * Updates the current user's preferences.
+     * 
+     * @route PUT /api/users/preferences
+     * @access Protected (requires authentication)
+     * @param req - Express request with preferences in body
+     * @param res - Express response object
+     * @returns Updated preferences object
+     */
+    static updatePreferences = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        const user = req.user;
+
+        if (!user) {
+            res.status(401);
+            throw new Error('User authentication required');
+        }
+
+        // Merge new preferences with existing ones
+        const updatedPreferences = {
+            ...user.preferences,
+            ...req.body
+        };
+
+        // Update user preferences
+        user.preferences = updatedPreferences;
+        await user.save();
+
+        ResponseHandler.success(res, updatedPreferences);
+    });
+
 }
