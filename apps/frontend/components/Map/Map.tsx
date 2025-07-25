@@ -19,6 +19,7 @@ interface MapProps {
 export const Map = (props: MapProps) => {
     const {className} = props;
     const {
+        isOnRide,
         destination,
         setIsRouteAvailable,
         routeStatus,
@@ -97,7 +98,7 @@ export const Map = (props: MapProps) => {
 
     useEffect(() => {
         // only show modal if there is an error and routeStatus was previously ok.
-        if (previousRouteStatus.current !== "OK" || routeStatus == "OK")
+        if (!isOnRide || previousRouteStatus.current !== "OK" || routeStatus == "OK")
             return;
 
         switch (routeStatus) {
@@ -115,7 +116,7 @@ export const Map = (props: MapProps) => {
                 openRouteErrorModal();
                 console.warn(`Error finding route: ${routeStatus}`);
         }
-    }, [routeStatus, openUnknownLocationModal, openNoRouteModal, openRouteErrorModal])
+    }, [isOnRide, routeStatus, openUnknownLocationModal, openNoRouteModal, openRouteErrorModal])
 
     return (
         <>
