@@ -49,6 +49,7 @@ export class RideMLService {
             const cached = await redisClient.get(cacheKey);
             if (cached) {
                 const rating = parseInt(cached);
+                console.log(`INFO: ML Cache HIT - Route: ${zones.originZone} → ${zones.destinationZone}, Hour: ${hourOfDay}, Rating: ${rating}`);
                 return { rating, zones };
             }
             
@@ -67,6 +68,7 @@ export class RideMLService {
 
             // Cache for 1 hour (predictions change by hour)
             await redisClient.setEx(cacheKey, 3600, rating.toString());
+            console.log(`INFO: ML Cache MISS - Route: ${zones.originZone} → ${zones.destinationZone}, Hour: ${hourOfDay}, New Rating: ${rating} (cached for 1h)`);
 
             return { rating, zones };
             

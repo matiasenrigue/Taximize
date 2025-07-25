@@ -52,10 +52,19 @@ class RedisClient {
      * and the calling code will compute the value fresh.
      */
     async get(key: string): Promise<string | null> {
-        if (!this.isConnected || !this.client) return null;
+        if (!this.isConnected || !this.client) {
+            console.log(`INFO: Cache SKIP (Redis not connected) for key: ${key}`);
+            return null;
+        }
         
         try {
-            return await this.client.get(key);
+            const value = await this.client.get(key);
+            if (value) {
+                console.log(`INFO: Cache HIT for key: ${key}`);
+            } else {
+                console.log(`INFO: Cache MISS for key: ${key}`);
+            }
+            return value;
         } catch (error) {
             console.error('Redis get error:', error);
             return null;
@@ -67,10 +76,14 @@ class RedisClient {
      * If Redis is down, this does nothing (and that's okay)
      */
     async setEx(key: string, seconds: number, value: string): Promise<void> {
-        if (!this.isConnected || !this.client) return;
+        if (!this.isConnected || !this.client) {
+            console.log(`INFO: Cache SKIP (Redis not connected) - Unable to cache key: ${key}`);
+            return;
+        }
         
         try {
             await this.client.setex(key, seconds, value);
+            console.log(`INFO: Cache SET for key: ${key} (TTL: ${seconds}s)`);
         } catch (error) {
             console.error('Redis set error:', error);
         }

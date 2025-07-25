@@ -165,8 +165,10 @@ export class StatsService {
         // Check cache first
         const cached = await redisClient.get(cacheKey);
         if (cached) {
+            console.log(`INFO: Stats Cache HIT - Earnings for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`);
             return JSON.parse(cached);
         }
+        console.log(`INFO: Stats Cache MISS - Computing earnings for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`)
         
         // Get aggregated earnings data
         const earningsData = await RideRepository.aggregateEarningsByDate(
@@ -191,6 +193,7 @@ export class StatsService {
         
         // Cache for 5 minutes
         await redisClient.setEx(cacheKey, 300, JSON.stringify(result));
+        console.log(`INFO: Stats Cache SET - Earnings data cached for 5 minutes`);
         
         return result;
     }
@@ -208,8 +211,10 @@ export class StatsService {
         // Check cache first
         const cached = await redisClient.get(cacheKey);
         if (cached) {
+            console.log(`INFO: Stats Cache HIT - Work time for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`);
             return JSON.parse(cached);
         }
+        console.log(`INFO: Stats Cache MISS - Computing work time for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`)
         
         // Get all shifts in the date range with their associated rides
         const shifts = await ShiftRepository.findShiftsInDateRange(driverId, startDate, endDate, true);
@@ -232,6 +237,7 @@ export class StatsService {
         
         // Cache for 5 minutes
         await redisClient.setEx(cacheKey, 300, JSON.stringify(result));
+        console.log(`INFO: Stats Cache SET - Work time data cached for 5 minutes`);
         
         return result;
     }

@@ -16,10 +16,19 @@ echo "Starting deployment v2 with nginx..."
 echo "Stopping old containers..."
 eval $SUDO_CMD docker compose -f docker-compose.simple.yml down 2>/dev/null || true
 eval $SUDO_CMD docker compose -f docker-compose.prod.yml down 2>/dev/null || true
+eval $SUDO_CMD docker compose -f docker-compose.nginx.yml down 2>/dev/null || true
+
+# Remove old images to ensure fresh builds
+echo "Removing old images..."
+eval $SUDO_CMD docker rmi $(eval $SUDO_CMD docker images -q summer_project-ml-api) 2>/dev/null || true
+eval $SUDO_CMD docker rmi $(eval $SUDO_CMD docker images -q summer_project-backend) 2>/dev/null || true
+eval $SUDO_CMD docker rmi $(eval $SUDO_CMD docker images -q summer_project-frontend) 2>/dev/null || true
 
 # Build and start new containers with nginx
 echo "Building and starting containers with nginx..."
-eval $SUDO_CMD docker compose -f docker-compose.nginx.yml up -d --build
+# Force rebuild without cache to ensure latest code changes are included
+eval $SUDO_CMD docker compose -f docker-compose.nginx.yml build --no-cache
+eval $SUDO_CMD docker compose -f docker-compose.nginx.yml up -d
 
 # Wait for services to start
 echo "Waiting for services to start..."
@@ -68,6 +77,11 @@ curl -s -o /dev/null -w "Backend API status: %{http_code}\n" http://localhost/ap
 echo ""
 echo "Deployment v2 complete!"
 echo "Access your application at: http://137.43.49.22/"
+
+# Show container build times to verify fresh builds
+echo ""
+echo "Container build times (to verify fresh builds):"
+eval $SUDO_CMD docker ps --format "table {{.Names}}\t{{.CreatedAt}}"
 
 # Clean up old Docker images to save space
 echo ""
