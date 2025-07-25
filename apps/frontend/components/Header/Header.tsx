@@ -11,7 +11,7 @@ export const Header = () => {
         <header className={styles.header}>
             <Link
                 className={styles.logo}
-                href={"/"}>
+                href={"/map"}>
                 Taximize
             </Link>
             <FlexGroup direction={"row"}>

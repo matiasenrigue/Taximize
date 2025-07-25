@@ -22,6 +22,7 @@ interface ShiftContextType {
     duration: number;
     isLoaded: boolean;
     isShift: boolean;
+    isShiftOver: boolean;
     isPaused: boolean;
     isOvertime: boolean;
     startShift: (duration: number) => void;
@@ -51,6 +52,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const pathname = usePathname();
 
     const [isShift, setIsShift] = useState<boolean>(false);
+    const [isShiftOver, setIsShiftOver] = useState<boolean>(false);
     const [loadRide, setLoadRide] = useState<boolean>(false);
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -109,7 +111,6 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             setStartTime(shiftStart);
             setIsPaused(isPaused);
             setLastBreakTime(isPaused ? pauseStart : (lastPauseEnd ?? shiftStart));
-            router.push("/map");
         }).catch((error) => {
             console.warn(error);
         });
@@ -311,6 +312,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             duration,
             isLoaded,
             isShift,
+            isShiftOver,
             isPaused,
             isOvertime,
             startShift,

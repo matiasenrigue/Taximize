@@ -29,7 +29,7 @@ export default function MapPage() {
     const startBreakModalRef = useRef<ModalHandle>(null!);
 
     const router = useRouter();
-    const {endShift, isLoaded, isShift} = useShift();
+    const {endShift, isLoaded, isShift, isShiftOver} = useShift();
     const {isOnRide, destination, isRouteAvailable} = useRide();
     const t = useTranslations('map');
 
@@ -44,10 +44,10 @@ export default function MapPage() {
 
     // if not on shift, reroute to /start-shift
     useEffect(() => {
-        if (!isLoaded || isShift)
+        if (!isLoaded || isShift || isShiftOver)
             return;
         router.push("/start-shift");
-    }, [isLoaded, isShift, router]);
+    }, [isLoaded, isShift, isShiftOver, router]);
 
     if (!isAvailable)
         return <LocationUnavailable/>;
