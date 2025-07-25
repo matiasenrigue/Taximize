@@ -12,6 +12,7 @@ import { Message } from "../../../components/Message/Message";
 import { EMAIL_REGEX } from "../../../constants/constants";
 import { useUserContext } from "../../../contexts/UserContext/UserContext";
 import clsx from "clsx";
+import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
 
 export default function Signin() {
     const [email, setEmail] = useState("");
@@ -19,6 +20,7 @@ export default function Signin() {
     const router = useRouter();
     const [msg, setMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
     const { setUser } = useUserContext();
+    const { loadShift } = useShift();
 
     const isEmailValid = EMAIL_REGEX.test(email);
     const isPasswordValid = password.length >= 8;
@@ -34,15 +36,15 @@ export default function Signin() {
             }).then((response) => {
                 // when the status is 200, the response will contain a token
                 if (response.data.success === true) {
-                setToken(response.data.data.token);
-                // Update user context with the new user data
-                setUser(response.data.data.user);
-                // Show success message
-                setMsg({ type: "success", text: response.data.message || t("signinSuccess") });
-                // Redirect to home page after successful signin
-                router.push("/start-shift");
+                    setToken(response.data.data.token);
+                    // Update user context with the new user data
+                    setUser(response.data.data.user);
+                    // Show success message
+                    setMsg({ type: "success", text: response.data.message || t("signinSuccess") });
+                    loadShift();
+                    router.push("/start-shift");
                 } else {
-                // when the status is 200, but the response does not contain a token(e.g. invalid credentials)
+                    // when the status is 200, but the response does not contain a token(e.g. invalid credentials)
                     setMsg({ type: "error", text: response.data.message || t("signinFailed") });
                 }
             }).catch((err) => {

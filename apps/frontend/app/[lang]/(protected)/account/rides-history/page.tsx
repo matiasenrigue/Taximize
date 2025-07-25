@@ -1,10 +1,10 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { MenuItem } from "../../../../components/MenuItem/MenuItem";
+import { MenuItem } from "../../../../../components/MenuItem/MenuItem";
 import styles from "./page.module.css";
-import BackButton from "../../../../components/BackButton/BackButton";
-import api from "../../../../lib/axios";
+import BackButton from "../../../../../components/BackButton/BackButton";
+import api from "../../../../../lib/axios";
 import { useTranslations } from "next-intl";
 
 function formatDay(dateString: string) {

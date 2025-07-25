@@ -1,12 +1,12 @@
 "use client"
 
 import React from "react";
-import { MenuItem } from "../../../components/MenuItem/MenuItem";
+import { MenuItem } from "../../../../components/MenuItem/MenuItem";
 import styles from "./page.module.css";
 import { useTranslations } from "next-intl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faSliders, faChartBar, faCar } from "@fortawesome/free-solid-svg-icons";
-import BackButton from "../../../components/BackButton/BackButton";
+import BackButton from "../../../../components/BackButton/BackButton";
 
 export default function Account() {
     const t = useTranslations('account');

@@ -25,6 +25,7 @@ interface ShiftContextType {
     isShiftOver: boolean;
     isPaused: boolean;
     isOvertime: boolean;
+    loadShift: () => void;
     startShift: (duration: number) => void;
     endShift: () => void;
     pauseShift: (duration?: number) => void;
@@ -70,9 +71,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
     const [totalDuration, setTotalDuration] = useState<number>(0);
     const [totalEarnings, setTotalEarnings] = useState<number>(0);
 
-
-    // initialize shift
-    useEffect(() => {
+    const loadShift = useCallback(() => {
         api.get("/shifts/current").then((response) => {
             const {
                 success,
@@ -115,6 +114,11 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             console.warn(error);
         });
     }, []);
+
+    // initialize shift
+    useEffect(() => {
+        loadShift();
+    }, [loadShift]);
 
     const startShift = useCallback((duration: number = DEFAULT_SHIFT_DURATION): void => {
         if (isShift || duration <= 0)
@@ -315,6 +319,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             isShiftOver,
             isPaused,
             isOvertime,
+            loadShift,
             startShift,
             endShift,
             pauseShift,

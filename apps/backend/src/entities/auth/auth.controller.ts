@@ -66,7 +66,7 @@ export const signin = asyncHandler(async (req: Request, res: Response) => {
         // 3) set refresh token as secure, HTTP-only cookie
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: false,
             sameSite: 'strict',
             path: '/api/auth/refresh',
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
@@ -114,7 +114,7 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
 export const logout = asyncHandler(async (req: Request, res: Response) => {
     res.clearCookie('refreshToken', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
         sameSite: 'strict',
         path: '/api/auth/refresh',
     });

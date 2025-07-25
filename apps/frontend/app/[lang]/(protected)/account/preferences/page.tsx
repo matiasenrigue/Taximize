@@ -3,13 +3,13 @@
 import React, {useCallback} from "react";
 import styles from "./page.module.css";
 import { useTranslations } from "next-intl";
-import { Select, Option } from "../../../../components/Select/Select";
-import { Switch } from "../../../../components/Switch/Switch";
+import { Select, Option } from "../../../../../components/Select/Select";
+import { Switch } from "../../../../../components/Switch/Switch";
 import { useRouter, usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useTheme } from "next-themes";
-import BackButton from "../../../../components/BackButton/BackButton";
-import {useShift} from "../../../../contexts/ShiftContext/ShiftContext";
+import BackButton from "../../../../../components/BackButton/BackButton";
+import {useShift} from "../../../../../contexts/ShiftContext/ShiftContext";
 
 export default function Preferences() {
     const t = useTranslations('preferences');

@@ -1,26 +1,26 @@
 "use client";
 
 import styles from "./page.module.css";
-import {Button} from "../../../components/Button/Button";
-import {ModalHandle} from "../../../components/Modal/Modal";
+import {Button} from "../../../../components/Button/Button";
+import {ModalHandle} from "../../../../components/Modal/Modal";
 import React, {useEffect, useRef} from "react";
 import {useTranslations} from "next-intl";
-import {RideEvaluationModal} from "../../../components/modals/RideEvaluationModal";
-import {RideSummaryModal} from "../../../components/modals/RideSummaryModal";
-import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
-import {Map} from "../../../components/Map/Map";
+import {RideEvaluationModal} from "../../../../components/modals/RideEvaluationModal";
+import {RideSummaryModal} from "../../../../components/modals/RideSummaryModal";
+import {useShift} from "../../../../contexts/ShiftContext/ShiftContext";
+import {Map} from "../../../../components/Map/Map";
 import {
     useUserLocationContext
-} from "../../../contexts/UserLocationContext/UserLocationContext";
+} from "../../../../contexts/UserLocationContext/UserLocationContext";
 import {APIProvider} from "@vis.gl/react-google-maps";
-import {LocationSearchbar} from "../../../components/LocationSearchbar";
-import {TaxiMeter} from "../../../components/TaxiMeter/TaxiMeter";
-import {FlexGroup} from "../../../components/FlexGroup/FlexGroup";
-import {useRide} from "../../../contexts/RideContext/RideContext";
-import {MenuOption, OptionsMenu} from "../../../components/OptionsMenu/OptionsMenu";
-import {StartBreakModal} from "../../../components/modals/BreakModalHandler/StartBreakModal";
+import {LocationSearchbar} from "../../../../components/LocationSearchbar";
+import {TaxiMeter} from "../../../../components/TaxiMeter/TaxiMeter";
+import {FlexGroup} from "../../../../components/FlexGroup/FlexGroup";
+import {useRide} from "../../../../contexts/RideContext/RideContext";
+import {MenuOption, OptionsMenu} from "../../../../components/OptionsMenu/OptionsMenu";
+import {StartBreakModal} from "../../../../components/modals/BreakModalHandler/StartBreakModal";
 import {LocationUnavailable} from "./LocationUnavailable";
-import {GOOGLE_MAPS_API_KEY} from "../../../constants/constants";
+import {GOOGLE_MAPS_API_KEY} from "../../../../constants/constants";
 import {useRouter} from "next/navigation";
 
 export default function MapPage() {

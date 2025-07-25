@@ -3,8 +3,8 @@
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
-import BackButton from "../../../../../components/BackButton/BackButton";
-import api from "../../../../../lib/axios";
+import BackButton from "../../../../../../components/BackButton/BackButton";
+import api from "../../../../../../lib/axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { useTranslations } from "next-intl";

@@ -1,6 +1,6 @@
 "use client";
 import styles from "./page.module.css";
-import { Select, Option } from "../../../../components/Select/Select";
+import { Select, Option } from "../../../../../components/Select/Select";
 import { useTranslations } from "next-intl";
 import {
     BarChart,
@@ -14,9 +14,9 @@ import {
     DefaultLegendContentProps,
 } from 'recharts';
 import React, {useState, useEffect} from 'react';
-import { useEarningStatistics } from "../../../../hooks/useEarningStatistics";
-import { useWorktimeStatistics } from "../../../../hooks/useWorktimeStatistics";
-import BackButton from "../../../../components/BackButton/BackButton";
+import { useEarningStatistics } from "../../../../../hooks/useEarningStatistics";
+import { useWorktimeStatistics } from "../../../../../hooks/useWorktimeStatistics";
+import BackButton from "../../../../../components/BackButton/BackButton";
 
 export default function StatisticsPage() {
     const t = useTranslations('statistics');

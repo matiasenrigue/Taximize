@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import styles from "./page.module.css";
-import { useUser } from "../../../../../hooks/useUser";
-import { Input } from "../../../../../components/Input/Input";
-import { Button } from "../../../../../components/Button/Button";
+import { useUser } from "../../../../../../hooks/useUser";
+import { Input } from "../../../../../../components/Input/Input";
+import { Button } from "../../../../../../components/Button/Button";
 import { useTranslations } from "next-intl";
-import { Message, MessageType } from "../../../../../components/Message/Message";
+import { Message, MessageType } from "../../../../../../components/Message/Message";
 import { useRouter } from "next/navigation";
 
 export default function ChangeUsername() {

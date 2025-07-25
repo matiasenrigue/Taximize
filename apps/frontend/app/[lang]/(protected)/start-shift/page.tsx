@@ -1,17 +1,17 @@
 "use client"
 
 import styles from "./page.module.css";
-import {Button} from "../../../components/Button/Button";
-import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
+import {Button} from "../../../../components/Button/Button";
+import {useShift} from "../../../../contexts/ShiftContext/ShiftContext";
 import {useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
-import {TimeInput} from "../../../components/TimeInput/TimeInput";
-import {FlexGroup} from "../../../components/FlexGroup/FlexGroup";
+import {TimeInput} from "../../../../components/TimeInput/TimeInput";
+import {FlexGroup} from "../../../../components/FlexGroup/FlexGroup";
 import {useTranslations} from "next-intl";
-import {DEFAULT_SHIFT_DURATION} from "../../../constants/constants";
-import {ErrorMessage} from "../../../components/ErrorMessage/ErrorMessage";
-import {Label} from "../../../components/Label/Label";
-import {Heading} from "../../../components/Heading/Heading";
+import {DEFAULT_SHIFT_DURATION} from "../../../../constants/constants";
+import {ErrorMessage} from "../../../../components/ErrorMessage/ErrorMessage";
+import {Label} from "../../../../components/Label/Label";
+import {Heading} from "../../../../components/Heading/Heading";
 
 export default function StartShift() {
     const router = useRouter();

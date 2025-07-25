@@ -3,12 +3,12 @@
 import React, { useState, useRef } from "react";
 import styles from "./page.module.css";
 import { useTranslations } from "next-intl";
-import { MenuItem } from "../../../../components/MenuItem/MenuItem";
-import { useUser } from "../../../../hooks/useUser";
-import { Modal, ModalHandle } from "../../../../components/Modal/Modal";
-import { Button } from "../../../../components/Button/Button";
-import { Message, MessageType } from "../../../../components/Message/Message";
-import BackButton from "../../../../components/BackButton/BackButton";
+import { MenuItem } from "../../../../../components/MenuItem/MenuItem";
+import { useUser } from "../../../../../hooks/useUser";
+import { Modal, ModalHandle } from "../../../../../components/Modal/Modal";
+import { Button } from "../../../../../components/Button/Button";
+import { Message, MessageType } from "../../../../../components/Message/Message";
+import BackButton from "../../../../../components/BackButton/BackButton";
 
 
 export default function Profile() {

@@ -1,13 +1,13 @@
 "use client";
 
 import styles from "./page.module.css";
-import {Button} from "../../../components/Button/Button";
-import {FlexGroup} from "../../../components/FlexGroup/FlexGroup";
+import {Button} from "../../../../components/Button/Button";
+import {FlexGroup} from "../../../../components/FlexGroup/FlexGroup";
 import {useTranslations} from "next-intl";
 import {useRouter} from "next/navigation";
-import {useShift} from "../../../contexts/ShiftContext/ShiftContext";
-import {formatDuration} from "../../../lib/formatDuration/formatDuration";
-import {Heading} from "../../../components/Heading/Heading";
+import {useShift} from "../../../../contexts/ShiftContext/ShiftContext";
+import {formatDuration} from "../../../../lib/formatDuration/formatDuration";
+import {Heading} from "../../../../components/Heading/Heading";
 
 export default function EndShift() {
     const t = useTranslations("end-shift");

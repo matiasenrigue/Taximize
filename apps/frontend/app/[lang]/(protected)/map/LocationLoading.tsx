@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./page.module.css";
 import {useTranslations} from "next-intl";
-import {LoadingSpinner} from "../../../components/LoadingSpinner/LoadingSpinner";
+import {LoadingSpinner} from "../../../../components/LoadingSpinner/LoadingSpinner";
 
 export const LocationLoading = () => {
     const t = useTranslations("LocationLoading");
