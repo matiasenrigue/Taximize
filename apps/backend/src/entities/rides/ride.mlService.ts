@@ -60,7 +60,7 @@ export class RideMLService {
             });
             
             // Validate and convert score
-            const prediction = scoreResult.predicted_score / 100;
+            const prediction = scoreResult.final_score;
 
             RideValidators.validatePredictionScore(prediction);
             
