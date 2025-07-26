@@ -99,9 +99,6 @@ export const validateStartRideRequest = (req: Request, res: Response, next: Next
  * @throws 400 if missing fare/distance or negative values
  */
 export const validateEndRideRequest = (req: Request, res: Response, next: NextFunction): void => {
-    // turned off for demo purposes, weird bug happening
-    next();
-    return;
     
     const { fareCents, actualDistanceKm, timestamp } = req.body;
     
