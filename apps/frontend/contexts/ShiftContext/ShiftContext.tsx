@@ -23,6 +23,7 @@ interface ShiftContextType {
     isLoaded: boolean;
     isShift: boolean;
     isShiftOver: boolean;
+    setIsShiftOver: Dispatch<SetStateAction<boolean>>;
     isPaused: boolean;
     isOvertime: boolean;
     loadShift: () => void;
@@ -319,6 +320,7 @@ export const ShiftContextProvider = (props: PropsWithChildren) => {
             isLoaded,
             isShift,
             isShiftOver,
+            setIsShiftOver,
             isPaused,
             isOvertime,
             loadShift,

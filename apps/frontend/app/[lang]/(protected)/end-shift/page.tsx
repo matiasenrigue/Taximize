@@ -8,11 +8,16 @@ import {useRouter} from "next/navigation";
 import {useShift} from "../../../../contexts/ShiftContext/ShiftContext";
 import {formatDuration} from "../../../../lib/formatDuration/formatDuration";
 import {Heading} from "../../../../components/Heading/Heading";
+import {useEffect} from "react";
 
 export default function EndShift() {
     const t = useTranslations("end-shift");
     const router = useRouter();
-    const {totalEarnings, totalDuration} = useShift();
+    const {totalEarnings, totalDuration, setIsShiftOver} = useShift();
+
+    useEffect(() => {
+        setIsShiftOver(false);
+    }, []);
 
     return (
         <div className={styles.page}>
