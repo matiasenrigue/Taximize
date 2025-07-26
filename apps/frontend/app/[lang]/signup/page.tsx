@@ -2,7 +2,7 @@
 
 import styles from "./page.module.css";
 import { Button } from "../../../components/Button/Button";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "../../../components/Input/Input"; 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -11,6 +11,7 @@ import Message from "../../../components/Message/Message";
 import api from "../../../lib/axios";
 import { EMAIL_REGEX } from "../../../constants/constants";
 import clsx from "clsx";
+import { getToken } from "../../../lib/token";
 
 
 export default function Signup() {
@@ -20,6 +21,14 @@ export default function Signup() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [msg, setMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
     const router = useRouter();
+
+    // Redirect if already logged in
+    useEffect(() => {
+        const token = getToken();
+        if (token) {
+            router.push("/start-shift");
+        }
+    }, [router]);
 
     const isEmailValid = EMAIL_REGEX.test(email);
     const isPasswordValid = password.length >= 8;

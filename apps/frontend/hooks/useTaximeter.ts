@@ -12,7 +12,7 @@ import {calculateDistance} from "../lib/calculateDistance/calculateDistance";
 interface TaximeterType {
     fare: number;
     distance: number;
-    start: (startLocation?: LatLng, startTime?: number) => void;
+    start: (startLocation?: LatLng, startTime?: number, initialFare?: number, initialDistance?: number) => void;
     stop: () => void;
 }
 
@@ -27,11 +27,11 @@ export const useTaximeter = (location: LatLng | null): TaximeterType => {
     const fareTimeRef = useRef<number>(0);
     const fareDistanceRef = useRef<number>(0);
 
-    const start = useCallback((startLocation?: LatLng, startTime?: number) => {
+    const start = useCallback((startLocation?: LatLng, startTime?: number, initialFare?: number, initialDistance?: number) => {
         if (isRunning)
             return;
-        setFare(BASE_FARE);
-        setDistance(0);
+        setFare(initialFare ?? BASE_FARE);
+        setDistance(initialDistance ?? 0);
         lastLocationRef.current = startLocation ?? location;
         lastTimeRef.current = startTime ?? moment.now();
         fareTimeRef.current = 0;

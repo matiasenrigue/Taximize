@@ -2,12 +2,12 @@
 
 import styles from "./page.module.css";
 import { Button } from "../../../components/Button/Button";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "../../../components/Input/Input"; 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import api from "../../../lib/axios";
-import { setToken } from "../../../lib/token";
+import { setToken, getToken } from "../../../lib/token";
 import { Message } from "../../../components/Message/Message";
 import { EMAIL_REGEX } from "../../../constants/constants";
 import { useUserContext } from "../../../contexts/UserContext/UserContext";
@@ -21,6 +21,14 @@ export default function Signin() {
     const [msg, setMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
     const { setUser } = useUserContext();
     const { loadShift } = useShift();
+
+    // Redirect if already logged in
+    useEffect(() => {
+        const token = getToken();
+        if (token) {
+            router.push("/start-shift");
+        }
+    }, [router]);
 
     const isEmailValid = EMAIL_REGEX.test(email);
     const isPasswordValid = password.length >= 8;

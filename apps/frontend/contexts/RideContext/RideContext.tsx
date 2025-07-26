@@ -95,7 +95,8 @@ export const RideContextProvider = (props: PropsWithChildren) => {
                 estimatedFareCents,
             } = data;
 
-            const startTime = moment.now(); // missing from backend
+            // Calculate the actual start time based on elapsed time
+            const startTime = moment.now() - elapsedTimeMs;
             const startLocation = {lat: startLatitude, lng: startLongitude};
 
             setIsOnRide(true);
@@ -106,11 +107,12 @@ export const RideContextProvider = (props: PropsWithChildren) => {
                 lat: currentDestinationLatitude,
                 lng: currentDestinationLongitude
             });
-            startTaximeter(startLocation, startTime);
+            // Restore taximeter with existing fare and distance
+            startTaximeter(startLocation, startTime, estimatedFareCents, distanceKm * 1000);
         }).catch((error) => {
             console.warn(error);
         });
-    }, [loadRide]);
+    }, [loadRide, startTaximeter]);
 
     const evaluateRide = useCallback(() => {
         if (!destination || !userLocation)
