@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./page.module.css";
 import { useTranslations } from "next-intl";
 import { MenuItem } from "../../../../../components/MenuItem/MenuItem";
@@ -12,11 +12,18 @@ import BackButton from "../../../../../components/BackButton/BackButton";
 
 
 export default function Profile() {
-    const { user, error, signOut } = useUser();
-    const email = user?.email || "example@gmail.com";
-    const username = user?.username || "John Doe";
+    const { user, error, signOut, refreshUser } = useUser();
+    const email = user?.email || "";
+    const username = user?.username || "";
     const t = useTranslations('profile');
     const [msg, setMsg] = useState<{ type: MessageType; message: string } | null>(null);
+
+    // Refresh user data when component mounts
+    useEffect(() => {
+        if (!user) {
+            refreshUser();
+        }
+    }, []);
 
      if (error) {
         const errorMessage = error || 'Failed to fetch user data';
