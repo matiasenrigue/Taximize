@@ -1,6 +1,7 @@
 import { Pause } from './pause.model';
 import { ShiftSignal } from '../shift-signals/shiftSignal.model';
 import { ShiftService } from '../shifts/shift.service';
+import { ensureBigintSafe } from '../../shared/utils/bigintSafety';
 
 /**
  * Service layer for managing shift pause operations.
@@ -53,7 +54,7 @@ abstract class PauseService {
             shift_id: continueSignal.shift_id,
             pause_start: pauseSignal.timestamp,
             pause_end: continueSignal.timestamp,
-            duration_ms: pauseDuration
+            duration_ms: ensureBigintSafe(pauseDuration, 'pause.duration_ms')
         });
     }
 

@@ -11,6 +11,7 @@ import { ShiftCalculationUtils } from './utils/ShiftCalculationUtils';
 import { Op } from 'sequelize';
 import { ShiftCreationData, ShiftEndData } from './shift.types';
 import { SHIFT_CONSTANTS, SHIFT_ERRORS } from './shift.constants';
+import { ensureBigintSafe } from '../../shared/utils/bigintSafety';
 
 
 /**
@@ -141,10 +142,11 @@ export class ShiftService {
         }
         
         // Create new shift
+        const plannedDuration = ensureBigintSafe(duration || SHIFT_CONSTANTS.DEFAULT_PLANNED_DURATION_MS, 'planned_duration_ms');
         const shiftData: ShiftCreationData = {
             driver_id: driverId,
             shift_start: new Date(timestamp),
-            planned_duration_ms: duration || SHIFT_CONSTANTS.DEFAULT_PLANNED_DURATION_MS
+            planned_duration_ms: plannedDuration || undefined
         };
         
         await Shift.create(shiftData as any);
@@ -273,9 +275,11 @@ export class ShiftService {
 
         const shiftEnd = new Date();
         
+        const totalDuration = shiftEnd.getTime() - shift.shift_start.getTime();
+        const safeDuration = ensureBigintSafe(totalDuration, 'total_duration_ms');
         const endData: ShiftEndData = {
             shift_end: shiftEnd,
-            total_duration_ms: shiftEnd.getTime() - shift.shift_start.getTime()
+            total_duration_ms: safeDuration || undefined
         };
         
         const { pauses, rides } = await this.getShiftRelatedData(shiftId);

@@ -3,6 +3,7 @@ import { Ride } from '../../rides/ride.model';
 import { Pause } from '../../shift-pauses/pause.model';
 
 import { camelToSnake } from '../../../shared/utils/caseTransformer';
+import { ensureBigintSafe } from '../../../shared/utils/bigintSafety';
 
 interface PausesData {
     totalBreakTimeMs: number;
@@ -73,12 +74,12 @@ export class ShiftCalculationUtils {
         }, 0);
 
         const numberOfBreaks = validPauses.length;
-        const averageBreakDurationMs = totalBreakTimeMs / numberOfBreaks;
+        const averageBreakDurationMs = numberOfBreaks > 0 ? Math.floor(totalBreakTimeMs / numberOfBreaks) : 0;
 
         return {
-            totalBreakTimeMs,
+            totalBreakTimeMs: ensureBigintSafe(totalBreakTimeMs, 'totalBreakTimeMs') || 0,
             numberOfBreaks,
-            averageBreakDurationMs
+            averageBreakDurationMs: ensureBigintSafe(averageBreakDurationMs, 'averageBreakDurationMs') || 0
         };
     }
 
@@ -133,17 +134,25 @@ export class ShiftCalculationUtils {
 
         if (shift.shift_end) {
             const totalDurationMs = shift.shift_end.getTime() - shift.shift_start.getTime();
-            updateData.totalDurationMs = totalDurationMs;
+            const safeDuration = ensureBigintSafe(totalDurationMs, 'totalDurationMs');
+            if (safeDuration !== null) {
+                updateData.totalDurationMs = safeDuration;
+            }
         }
 
         if (mode !== 'onlyRideData' && pauses) {
             const pauseData = await this.calculatePausesData(shift, pauses);
             updateData.breakTimeMs = pauseData.totalBreakTimeMs;
             updateData.numBreaks = pauseData.numberOfBreaks;
+            updateData.avgBreakMs = pauseData.averageBreakDurationMs;
 
             // Work time = total - breaks
             if (updateData.totalDurationMs !== undefined) {
-                updateData.workTimeMs = updateData.totalDurationMs - pauseData.totalBreakTimeMs;
+                const workTime = updateData.totalDurationMs - pauseData.totalBreakTimeMs;
+                const safeWorkTime = ensureBigintSafe(workTime, 'workTimeMs');
+                if (safeWorkTime !== null) {
+                    updateData.workTimeMs = safeWorkTime;
+                }
             }
         }
 

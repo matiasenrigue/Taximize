@@ -7,6 +7,9 @@ import { ShiftService } from '../shifts/shift.service';
 import ShiftSignal from './shiftSignal.model';
 import Shift from '../shifts/shift.model';
 
+// Utils
+import { ensureBigintSafe } from '../../shared/utils/bigintSafety';
+
 
 import { SignalValidation, Signal } from './utils/signalValidation';
 
@@ -73,7 +76,7 @@ abstract class ShiftSignalService {
                 timestamp: new Date(timestamp),
                 shift_id: activeShift.id,
                 signal: signal as Signal,
-                planned_duration_ms: (signal === 'pause' && additionalData) ? additionalData : null
+                planned_duration_ms: (signal === 'pause' && additionalData) ? ensureBigintSafe(additionalData, 'planned_duration_ms') : null
             });
         }
 
