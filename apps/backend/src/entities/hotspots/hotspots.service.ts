@@ -40,6 +40,7 @@ export class HotspotsService {
     static async hotspotsApiCall(): Promise<any | null> { 
         try {
             // Get current time in UTC (Flask API will convert to NYC time)
+            // Flask API expects ISO 8601 UTC format and converts it to America/New_York timezone
             // Format ref: https://stackoverflow.com/questions/33599768/what-is-the-yyyy-mm-ddthhmmss-sssz-date-timezone-formatting-and-how-can-i-rep
             const formattedTime = moment.utc().toISOString();
             const formattedTimeWithoutMs = formattedTime.split('.')[0] + 'Z';

@@ -68,20 +68,20 @@ export async function scoreTripXGB(request: ScoringRequest): Promise<ScoringResp
 /**
  * Format datetime to the required format for scoring API
  * @param date - JavaScript Date object
- * @returns Formatted string: "MM/DD/YYYY HH:MM:SS AM/PM"
+ * @returns Formatted string: "MM/DD/YYYY HH:MM:SS AM/PM" in NYC timezone
  */
 export function formatDateTimeForScoring(date: Date): string {
 
-  // Code from: https://stackoverflow.com/questions/11591854/format-date-to-mm-dd-yyyy-in-javascript
-
-
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const year = date.getFullYear();
+  // Convert to NYC timezone
+  const nycDate = new Date(date.toLocaleString("en-US", { timeZone: "America/New_York" }));
   
-  let hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
+  const month = String(nycDate.getMonth() + 1).padStart(2, '0');
+  const day = String(nycDate.getDate()).padStart(2, '0');
+  const year = nycDate.getFullYear();
+  
+  let hours = nycDate.getHours();
+  const minutes = String(nycDate.getMinutes()).padStart(2, '0');
+  const seconds = String(nycDate.getSeconds()).padStart(2, '0');
   
   const ampm = hours >= 12 ? 'PM' : 'AM';
   hours = hours % 12 || 12;
