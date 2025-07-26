@@ -11,7 +11,7 @@ interface DemandStatus {
   nextGoodTime?: Date;
 }
 
-const getNYCTime = (): Date => {
+export const getNYCTime = (): Date => {
   const now = new Date();
   const nycTime = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
   return nycTime;
