@@ -13,6 +13,8 @@ export const useUser = () => {
     // sign out the user
     const signOut = async () => {
         try {
+            await api.post('/auth/logout');
+            
             // Clear all tokens (access and refresh)
             clearAllTokens();
             setUser(null);
