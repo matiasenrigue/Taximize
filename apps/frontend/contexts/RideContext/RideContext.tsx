@@ -7,7 +7,7 @@ import {
     SetStateAction,
     useCallback,
     useContext,
-    useEffect, useRef,
+    useEffect,
     useState
 } from "react";
 import moment from "moment";
@@ -15,7 +15,6 @@ import api from "../../lib/axios";
 import {useUserLocationContext} from "../UserLocationContext/UserLocationContext";
 import {useTaximeter} from "../../hooks/useTaximeter";
 import {useShift} from "../ShiftContext/ShiftContext";
-import {calculateDistance} from "../../lib/calculateDistance/calculateDistance";
 
 interface Place {
     placeId: string | null;
@@ -88,6 +87,7 @@ export const RideContextProvider = (props: PropsWithChildren) => {
             const {
                 address,
                 rideId,
+                startTime,
                 startLatitude,
                 startLongitude,
                 currentDestinationLatitude,
@@ -95,8 +95,6 @@ export const RideContextProvider = (props: PropsWithChildren) => {
                 elapsedTimeMs
             } = data;
 
-            // Calculate the actual start time based on elapsed time
-            const startTime = moment.now() - elapsedTimeMs;
             const startLatLng = {lat: startLatitude, lng: startLongitude};
 
             setIsOnRide(true);
