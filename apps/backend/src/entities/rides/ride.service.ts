@@ -89,29 +89,37 @@ export class RideService {
         }
 
         const predictedScore = coords.predictedScore;
+        // FUTURE FIX
+        // Solving Bug: FE hardcoded score to 0.5, we round it to interger
+        // Reason: Confusion with Data team, we thought score was between 0-1, but is actually 1-5,
+        // so all validations break, and we have to hardcode it to 0-1, even though it is not correct.
+        // The user still sees the correct score, but we store it as 0-1 (which does not matter since we don't display historical records on scores)
+        const roundedPredictedScore = predictedScore !== null && predictedScore !== undefined 
+            ? Math.round(predictedScore) 
+            : null;
+            
         const startTime = coords.timestamp ? new Date(coords.timestamp) : new Date();
+            const ride = await RideRepository.create({
+                shift_id: shiftId,
+                driver_id: driverId,
+                start_latitude: coords.startLat,
+                start_longitude: coords.startLng,
+                destination_latitude: coords.destLat,
+                destination_longitude: coords.destLng,
+                address: coords.address || "Address not provided",
+                start_time: startTime,
+                predicted_score: roundedPredictedScore,
+                end_time: null,
+                earning_cents: null,
+                earning_per_min: null,
+                distance_km: null
+            });
 
-        const ride = await RideRepository.create({
-            shift_id: shiftId,
-            driver_id: driverId,
-            start_latitude: coords.startLat,
-            start_longitude: coords.startLng,
-            destination_latitude: coords.destLat,
-            destination_longitude: coords.destLng,
-            address: coords.address || "Address not provided",
-            start_time: startTime,
-            predicted_score: predictedScore,
-            end_time: null,
-            earning_cents: null,
-            earning_per_min: null,
-            distance_km: null
-        });
-
-        return {
-            rideId: ride.id,
-            startTime: ride.start_time.getTime(),
-            predictedScore: predictedScore
-        };
+            return {
+                rideId: ride.id,
+                startTime: ride.start_time.getTime(),
+                predictedScore: roundedPredictedScore
+            };
     }
 
 
