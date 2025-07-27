@@ -4,7 +4,7 @@ This folder contains everything needed to score the app Taximize (NYC) using tra
 
 # Folder Structure
 
-Please note in the readme I will only be adding the structure for the month of July but everything that goes into that month applies to all months (February-December 2023)! 
+Please note in the readme I will only be adding the structure for the month of July  but everything that goes into that month applies to all months (February-December 2023)! 
 
 Scoring_model/
 
@@ -22,6 +22,7 @@ Scoring_model/
 │ │ ├── duration_variability_july.csv
 │ │ ├── scoring_weights_july.json
 │ │ └── scaler_july.json
+│ ├── august/ 
 
 ```
 ## What Each File In a Monthly Model Folder Does
@@ -77,6 +78,8 @@ final_score: Normalized value between 0-1 (safe to display in UI)
 # Final Notes 
 
 Scores are based on dropoff zone hotness, duration variability, boroughs, and time of day features.
+
+For backend when using this model please take the results from final_score rather than predicted
 
 Normalization is performed using the 5th and 95th percentiles of predicted scores to reduce the impact of outliers and improve score spread across the 0–1 range.
 
