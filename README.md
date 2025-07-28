@@ -277,3 +277,7 @@ NODE_ENV=production npm run migrate --workspace=apps/backend
 - **shift_pauses** - Break time tracking
 - **hotspots** - Zone data storage
 
+## 🗂️ Project Resources
+
+- 📑 [Record Keeping Sheet](https://drive.google.com/drive/folders/1j7uh8_LCfJmR-18U4RQFO6gStkrbBFKN?usp=sharing) – Track sprint notes, deliverables, and testing logs  
+- 🧠 [Notion Project Management](https://www.notion.so/Summer-Project-1fa9a3dee3a28095b1c6f3fbccc0ba68) – Tasks, timelines, and collaboration board
