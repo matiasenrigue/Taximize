@@ -41,6 +41,9 @@ A comprehensive full-stack application designed for taxi drivers to efficiently 
 
 ## Project Structure
 ```
+├── additional resources/                 #research for the report outside of lit review
+|   ├── Diksha -Forms to Look into        #Research looking through various forums and Persona Profiles
+|   ├── Ellie - Competitor Analysis       #Research into different ride hailing apps
 ├── apps/
 │   ├── backend/
 │   │   ├── src/
