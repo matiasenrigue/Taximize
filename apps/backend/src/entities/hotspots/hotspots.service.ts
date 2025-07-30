@@ -127,7 +127,7 @@ export class HotspotsService {
             const newHotspotsData: any | boolean = await this.fetchNewHotspotsData();
 
             if (newHotspotsData === false) {
-                // If fetching new data fails, try to get cached data
+                // If fetching new data fails, try to get cached data even if its not the freshest
                 const cachedData = await this.retrieveCachedHotspotsData();
 
                 if (cachedData === false) {

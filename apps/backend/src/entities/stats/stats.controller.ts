@@ -6,20 +6,22 @@ import { isValidDayOfWeek } from './utils/dateHelpers';
 
 export class StatsController {
 
-
-    // @desc    Get shifts for the last N days
-    // @route   GET /api/stats/shifts-by-days
-    // @access  Protected
+    /** 
+     * @desc    Get shifts for the last N days
+     * @route   GET /api/stats/shifts-by-days
+     * @access  Protected
+     */
     static getShiftsForLastNDays = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+
         const driverId = req.driverId!;
         const days = parseInt(req.query.days as string) || 7;
 
         const endDate = new Date();
-        endDate.setHours(23, 59, 59, 999);
+        endDate.setHours(23, 59, 59, 999); // put it to the end of the day for including the whole day
         
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - days + 1);
-        startDate.setHours(0, 0, 0, 0);
+        startDate.setHours(0, 0, 0, 0);   // put it to the beginning of the day for including the whole day
 
         try {
             const shifts = await StatsService.getShiftsForDateRange(driverId, startDate, endDate);
@@ -30,16 +32,22 @@ export class StatsController {
     });
 
 
-    // @desc    Get rides by day of week
-    // @route   GET /api/stats/rides-by-weekday
-    // @access  Protected
+
+    /** 
+     * @desc    Get rides by day of week
+     * @route   GET /api/stats/rides-by-weekday
+     * @access  Protected
+     */
     static getRidesByDayOfWeek = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+
         const driverId = req.driverId!;
         const day = req.query.day as string;
 
         if (!day || !isValidDayOfWeek(day)) {
             res.status(400);
-            throw new Error('Invalid day of week. Must be one of: monday, tuesday, wednesday, thursday, friday, saturday, sunday');
+            throw new Error(
+                'Invalid day of week. Must be one of: monday, tuesday, wednesday, thursday, friday, saturday, sunday'
+            );
         }
 
         try {
@@ -52,20 +60,21 @@ export class StatsController {
 
 
 
-    // @desc    Get earnings statistics
-    // @route   GET /api/stats/earnings
-    // @access  Protected
+    /** 
+     * @desc    Get earnings statistics
+     * @route   GET /api/stats/earnings
+     * @access  Protected
+     */
     static getEarningsStatistics = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+
         const driverId = req.driverId!;
         const { view, startDate, endDate } = req.query;
 
-        // Validate view parameter
         if (!view || (view !== 'weekly' && view !== 'monthly')) {
             res.status(400);
             throw new Error("The 'view' parameter is required and must be one of [weekly, monthly].");
         }
 
-        // Validate date parameters
         if (!startDate || !endDate) {
             res.status(400);
             throw new Error('Both startDate and endDate parameters are required');
@@ -98,21 +107,21 @@ export class StatsController {
     });
 
     
-    
-    // @desc    Get work time statistics
-    // @route   GET /api/stats/worktime
-    // @access  Protected
+    /** 
+     * @desc    Get work time statistics
+     * @route   GET /api/stats/worktime
+     * @access  Protected
+     */ 
     static getWorkTimeStatistics = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+
         const driverId = req.driverId!;
         const { view, startDate, endDate } = req.query;
 
-        // Validate view parameter
         if (!view || (view !== 'weekly' && view !== 'monthly')) {
             res.status(400);
             throw new Error("The 'view' parameter is required and must be one of [weekly, monthly].");
         }
 
-        // Validate date parameters
         if (!startDate || !endDate) {
             res.status(400);
             throw new Error('Both startDate and endDate parameters are required');

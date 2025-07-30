@@ -60,8 +60,11 @@ export function groupRidesByDate(rides: any[]): Map<string, any[]> {
 
 
 
-// Calculates time spent with passengers vs waiting between rides per day
+/**
+ * Calculates time spent with passengers vs waiting between rides per day
+ */ 
 export function calculateWorkTimeByDate(rides: any[]): WorkTimeByDate {
+
     const workTimeByDate: WorkTimeByDate = {};
     
     // Group rides by date and process in single pass
@@ -76,6 +79,7 @@ export function calculateWorkTimeByDate(rides: any[]): WorkTimeByDate {
     });
     
     ridesByDate.forEach((dayRides, date) => {
+        
         // Sort rides by start time
         dayRides.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
         
@@ -112,13 +116,16 @@ export function calculateWorkTimeByDate(rides: any[]): WorkTimeByDate {
 
 
 
-// Generates time breakdown with labels based on view type (weekly: "Mon", monthly: "15")
+/**
+ * Generates time breakdown with labels based on view type (weekly: "Mon", monthly: "15")
+ */ 
 export function generateWorkTimeBreakdown(
     view: 'weekly' | 'monthly',
     startDate: Date,
     endDate: Date,
     workTimeData: WorkTimeByDate
 ): Array<{ label: string; date: string; withPassengerTime: number; emptyTime: number }> {
+
     const dates = generateDateArray(startDate, endDate);
     
     return dates.map(date => {

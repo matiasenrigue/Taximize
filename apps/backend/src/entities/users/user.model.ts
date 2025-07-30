@@ -2,13 +2,7 @@ import { Model, DataTypes } from '../../shared/config/db';
 import bcrypt from 'bcrypt';
 import { sequelize } from '../../shared/config/db';
 
-/**
- * Represents a user in the system.
- * 
- * Users are the primary authentication entity, storing credentials
- * and basic profile information. Passwords are automatically hashed
- * before storage for security.
- */
+
 export class User extends Model {
     /** Unique identifier for the user (UUID v4) */
     public id!: string;
@@ -38,13 +32,8 @@ export class User extends Model {
     public matchPassword!: (entered: string) => Promise<boolean>;
 }
 
-/**
- * Initialize the User model with its schema definition.
- * 
- * This model uses UUID v4 for primary keys and includes
- * email validation and password length requirements.
- * Timestamps are automatically managed by Sequelize.
- */
+
+
 User.init(
     {
         id: {

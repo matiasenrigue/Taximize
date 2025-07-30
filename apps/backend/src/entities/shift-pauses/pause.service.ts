@@ -4,11 +4,8 @@ import { ShiftService } from '../shifts/shift.service';
 import { ensureBigintSafe } from '../../shared/utils/bigintSafety';
 
 /**
- * Service layer for managing shift pause operations.
- * 
  * Handles the creation and retrieval of pause records based on shift signals.
- * Works in conjunction with ShiftSignalService to track when drivers
- * take breaks during their shifts.
+ * Works with ShiftSignalService to track when drivers take breaks during their shifts.
  */
 abstract class PauseService {
 
@@ -19,7 +16,6 @@ abstract class PauseService {
      * It looks back at the previous 'pause' signal to calculate
      * the pause duration and create a complete pause record.
      * 
-     * @param driverId - The unique identifier of the driver
      * @throws Error if no active shift found or invalid signal sequence
      */
     static async saveShiftPause(driverId: string): Promise<void> {
@@ -68,7 +64,6 @@ abstract class PauseService {
      * - When the last pause ended
      * - Current pause duration (if paused)
      * 
-     * @param driverId - The unique identifier of the driver
      * @returns Object containing pause status and timing information
      */
     static async getPauseInfo(driverId: string): Promise<any> {
@@ -131,7 +126,6 @@ abstract class PauseService {
      * Returns pauses in chronological order, useful for calculating
      * total break time and analyzing pause patterns within a shift.
      * 
-     * @param shiftId - The unique identifier of the shift
      * @returns Array of pause records sorted by start time
      */
     static async getPausesForShift(shiftId: string): Promise<Pause[]> {

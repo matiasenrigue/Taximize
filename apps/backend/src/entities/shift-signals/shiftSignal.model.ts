@@ -1,14 +1,13 @@
 import { sequelize, Model, DataTypes } from '../../shared/config/db';
 
 /**
- * Represents a shift signal event in the system.
- * 
  * Shift signals track state transitions during a driver's shift,
  * including when they start, pause, continue, or stop working.
+ * 
  * Each signal is timestamped and linked to a specific shift.
  */
 export class ShiftSignal extends Model {
-    /** Unique identifier for the shift signal (UUID v4) */
+
     public id!: string;
     
     /** The exact time when this signal was created */
@@ -26,20 +25,11 @@ export class ShiftSignal extends Model {
      */
     public planned_duration_ms!: number | null;
     
-    /** Timestamp when this record was created in the database */
-    public created_at!: Date;
-    
-    /** Timestamp when this record was last updated */
+    public created_at!: Date;    
     public updated_at!: Date;
 }
 
-/**
- * Initialize the ShiftSignal model with its schema definition.
- * 
- * This model uses UUID v4 for primary keys and tracks all shift state
- * transitions with timestamps. The signal enum ensures only valid
- * state transitions are recorded.
- */
+
 ShiftSignal.init(
     {
         id: {
