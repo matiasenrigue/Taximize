@@ -4,15 +4,73 @@
 
 A comprehensive full-stack application designed for taxi drivers to efficiently manage their shifts, rides, and earnings. Built with modern technologies and optimized for real-world taxi operations in NYC.
 
+## 📹 Video Demo
+
+[![Watch the Demo](https://img.shields.io/badge/▶️_Watch_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/eccbbC6lNtw?si=tFIqfrkAXYZm0xKZ)
+
+> See the Taxi Driver App in action with a comprehensive walkthrough of all features and functionalities.
+
 ## 🚀 Features
 
-- **🔐 Secure Authentication**: JWT-based authentication with access/refresh tokens
-- **📊 Shift Management**: Track work sessions with GPS location, breaks, and earnings
-- **🚖 Ride Tracking**: ML-powered ride evaluation with automatic scoring (1-5 rating)
-- **🗺️ NYC Zone Integration**: Accurate zone detection using official NYC taxi zone boundaries
-- **📈 Analytics Dashboard**: Visualize earnings, ride patterns, and performance metrics
-- **🌐 Multi-language Support**: Internationalization ready with next-intl
-- **📱 Responsive Design**: Mobile-first approach for on-the-go usage
+### 🎯 **Smart Hotspots**
+AI-powered passenger demand forecasting based on temporal and spatial patterns. The darker zones indicate higher probability of finding passengers, helping drivers optimize their positioning for maximum efficiency.
+
+<img src="apps/backend/documentation/media/Hotspots.gif" alt="Hotspots Demo" width="300"/>
+
+### ⭐ **Intelligent Ride Prediction**
+ML-powered ride evaluation system that estimates the economic value of each ride before acceptance. Get instant scoring from 1-5 stars to make informed decisions about which rides to accept.
+
+<table>
+<tr>
+<td><img src="apps/backend/documentation/media/3_stars_ride.gif" alt="3 Star Ride" width="300"/></td>
+<td><img src="apps/backend/documentation/media/5_stars_ride.gif" alt="5 Star Ride" width="300"/></td>
+</tr>
+</table>
+
+### 📊 **Analytics Dashboard**
+Comprehensive statistics tracking your working vs idle time and detailed earnings analytics. View your performance metrics on weekly or monthly basis to optimize your driving strategy.
+
+<img src="apps/backend/documentation/media/stats.gif" alt="Analytics Dashboard" width="300"/>
+
+### 🔄 **Persistent State Management**
+Seamless app experience with full state persistence. Exit and return to the app without losing progress - counters, timers, and current page state are perfectly maintained across sessions.
+
+> 🔍 **Notice**: Watch how page reloads maintain exact state - timers continue running and current page stays unchanged!
+
+<table>
+<tr>
+<td><img src="apps/backend/documentation/media/reload-breaks.gif" alt="Break State Persistence" width="300"/></td>
+<td><img src="apps/backend/documentation/media/reload-ride.gif" alt="Ride State Persistence" width="300"/></td>
+</tr>
+</table>
+
+### ⚙️ **Customizable Preferences**
+Personalize your experience with:
+- 🌙 **Dark/Light Mode** - Choose your preferred theme
+- 🌍 **Multi-language Support** - Currently available in English and German
+- ⏰ **Safety Notifications** - Configure automatic break reminders (every 3 hours for driver safety)
+
+<img src="apps/backend/documentation/media/preferences.gif" alt="Preferences Demo" width="300"/>
+
+
+### 🕐 **Shift Starting Recommendation**
+AI-powered recommendations on optimal shift timing to maximize profitability. Get instant visual feedback on whether it's the right time to start driving based on demand patterns and historical data.
+
+> ⚠️ **Note**: This feature currently uses hardcoded hours as it was not part of the initial MVP - planned for future development.
+
+<table>
+<tr>
+<td><img src="apps/backend/documentation/media/green.png" alt="Good Time to Start" width="200"/></td>
+<td><img src="apps/backend/documentation/media/orange_hour.PNG" alt="Moderate Time" width="200"/></td>
+<td><img src="apps/backend/documentation/media/red_hour.PNG" alt="Poor Time to Start" width="200"/></td>
+</tr>
+<tr>
+<td align="center"><strong>🟢 Optimal Time</strong></td>
+<td align="center"><strong>🟡 Moderate Time</strong></td>
+<td align="center"><strong>🔴 Poor Time</strong></td>
+</tr>
+</table>
+
 
 ## 🛠️ Tech Stack
  
@@ -41,7 +99,7 @@ A comprehensive full-stack application designed for taxi drivers to efficiently 
 
 ## Project Structure
 ```
-├── additional resources/                 #research for the report outside of lit review
+├── market_research/                 #research for the report outside of lit review
 |   ├── Diksha -Forms to Look into        #Research looking through various forums and Persona Profiles
 |   ├── Ellie - Competitor Analysis       #Research into different ride hailing apps
 ├── apps/

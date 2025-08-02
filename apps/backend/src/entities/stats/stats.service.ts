@@ -21,8 +21,11 @@ import { redisClient } from '../../shared/config/redis';
 
 export class StatsService {
     
-    // Returns shifts grouped by day with ride information for calendar view
+    /** 
+     * Returns shifts grouped by day with ride information for calendar view
+     */
     static async getShiftsForDateRange(driverId: string, startDate: Date, endDate: Date): Promise<any[]> {
+
         // Get all shifts in the date range with their associated rides
         const shifts = await ShiftRepository.findShiftsInDateRange(driverId, startDate, endDate, true);
         
@@ -87,7 +90,9 @@ export class StatsService {
         });
     }
 
-    // Returns all shifts that contain rides on a specific weekday (e.g., all Monday rides)
+    /** 
+     * Returns all shifts that contain rides on a specific weekday (e.g., all Monday rides)
+     */
     static async getRidesByDayOfWeek(driverId: string, dayOfWeek: string): Promise<any[]> {
         const dayNumber = getDayNumber(dayOfWeek);
         
@@ -114,7 +119,7 @@ export class StatsService {
                 },
                 required: false
             }],
-            limit: 1000
+            limit: 50
         });
         
         // Map shifts with their rides filtered by day of week
@@ -152,35 +157,41 @@ export class StatsService {
         }));
     }
 
-    // Aggregates earnings data with breakdown by day (weekly shows Mon-Sun, monthly shows 1-31)
+
+    /**
+     * Aggregates earnings data with breakdown by day (weekly shows Mon-Sun, monthly shows 1-31)
+     */
     static async getEarningsStatistics(
         driverId: string, 
         view: 'weekly' | 'monthly', 
         startDate: Date, 
         endDate: Date
     ): Promise<any> {
-        // Generate cache key
+
+        // Cache key
         const cacheKey = `stats:earnings:${driverId}:${view}:${formatDate(startDate)}:${formatDate(endDate)}`;
         
-        // Check cache first
+        // Check if key already exists
         const cached = await redisClient.get(cacheKey);
         if (cached) {
-            console.log(`INFO: Stats Cache HIT - Earnings for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`);
+            console.log(
+                `INFO: Stats Cache HIT - Earnings for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`
+            );
             return JSON.parse(cached);
         }
-        console.log(`INFO: Stats Cache MISS - Computing earnings for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`)
+        console.log(
+            `INFO: Stats Cache MISS - Computing earnings for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`
+        )
         
-        // Get aggregated earnings data
+        // Make the calculation if No cache
         const earningsData = await RideRepository.aggregateEarningsByDate(
             driverId,
             startDate,
             endDate
         );
         
-        // Calculate total earnings
         const totalEarnings = calculateTotalEarnings(earningsData);
         
-        // Generate breakdown
         const breakdown = generateEarningsBreakdown(view, startDate, endDate, earningsData);
         
         const result = {
@@ -198,34 +209,41 @@ export class StatsService {
         return result;
     }
 
-    // Calculates work hours split between active rides and waiting time
+
+
+    /**
+     * Calculates work hours split between active rides and waiting time
+     */
     static async getWorkTimeStatistics(
         driverId: string,
         view: 'weekly' | 'monthly',
         startDate: Date,
         endDate: Date
     ): Promise<any> {
-        // Generate cache key
+
+        // Cache key
         const cacheKey = `stats:worktime:${driverId}:${view}:${formatDate(startDate)}:${formatDate(endDate)}`;
         
-        // Check cache first
+        // Check if key already exists
         const cached = await redisClient.get(cacheKey);
         if (cached) {
-            console.log(`INFO: Stats Cache HIT - Work time for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`);
+            console.log(
+                `INFO: Stats Cache HIT - Work time for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`
+            );
             return JSON.parse(cached);
         }
         console.log(`INFO: Stats Cache MISS - Computing work time for driver ${driverId}, ${view} view, ${formatDate(startDate)} to ${formatDate(endDate)}`)
         
+        // Make the calculation if No cache
+
         // Get all shifts in the date range with their associated rides
         const shifts = await ShiftRepository.findShiftsInDateRange(driverId, startDate, endDate, true);
         
         // Extract all rides from shifts
         const rides = shifts.flatMap(shift => (shift as any).rides || []);
         
-        // Calculate work time by date
         const workTimeByDate = calculateWorkTimeByDate(rides);
         
-        // Generate breakdown
         const breakdown = generateWorkTimeBreakdown(view, startDate, endDate, workTimeByDate);
         
         const result = {
