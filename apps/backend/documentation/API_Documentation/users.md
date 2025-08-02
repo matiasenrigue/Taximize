@@ -1,39 +1,35 @@
-# Users API Documentation
+# 👤 Users API
 
-## Overview
+## 📁 Entity Documentation
+**[View Users Entity README →](../../src/entities/users/README.md)** *(User Management and Preferences)*
 
-The Users API provides endpoints for authenticated users to manage and retrieve their profile information. All user endpoints require authentication via JWT token.
+## 📋 Quick Reference
 
-**Base URL:** `/api/users`
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| [`/api/users/me`](#get-user-profile) | GET | Get current user profile | 🔐 Bearer |
+| [`/api/users/preferences`](#get-preferences) | GET | Get user preferences | 🔐 Bearer |
+| [`/api/users/preferences`](#update-preferences) | PUT | Update user preferences | 🔐 Bearer |
 
-**Authentication:** All endpoints require a valid JWT access token
+---
 
-## Endpoints
+## 🙋 Get User Profile
 
-### 1. Get Current User Profile
+**Endpoint:** `GET /api/users/me`
 
-**Description:** Retrieves the profile information of the currently authenticated user. This endpoint returns basic user data excluding sensitive information like passwords. The user object is automatically loaded by the authentication middleware.
+Retrieves the authenticated user's profile information. Password fields are automatically excluded.
 
-**URL:** `GET /api/users/me`
+### 📥 Request
 
-**Authentication:** Required (Bearer token)
+**Headers Required:**
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
 
-### Request Parameters
+### 📤 Success Response (200)
 
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
-
-#### Query Parameters
-None
-
-#### Request Body
-None
-
-### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -47,18 +43,8 @@ None
 }
 ```
 
-#### Response Fields
-| Field | Type | Description |
-|-------|------|-------------|
-| id | string | Unique user identifier (UUID) |
-| username | string | User's display name |
-| email | string | User's email address |
-| createdAt | string | ISO 8601 timestamp of account creation |
-| updatedAt | string | ISO 8601 timestamp of last profile update |
+### ❌ Error Responses
 
-#### Error Responses
-
-**401 Unauthorized - No Token**
 ```json
 {
   "success": false,
@@ -66,7 +52,6 @@ None
 }
 ```
 
-**401 Unauthorized - Invalid Token**
 ```json
 {
   "success": false,
@@ -74,7 +59,6 @@ None
 }
 ```
 
-**401 Unauthorized - User Not Found**
 ```json
 {
   "success": false,
@@ -82,69 +66,30 @@ None
 }
 ```
 
-**401 Unauthorized - Missing User**
-```json
-{
-  "success": false,
-  "error": "User authentication required"
-}
-```
-
-These errors occur when:
-- No authorization token is provided ("Not authorized, no token")
-- The token is invalid, expired, or malformed ("Not authorized, token failed")
-- The user associated with the token no longer exists ("User not found")
-- The user object is missing in the request ("User authentication required")
-
-### Example Usage
-
-```bash
-curl -X GET http://localhost:3000/api/users/me \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-```
-
-### JavaScript/Axios Example
-```javascript
-const getUserProfile = async () => {
-  try {
-    const response = await axios.get('/api/users/me', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-      }
-    });
-    console.log('User profile:', response.data.data);
-  } catch (error) {
-    console.error('Failed to fetch profile:', error.response.data.error);
-  }
-};
-```
+### 🔒 Security Notes
+- UUID v4 primary keys
+- Passwords never included in responses
+- User can only access own profile
 
 ---
 
-### 2. Get User Preferences
+## ⚙️ Get Preferences
 
-**Description:** Retrieves the user preferences for the currently authenticated user. This endpoint returns the user's personalized settings such as theme, language, and notification preferences. Returns an empty object if no preferences are set.
+**Endpoint:** `GET /api/users/preferences`
 
-**URL:** `GET /api/users/preferences`
+Retrieves user's personalized settings. Returns empty object if no preferences set.
 
-**Authentication:** Required (Bearer token)
+### 📥 Request
 
-#### Request Parameters
+**Headers Required:**
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
 
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
+### 📤 Success Response (200)
 
-#### Query Parameters
-None
-
-#### Request Body
-None
-
-#### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -156,63 +101,24 @@ None
 }
 ```
 
-#### Response Fields
-| Field | Type | Description |
-|-------|------|-------------|
-| theme | string | UI theme preference (e.g., "light", "dark") |
-| language | string | Language/locale setting (e.g., "en", "es") |
-| breakWarnings | boolean | Whether to show break reminder notifications |
+### 📋 Preference Fields
+- **theme**: UI theme ("light", "dark")
+- **language**: Locale setting ("en", "es", etc.)
+- **breakWarnings**: Show break reminders (boolean)
 
-**Note:** If no preferences are set, returns an empty object `{}`
-
-#### Error Responses
-Same authentication error responses as the `/me` endpoint.
-
-#### Example Usage
-
-```bash
-curl -X GET http://localhost:3000/api/users/preferences \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-```
-
-#### JavaScript/Axios Example
-```javascript
-const getUserPreferences = async () => {
-  try {
-    const response = await axios.get('/api/users/preferences', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-      }
-    });
-    console.log('User preferences:', response.data.data);
-  } catch (error) {
-    console.error('Failed to fetch preferences:', error.response.data.error);
-  }
-};
-```
+### 💡 Note
+Returns `{}` if no preferences are configured.
 
 ---
 
-### 3. Update User Preferences
+## 🔧 Update Preferences
 
-**Description:** Updates the user preferences for the currently authenticated user. This endpoint merges the provided preferences with existing ones, allowing partial updates. Any existing preferences not included in the request will remain unchanged.
+**Endpoint:** `PUT /api/users/preferences`
 
-**URL:** `PUT /api/users/preferences`
+Updates user preferences with partial updates supported. Unspecified fields remain unchanged.
 
-**Authentication:** Required (Bearer token)
+### 📥 Request
 
-#### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
-| Content-Type | string | Yes | `application/json` |
-
-#### Query Parameters
-None
-
-#### Request Body
 ```json
 {
   "theme": "dark",
@@ -221,18 +127,8 @@ None
 }
 ```
 
-#### Request Body Fields
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| theme | string | No | UI theme preference (e.g., "light", "dark") |
-| language | string | No | Language/locale setting (e.g., "en", "es") |
-| breakWarnings | boolean | No | Whether to show break reminder notifications |
+### 📤 Success Response (200)
 
-**Note:** All fields are optional. Only provided fields will be updated.
-
-#### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -244,74 +140,17 @@ None
 }
 ```
 
-#### Response Fields
-Returns the complete updated preferences object with all current settings.
+### ✨ Update Behavior
+- All fields optional
+- Partial updates supported
+- Returns complete preferences object
+- Existing values preserved if not specified
 
-#### Error Responses
-Same authentication error responses as other endpoints, plus:
+### ❌ Error Response (400)
 
-**400 Bad Request - Invalid JSON**
 ```json
 {
   "success": false,
   "error": "Invalid JSON format"
 }
 ```
-
-#### Example Usage
-
-```bash
-curl -X PUT http://localhost:3000/api/users/preferences \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  -H "Content-Type: application/json" \
-  -d '{"theme": "dark", "breakWarnings": false}'
-```
-
-#### JavaScript/Axios Example
-```javascript
-const updateUserPreferences = async (preferences) => {
-  try {
-    const response = await axios.put('/api/users/preferences', preferences, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    console.log('Updated preferences:', response.data.data);
-  } catch (error) {
-    console.error('Failed to update preferences:', error.response.data.error);
-  }
-};
-
-// Example usage
-updateUserPreferences({
-  theme: 'dark',
-  breakWarnings: false
-});
-```
-
----
-
-## Authentication Flow
-
-To use the Users API endpoints, you must first authenticate via the Auth API:
-
-1. **Login** via `POST /api/auth/signin` to receive an access token
-2. **Include the token** in the Authorization header for all user requests
-3. **Refresh the token** via `POST /api/auth/refresh` when it expires
-
-## Security Notes
-
-- User passwords are never included in API responses
-- All user endpoints require valid authentication
-- Tokens should be stored securely (e.g., httpOnly cookies or secure storage)
-- Users can only access their own profile data
-
-## Error Codes
-
-| Status Code | Description |
-|-------------|-------------|
-| 200 | Success - data returned |
-| 401 | Unauthorized - invalid or missing token |
-| 403 | Forbidden - token valid but insufficient permissions |
-| 500 | Internal server error |
