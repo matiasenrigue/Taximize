@@ -2,10 +2,13 @@
 
 AI-powered passenger demand forecasting based on temporal and spatial patterns. The darker zones indicate higher probability of finding passengers, helping drivers optimize their positioning for maximum efficiency
 
+## 📖 API Documentation
+**[View Complete API Reference →](../../../documentation/API_Documentation/hotspots.md)**
+
 <img src="../../../documentation/media/Hotspots.gif" alt="Hotspots Demo" width="200"/>
 
 
-## The Caching Strategy
+## 🗋 The Caching Strategy
 
 > ⚠️ **Important**: This is a first-implementation compromise. See [Caching Strategy: A Pragmatic First Implementation](#caching-strategy-a-pragmatic-first-implementation) for limitations and why we knowingly ship with this "not perfect" stategy
 
@@ -22,7 +25,7 @@ The flow goes like this:
 4. Only throw an error if we have absolutely no data to show
 
 
-## The API Connection
+## 🔌 The API Connection
 
 The system talks to a Flask-based ML service that:
 1. Takes a UTC timestamp
@@ -33,13 +36,13 @@ The system talks to a Flask-based ML service that:
 We send timestamps in ISO format: `2024-03-14T15:30:00.000Z`
 
 
-## Caching Strategy: A Pragmatic First Implementation
+## 🚼 Caching Strategy: A Pragmatic First Implementation
 
-### Why We Use Stale Cache as Fallback
+### ⚠️ Why We Use Stale Cache as Fallback
 
 We're fully aware that serving potentially days-old hotspot predictions when the ML API fails isn't ideal. In fact, it goes against the whole point of "real-time" predictions. In production, hotspot predictions that don't represent real-time conditions can actually harm driver earnings by sending them to zones that *were* busy but aren't anymore. 
 
-### The Current Reality vs. The Ideal
+### 🎯 The Current Reality vs. The Ideal
 
 **Current Implementation:**
 - 1-hour cache window (way too long for rush hour dynamics)

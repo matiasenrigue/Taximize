@@ -2,6 +2,9 @@
 
 Each ride represents a single passenger trip from pickup to destination, tracking location data, timing, earnings, and ML-predicted profitability scores. The ride system enforces strict business rules to ensure data integrity and seamless integration with shifts and driver states.
 
+## 📖 API Documentation
+**[View Complete API Reference →](../../../documentation/API_Documentation/rides.md)**
+
 <table>
 <tr>
 <td><img src="../../../documentation/media/3_stars_ride.gif" alt="3 Star Ride" width="250"/></td>
@@ -9,9 +12,9 @@ Each ride represents a single passenger trip from pickup to destination, trackin
 </tr>
 </table>
 
-## Architecture
+## 🏗️ Architecture
 
-### Components
+### 🔧 Components
 
 1. **Ride Model** (`ride.model.ts`)
    - Enforces unique constraint: only one active ride per shift
@@ -28,9 +31,9 @@ Each ride represents a single passenger trip from pickup to destination, trackin
 5. **Zone Detector** (`utils/zoneDetector.ts`)
    - Determines NYC zones from GPS coordinates: Essential for ML predictions based on pickup/dropoff zones
 
-## How It Works
+## ⚙️ How It Works
 
-### Ride Lifecycle
+### 🔄 Ride Lifecycle
 
 #### 1. Ride Evaluation: `POST /api/rides/evaluate-ride`
 Before starting a ride, drivers can evaluate potential profitability:
@@ -58,7 +61,7 @@ Before starting a ride, drivers can evaluate potential profitability:
 3. Returns complete ride metrics
 
 
-### Business Rules
+### 📋 Business Rules
 
 1. **Single Active Ride**: Database constraint ensures only one active ride per shift
 2. **Shift State Validation**: Cannot start rides while paused or without active shift

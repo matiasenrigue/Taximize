@@ -2,6 +2,8 @@
 
 This directory contains the core business entities and their associated logic for the backend application. Each entity is organized as a self-contained module with its own controllers, services, models, routes, and tests.
 
+> Link to check API documentation for all the entites
+
 ## Directory Structure
 
 - **auth/** - Authentication and authorization logic

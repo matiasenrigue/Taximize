@@ -8,6 +8,7 @@ import asyncHandler from 'express-async-handler';
  */
 export const requireDriver = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+        
         // Check if user is authenticated (protect middleware should have run first)
         if (!req.user) {
             res.status(401);

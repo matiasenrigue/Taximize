@@ -2,6 +2,9 @@
 
 Shift signals are the core mechanism for tracking driver work status in real-time. They function as a state machine that records every status change during a driver's shift, ensuring accurate time tracking and preventing invalid state transitions
 
+## 📖 API Documentation
+**[View Complete API Reference →](../../../documentation/API_Documentation/shifts.md)** *(Signals are managed through shift endpoints)*
+
 ### 🔄 **Persistent State Management**
 This allows the FrontEnd to be able to restart the page and keep the user exactly where they where, by tracking their last which was their last action and when it was made
 
@@ -14,7 +17,7 @@ This allows the FrontEnd to be able to restart the page and keep the user exactl
 </tr>
 </table>
 
-## Signal Types
+## 📡 Signal Types
 
 The system supports four signal types:
 
@@ -23,9 +26,9 @@ The system supports four signal types:
 - **`continue`** - Resumes work after a pause
 - **`stop`** - Ends the current shift
 
-## Architecture
+## 🏗️ Architecture
 
-### Components
+### 🔧 Components
 
 1. **ShiftSignal Model** (`shiftSignal.model.ts`)
 
@@ -37,9 +40,9 @@ The system supports four signal types:
    - REST API endpoints for signal operations: uses abstract handler pattern for consistent error handling
 
 
-## How It Works
+## ⚙️ How It Works
 
-### State Transition Rules
+### 🔄 State Transition Rules
 
 The system enforces strict validation rules to maintain data integrity:
 
@@ -51,13 +54,13 @@ The system enforces strict validation rules to maintain data integrity:
 | Continued | `pause`, `stop` | `continue`, `start` |
 | Stopped | `start` only | `pause`, `continue`, `stop` |
 
-### Additional Validation Rules
+### 🔍 Additional Validation Rules
 
 - **Active Ride Check**: No signals can be processed while the driver has an active ride
 - **Single Active Shift**: Only one active shift is allowed per driver at any time
 - **Signal Validation**: All transitions are validated through `SignalValidation.isValidTransition()`
 
-### Signal Processing Flow
+### 📩 Signal Processing Flow
 
 #### Start Signal: `POST /api/shifts/start-shift`
 
@@ -85,6 +88,6 @@ The system enforces strict validation rules to maintain data integrity:
 4. Returns computed metrics (duration, earnings, breaks, etc.)
 
 
-### Skip Pause `POST /api/shifts/skip-pause`
+### ⏭️ Skip Pause `POST /api/shifts/skip-pause`
 
 The `skipPause` handler allows drivers to register an instant pause-continue sequence. This is useful because for security reasons, when a shift has been going on for 3 hours we prompt the driver to take a break. However if the user doesn't want to, he/she will click to not have the break. This signal is the way to trick the backend into thinking that the user took a pause, so we are not constantly prompting the user to take a pause when he/she doesn't want to

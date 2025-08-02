@@ -7,8 +7,8 @@ const POSTGRES_BIGINT_MAX = 9223372036854775807n;
 const POSTGRES_BIGINT_MIN = -9223372036854775808n;
 
 /**
- * Ensures a number value is within PostgreSQL bigint range.
- * If the value exceeds the range, it returns the max/min allowed value.
+ * Ensures a number value is within PostgreSQL bigint range
+ * If the value exceeds the range, it returns the max/min allowed value
  * @param value The number to check
  * @param fieldName Optional field name for logging
  * @returns A safe bigint value

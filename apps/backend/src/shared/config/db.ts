@@ -1,4 +1,3 @@
-// src/config/db.ts
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { initializeAssociations } from './associations';
 

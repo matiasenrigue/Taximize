@@ -15,15 +15,15 @@ import { ensureBigintSafe } from '../../shared/utils/bigintSafety';
 
 
 /**
- * Handles driver shift lifecycle - creation, tracking, signals and metrics.
- * Works with PauseService and RideService for complete shift data.
+ * Handles driver shift lifecycle - creation, tracking, signals and metrics
+ * Works with PauseService and RideService for complete shift data
  */
 export class ShiftService {
 
 
 
     /**
-     * Gets shift and ensures driver owns it.
+     * Gets shift and ensures driver owns it
      * @throws If shift missing or wrong driver
      */
     private static async getShiftWithAuth(shiftId: string, driverId: string): Promise<Shift> {
@@ -44,7 +44,7 @@ export class ShiftService {
 
 
     /**
-     * Fetches shift's pauses and rides in parallel.
+     * Fetches shift's pauses and rides in parallel
      * @returns Both pauses and rides arrays
      */
     private static async getShiftRelatedData(shiftId: string): Promise<{ pauses: Pause[], rides: Ride[] }> {
@@ -60,7 +60,7 @@ export class ShiftService {
 
 
     /**
-     * Get current shift status including timing and pause info.
+     * Get current shift status including timing and pause info
      * @returns Status object or null if no active shift
      */
     static async getCurrentShiftStatus(driverId: string): Promise<{
@@ -105,7 +105,7 @@ export class ShiftService {
 
 
     /**
-     * Check if driver can accept rides (on shift and not paused).
+     * Check if driver can accept rides (on shift and not paused)
      * @returns true if available
      */
     static async driverIsAvailable(driverId: string): Promise<boolean> {
@@ -154,7 +154,7 @@ export class ShiftService {
 
 
     /**
-     * End driver's current shift.
+     * End driver's current shift
      * @returns saved shift data
      * @throws If no active shift
      */
@@ -169,7 +169,7 @@ export class ShiftService {
 
 
     /**
-     * Remove all signals for a shift (uses active shift if no ID given).
+     * Remove all signals for a shift (uses active shift if no ID given)
      */
     static async deleteShiftSignals(driverId: string, shiftId?: string): Promise<void> {
         const targetShiftId = shiftId || (await ShiftService.getActiveShift(driverId))?.id;
@@ -184,7 +184,7 @@ export class ShiftService {
 
 
     /**
-     * Get last signal type for driver's active shift.
+     * Get last signal type for driver's active shift
      */
     static async getLastSignal(driverId: string): Promise<Signal | null> {
         const activeShift = await this.getActiveShift(driverId);
@@ -200,7 +200,7 @@ export class ShiftService {
 
 
     /**
-     * Get last signal with all details.
+     * Get last signal with all details
      */
     private static async getLastSignalWithDetails(driverId: string): Promise<ShiftSignal | null> {
         const activeShift = await this.getActiveShift(driverId);
@@ -214,7 +214,7 @@ export class ShiftService {
 
 
     /**
-     * Get driver's active shift if exists.
+     * Get driver's active shift if exists
      */
     static async getActiveShift(driverId: string): Promise<Shift | null> {
         return await ShiftRepository.findActiveByDriverId(driverId);
@@ -223,7 +223,7 @@ export class ShiftService {
 
 
     /**
-     * Find the 'start' signal that began current shift period.
+     * Find the 'start' signal that began current shift period
      * (After the most recent 'stop' if any)
      */
     private static async getShiftStartSignal(driverId: string): Promise<ShiftSignal | null> {
@@ -257,7 +257,7 @@ export class ShiftService {
 
 
     /**
-     * End shift and calculate all metrics (duration, earnings, breaks).
+     * End shift and calculate all metrics (duration, earnings, breaks)
      * @throws If shift not found or ride still active
      */
     private static async saveShiftByShiftId(shiftId: string): Promise<Shift> {
@@ -301,7 +301,7 @@ export class ShiftService {
     }
 
     /**
-     * Get all shifts for a driver (historical data).
+     * Get all shifts for a driver (historical data)
      */
     static async getShiftsByDriver(driverId: string): Promise<Shift[]> {
         const endDate = new Date();
@@ -312,7 +312,7 @@ export class ShiftService {
 
 
     /**
-     * Get shift by ID (with auth check).
+     * Get shift by ID (with auth check)
      */
     static async getShiftById(shiftId: string, driverId: string): Promise<Shift> {
         return await this.getShiftWithAuth(shiftId, driverId);
@@ -321,7 +321,7 @@ export class ShiftService {
     
 
     /**
-     * End specific shift and return summary stats.
+     * End specific shift and return summary stats
      * @returns Summary with durations, earnings, breaks
      * @throws If already ended or ride active
      */

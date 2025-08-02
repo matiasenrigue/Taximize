@@ -1,4 +1,3 @@
-// Placeholder file for TDD Red phase - routes will be implemented in Green phase
 import { Router } from 'express';
 import { ShiftController } from './shift.controller';
 import { ShiftSignalController } from '../shift-signals/shiftSignal.controller';

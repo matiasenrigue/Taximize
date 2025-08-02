@@ -121,6 +121,177 @@ const getUserProfile = async () => {
 
 ---
 
+### 2. Get User Preferences
+
+**Description:** Retrieves the user preferences for the currently authenticated user. This endpoint returns the user's personalized settings such as theme, language, and notification preferences. Returns an empty object if no preferences are set.
+
+**URL:** `GET /api/users/preferences`
+
+**Authentication:** Required (Bearer token)
+
+#### Request Parameters
+
+#### Headers
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
+
+#### Query Parameters
+None
+
+#### Request Body
+None
+
+#### Response
+
+#### Success Response (200 OK)
+```json
+{
+  "success": true,
+  "data": {
+    "theme": "dark",
+    "language": "en",
+    "breakWarnings": true
+  }
+}
+```
+
+#### Response Fields
+| Field | Type | Description |
+|-------|------|-------------|
+| theme | string | UI theme preference (e.g., "light", "dark") |
+| language | string | Language/locale setting (e.g., "en", "es") |
+| breakWarnings | boolean | Whether to show break reminder notifications |
+
+**Note:** If no preferences are set, returns an empty object `{}`
+
+#### Error Responses
+Same authentication error responses as the `/me` endpoint.
+
+#### Example Usage
+
+```bash
+curl -X GET http://localhost:3000/api/users/preferences \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+#### JavaScript/Axios Example
+```javascript
+const getUserPreferences = async () => {
+  try {
+    const response = await axios.get('/api/users/preferences', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    });
+    console.log('User preferences:', response.data.data);
+  } catch (error) {
+    console.error('Failed to fetch preferences:', error.response.data.error);
+  }
+};
+```
+
+---
+
+### 3. Update User Preferences
+
+**Description:** Updates the user preferences for the currently authenticated user. This endpoint merges the provided preferences with existing ones, allowing partial updates. Any existing preferences not included in the request will remain unchanged.
+
+**URL:** `PUT /api/users/preferences`
+
+**Authentication:** Required (Bearer token)
+
+#### Request Parameters
+
+#### Headers
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
+| Content-Type | string | Yes | `application/json` |
+
+#### Query Parameters
+None
+
+#### Request Body
+```json
+{
+  "theme": "dark",
+  "language": "en",
+  "breakWarnings": true
+}
+```
+
+#### Request Body Fields
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| theme | string | No | UI theme preference (e.g., "light", "dark") |
+| language | string | No | Language/locale setting (e.g., "en", "es") |
+| breakWarnings | boolean | No | Whether to show break reminder notifications |
+
+**Note:** All fields are optional. Only provided fields will be updated.
+
+#### Response
+
+#### Success Response (200 OK)
+```json
+{
+  "success": true,
+  "data": {
+    "theme": "dark",
+    "language": "en",
+    "breakWarnings": true
+  }
+}
+```
+
+#### Response Fields
+Returns the complete updated preferences object with all current settings.
+
+#### Error Responses
+Same authentication error responses as other endpoints, plus:
+
+**400 Bad Request - Invalid JSON**
+```json
+{
+  "success": false,
+  "error": "Invalid JSON format"
+}
+```
+
+#### Example Usage
+
+```bash
+curl -X PUT http://localhost:3000/api/users/preferences \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  -H "Content-Type: application/json" \
+  -d '{"theme": "dark", "breakWarnings": false}'
+```
+
+#### JavaScript/Axios Example
+```javascript
+const updateUserPreferences = async (preferences) => {
+  try {
+    const response = await axios.put('/api/users/preferences', preferences, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log('Updated preferences:', response.data.data);
+  } catch (error) {
+    console.error('Failed to update preferences:', error.response.data.error);
+  }
+};
+
+// Example usage
+updateUserPreferences({
+  theme: 'dark',
+  breakWarnings: false
+});
+```
+
+---
+
 ## Authentication Flow
 
 To use the Users API endpoints, you must first authenticate via the Auth API:
