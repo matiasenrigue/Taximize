@@ -1,55 +1,61 @@
 # Security
 
-## Authentication
+This document outlines the comprehensive security measures implemented throughout the application to protect against common vulnerabilities and ensure data integrity.
 
-### JWT Implementation
-- **Access Token**: 15 minutes expiry, stored in client memory
-- **Refresh Token**: 7 days expiry, HTTP-only cookie
+## 🔐 Authentication
+
+The application implements a robust JWT-based authentication system designed for security and user experience balance.
+
+### 🎫 **JWT Implementation**
+- **Access Token**: 15-minute expiry, stored in client memory for XSS protection
+- **Refresh Token**: 7-day expiry, HTTP-only cookie for enhanced security
 - **Secrets**: `ACCESS_TOKEN_SECRET` and `REFRESH_TOKEN_SECRET` environment variables
+- **Strategy**: Dual-token approach minimizes exposure while maintaining usability
 
-### Password Security
-- **Hashing**: Bcrypt with salt (10 rounds)
-- **Storage**: Only hashed passwords stored
-- **Validation**: Minimum 8 characters required
+### 🔒 **Password Security**
+- **Hashing Algorithm**: Bcrypt with salt for secure password storage
+- **Storage Policy**: Only hashed passwords stored, plaintext never persisted
 
-## Authorization
 
-### Middleware
-- **protect**: Validates JWT tokens from Authorization header
-- **requireDriver**: Ensures user has driver permissions
+## 🛡️ Authorization
 
-## Input Validation
+### 🔍 **Middleware Protection**
+- **`protect` Middleware**: Validates JWT tokens from Authorization header
+- **Route Protection**: Applied to all authenticated endpoints
+- **Token Verification**: Ensures valid signatures and expiry times
 
-### Sequelize Validators
-- Email format validation
-- Username minimum 3 characters
-- Password minimum 8 characters
-- Coordinate validation for location data
+## ✅ Input Validation
 
-### Sanitization
-- Username escaping for XSS prevention
-- Email normalization
-- Type checking for numeric inputs
+Comprehensive validation and sanitization prevents injection attacks and data corruption.
 
-## API Security
+### 🧹 **Data Sanitization**
+- **Username Escaping**: XSS prevention through proper character encoding
+- **Email Normalization**: Consistent format and case handling
+- **Type Validation**: Strict checking for numeric inputs and data types
+- **Sequelize Validators**: Built-in ORM validation for data integrity
 
-### Rate Limiting
-- 100 requests per 15 minutes per IP
-- DDoS protection via express-rate-limit
+## 🌐 API Security
 
-### Security Headers (Helmet.js)
-- X-Frame-Options
-- X-Content-Type-Options
-- Strict-Transport-Security
-- X-XSS-Protection
+### ⏱️ **Rate Limiting**
+- **Limit**: 100 requests per 15 minutes per IP address
+- **Protection**: DDoS mitigation via `express-rate-limit`
+- **Strategy**: Per-IP tracking prevents abuse while allowing legitimate usage
 
-### CORS
-- Configured for frontend URL
-- Credentials enabled
+### 🛡️ **Security Headers (Helmet.js)**
+- **X-Frame-Options**: Prevents clickjacking attacks
+- **X-Content-Type-Options**: Stops MIME sniffing vulnerabilities
+- **Strict-Transport-Security**: Enforces HTTPS connections
+- **X-XSS-Protection**: Browser-level XSS filtering
 
-## Database Security
+### 🔄 **CORS Configuration**
+- **Origin Control**: Configured for specific frontend URL
+- **Credentials**: Enabled for authenticated requests
+- **Method Restrictions**: Only necessary HTTP methods allowed
 
-### SQL Injection Prevention
-- Sequelize ORM with parameterized queries
-- UUID v4 for unpredictable IDs
-- Foreign key constraints
+## 💾 Database Security
+
+### 🚫 **SQL Injection Prevention**
+- **ORM Protection**: Sequelize ORM with parameterized queries
+- **UUID Implementation**: UUID v4 for unpredictable primary keys
+- **Constraint Enforcement**: Foreign key constraints maintain referential integrity
+- **Query Validation**: All database interactions through validated models

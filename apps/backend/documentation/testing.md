@@ -1,35 +1,37 @@
 # Testing Strategy
 
-## Test-Driven Development (TDD) Approach
+This project follows a comprehensive Test-Driven Development methodology that ensures code quality, reliability, and maintainability across all entities and services.
 
-This project follows a Test-Driven Development methodology with an enhanced four-phase approach:
+## 🎯 Test-Driven Development (TDD) Approach
 
-### 1. Planning Phase (Enhancement to Traditional TDD)
-Before writing any code or tests, we document the expected behavior in plain English. This involves:
-- Clearly defining the feature requirements
-- Outlining expected inputs and outputs
-- Creating a mental model of the implementation
+Our enhanced four-phase TDD approach goes beyond traditional red-green-refactor cycles:
 
-### 2. Red Phase
+### 📋 **1. Planning Phase** *(Enhanced TDD Addition)*
+Before writing any code or tests, we document the expected behavior in plain English, clearly defining feature requirements and acceptance criteria.
+
+### 🔴 **2. Red Phase**
 Write a failing test that defines the desired functionality:
 - Start with the simplest test case
 - Focus on testing behavior, not implementation details
+- Ensure test failure for the right reasons
 
-### 3. Green Phase
+### 🟢 **3. Green Phase**
 Write the minimum code necessary to make the test pass:
 - Implement only what's needed to satisfy the test
 - Keep the implementation simple and straightforward
+- Prioritize functionality over optimization
 
-### 4. Refactor Phase
+### 🔄 **4. Refactor Phase**
 Improve the code while keeping tests green:
-- Remove duplication
+- Remove duplication and improve readability
+- Optimize performance where needed
 - Ensure all tests continue to pass
 
-## Test Results
+## 📊 Test Results
 
 ![Test Results](./media/test_results.png)
 
-### Current Test Coverage Summary
+### 📈 **Current Test Coverage Summary**
 
 ```
 Test Suites: 16 passed, 16 total
@@ -38,23 +40,23 @@ Snapshots:   0 total
 Time:        6.573 s
 ```
 
-## Test Organization
+## 🏗️ Test Organization
 
-The project maintains a clear separation between different types of tests:
+The project maintains a clear separation between different types of tests to ensure comprehensive coverage:
 
-### Unit Tests
-- Located in `tests/unit/` directories within each entity
-- Focus on testing individual components in isolation
-- Mock external dependencies
-- Examples: `hotspotsController.unit.test.ts`, `shiftService.unit.test.ts`
+### 🔬 **Unit Tests**
+- **Location**: `tests/unit/` directories within each entity
+- **Purpose**: Focus on testing individual components in isolation
+- **Scope**: Single functions, methods, or small units of functionality
 
-### Integration Tests
-- Located in `tests/integration/` directories within each entity
-- Test the interaction between multiple components
-- Use real database connections and API endpoints
-- Examples: `rideAPI.integration.test.ts`, `statsAPI.integration.test.ts`
+### 🔗 **Integration Tests**
+- **Location**: `tests/integration/` directories within each entity
+- **Purpose**: Test the interaction between multiple components
+- **Scope**: API endpoints, database interactions, service integrations
 
-## Running Tests
+## ⚙️ Running Tests
+
+### 🚀 **Common Commands**
 
 ```bash
 # Run all tests
@@ -68,4 +70,17 @@ npm run test:coverage
 
 # Run specific test file
 npm test -- path/to/test.ts
+```
+
+### 🎯 **Targeted Testing**
+
+```bash
+# Run tests for specific entity
+npm test -- src/entities/auth
+
+# Run only unit tests
+npm test -- tests/unit
+
+# Run only integration tests
+npm test -- tests/integration
 ```

@@ -1,8 +1,8 @@
-# Environment Variables Documentation
+# Environment Variables
 
-This document describes all environment variables required for the backend application.
+This comprehensive guide covers all environment variables required and optional for running the backend application across different environments, ensuring proper configuration and security.
 
-## Database Configuration
+## 💾 Database Configuration
 
 ### PG_ADMIN_URL
 - **Type**: `string`
@@ -39,7 +39,9 @@ This document describes all environment variables required for the backend appli
 - **Example**: `my_app_database`
 - **Required**: Yes
 
-## Database Connection Pooling
+---
+
+## ⚡ Database Connection Pooling
 
 ### DB_POOL_MAX
 - **Type**: `number`
@@ -81,7 +83,7 @@ This document describes all environment variables required for the backend appli
 - **Required**: No
 - **Used in**: `src/shared/config/db.ts:22`
 
-## Server Configuration
+## 🖥️ Server Configuration
 
 ### PORT
 - **Type**: `number`
@@ -102,7 +104,10 @@ This document describes all environment variables required for the backend appli
   - `src/shared/middleware/error.middleware.ts:12-13`
   - `src/entities/auth/auth.controller.ts:69`
 
-## Authentication & Security
+
+---
+
+## 🔐 Authentication & Security
 
 ### ACCESS_TOKEN_SECRET
 - **Type**: `string`
@@ -125,7 +130,9 @@ This document describes all environment variables required for the backend appli
   - `src/entities/auth/auth.controller.ts:100`
 
 
-## External Services
+---
+
+## 🌐 External Services
 
 ### CLIENT_URL
 - **Type**: `string`
@@ -146,7 +153,9 @@ This document describes all environment variables required for the backend appli
 - **Required**: No (has default)
 - **Used in**: `src/shared/utils/dataApiClient.ts:3`
 
-## Caching Configuration
+---
+
+## 📊 Caching Configuration
 
 ### REDIS_URL
 - **Type**: `string`
@@ -158,9 +167,11 @@ This document describes all environment variables required for the backend appli
 - **Used in**: `src/shared/config/redis.ts:18`
 - **Note**: If Redis is unavailable, caching is disabled but app continues to work
 
-## Environment File Examples
+---
 
-### Development (.env)
+## 📄 Environment File Examples
+
+### 🛠️ **Development (.env)**
 ```env
 # Database Configuration
 PG_ADMIN_URL=postgres://username:password@localhost:5432/postgres  # Default PostgreSQL port
@@ -192,7 +203,9 @@ DATA_API_URL=http://localhost:5050  # Replace with your ML API port
 REDIS_URL=redis://localhost:6379
 ```
 
-### Production (.env.production)
+---
+
+### 🚀 **Production (.env.production)**
 ```env
 # Database Configuration
 PG_ADMIN_URL=postgres://username:password@db_host:5432/postgres  # Replace db_host with your database host
@@ -224,8 +237,9 @@ DATA_API_URL=http://ml-api-service:5050  # Replace with your ML API service name
 REDIS_URL=redis://redis:6379  # Use Docker service name in production
 ```
 
+---
 
-## Generating Secure Secrets
+## 🔑 Generating Secure Secrets
 
 To generate secure secret keys, you can use:
 

@@ -1,8 +1,8 @@
-# Database Schema Documentation
+# Database Schema
 
-This application uses PostgreSQL as its database management system, leveraging its robust features for data integrity, performance, and advanced data types like JSONB.
+This application uses PostgreSQL as its database management system, leveraging its robust features for data integrity, performance, and advanced data types like JSONB for optimal driver management and ride tracking.
 
-## Entity Relationship Diagram
+## 📊 Entity Relationship Diagram
 
 ```mermaid
 erDiagram
@@ -92,12 +92,15 @@ erDiagram
     }
 ```
 
-## Database Constraints
+## 🔒 Database Constraints
 
-### Primary Keys
-- All tables use UUID as primary key with auto-generation (`DataTypes.UUIDV4`)
+Our database schema implements comprehensive constraints to ensure data integrity and business rule enforcement.
 
-### Foreign Key Constraints
+### 🔑 **Primary Keys**
+- **Strategy**: All tables use UUID as primary key with auto-generation (`DataTypes.UUIDV4`)
+- **Benefits**: Distributed system compatibility and enhanced security through unpredictable IDs
+
+### 🔗 **Foreign Key Constraints**
 | Table | Column | References | Constraint |
 |-------|--------|------------|------------|
 | shifts | driver_id | users.id | NOT NULL |
@@ -106,21 +109,21 @@ erDiagram
 | rides | shift_id | shifts.id | NOT NULL |
 | rides | driver_id | users.id | NOT NULL |
 
-### Unique Constraints
+### ⭐ **Unique Constraints**
 | Table | Constraint Name | Fields | Condition | Description |
 |-------|----------------|--------|-----------|-------------|
 | users | email_unique | email | - | Each email must be unique |
 | shifts | one_active_shift_per_driver | driver_id | WHERE shift_end IS NULL | Only one active shift per driver |
 | rides | one_active_ride_per_shift | shift_id | WHERE end_time IS NULL | Only one active ride per shift |
 
-### Check Constraints
+### ✅ **Check Constraints**
 | Table | Column | Constraint | Description |
 |-------|--------|------------|-------------|
 | users | email | Valid email format | Must match email regex pattern |
 | users | password | Length 8-100 | Password must be between 8 and 100 characters |
 | shift_signals | signal | ENUM check | Must be one of: 'start', 'stop', 'pause', 'continue' |
 
-### Default Values
+### 📝 **Default Values**
 | Table | Column | Default | Description |
 |-------|--------|---------|-------------|
 | all tables | id | UUIDV4 | Auto-generated UUID |
@@ -128,85 +131,55 @@ erDiagram
 | all tables | created_at | CURRENT_TIMESTAMP | Set on insert |
 | all tables | updated_at | CURRENT_TIMESTAMP | Updated on modification |
 
-### Indexes (Currently Implemented)
+### 🚀 **Indexes** 
 | Table | Index Name | Columns | Type | Purpose |
 |-------|------------|---------|------|---------|
 | shifts | one_active_shift_per_driver | driver_id | UNIQUE (WHERE shift_end IS NULL) | Ensures only one active shift per driver |
 | rides | one_active_ride_per_shift | shift_id | UNIQUE (WHERE end_time IS NULL) | Ensures only one active ride per shift |
 
-### Indexes (Recommended for Performance)
-The following indexes are recommended but not yet implemented in the models:
-| Table | Index Name | Columns | Type | Purpose |
-|-------|------------|---------|------|---------|
-| shifts | idx_shifts_driver_id | driver_id | BTREE | Foreign key lookups |
-| shifts | idx_shifts_shift_start | shift_start | BTREE | Temporal queries |
-| shifts | idx_shifts_deleted_at | deleted_at | BTREE | Soft delete filtering |
-| shift_signals | idx_shift_signals_shift_id | shift_id | BTREE | Foreign key lookups |
-| shift_signals | idx_shift_signals_timestamp | timestamp | BTREE | Temporal queries |
-| shift_pauses | idx_shift_pauses_shift_id | shift_id | BTREE | Foreign key lookups |
-| rides | idx_rides_shift_id | shift_id | BTREE | Foreign key lookups |
-| rides | idx_rides_driver_id | driver_id | BTREE | Driver queries |
-| rides | idx_rides_start_time | start_time | BTREE | Temporal queries |
-| rides | idx_rides_deleted_at | deleted_at | BTREE | Soft delete filtering |
 
-## Special Features
+## ⚡ Special Features
 
-### Soft Deletes (Paranoid)
-- **Tables**: `shifts`, `rides`
-- **Implementation**: `deleted_at` timestamp column
+Advanced database features that enhance data safety and performance.
+
+### 🗂️ **Soft Deletes (Paranoid)**
+- **Affected Tables**: `shifts`, `rides`
+- **Implementation**: `deleted_at` timestamp column with automatic handling
 - **Behavior**: Records are not physically deleted, just marked with deletion timestamp
+- **Benefits**: Data recovery capability and audit trail preservation
 
-### Automatic Timestamps
-- All tables have `created_at` and `updated_at` columns
-- `updated_at` is automatically updated on record modification
-- Sequelize options: `timestamps: true, underscored: true`
-- Note: Models use camelCase internally (e.g., `createdAt`) but database columns use snake_case (e.g., `created_at`)
 
-### Password Security
-- **Table**: `users`
-- **Implementation**: Bcrypt hashing in `beforeSave` hook
-- **Salt rounds**: 10
+## 🎯 Business Logic Constraints
 
-### JSONB Storage
-- **Table**: `hotspots`
-- **Column**: `data`
-- **Purpose**: Flexible schema-less storage for hotspot information
+Critical business rules enforced through database constraints and application logic to maintain system integrity.
 
-## Sequelize Model Configuration
+### 🚫 **State Management Rules**
 
-### Common Options
-```javascript
-{
-    sequelize,
-    tableName: 'table_name',
-    timestamps: true,
-    underscored: true  // createdAt → created_at
-}
-```
+1. **👤 One Active Shift per Driver**
+   - **Rule**: A driver cannot have multiple shifts running simultaneously
+   - **Enforcement**: Unique index on `driver_id` where `shift_end IS NULL`
+   - **Purpose**: Prevents conflicting shift data and ensures accurate time tracking
 
-### Model-Specific Options
-- **shifts, rides**: `paranoid: true` (soft deletes)
-- **users**: Custom `beforeSave` hook for password hashing
-- **All models**: UUID primary keys with auto-generation
+2. **🚗 One Active Ride per Shift**
+   - **Rule**: A shift cannot have multiple rides active at the same time
+   - **Enforcement**: Unique index on `shift_id` where `end_time IS NULL`
+   - **Purpose**: Maintains clean ride-to-shift relationships and accurate earnings calculation
 
-## Business Logic Constraints
+### 🔄 **Sequential Logic Rules**
 
-1. **One Active Shift per Driver**
-   - A driver cannot have multiple shifts running simultaneously
-   - Enforced by unique index on `driver_id` where `shift_end IS NULL`
+3. **📡 Shift Signal Sequence**
+   - **Rule**: Signals must follow logical order: `start` → `pause`/`continue` → `stop`
+   - **Enforcement**: Application-level validation in signal service
+   - **Purpose**: Ensures valid state transitions and prevents invalid shift states
 
-2. **One Active Ride per Shift**
-   - A shift cannot have multiple rides active at the same time
-   - Enforced by unique index on `shift_id` where `end_time IS NULL`
+### 🔐 **Security & Data Validation**
 
-3. **Shift Signal Sequence**
-   - Signals must follow logical order: start → pause/continue → stop
-   - Enforced at application level
+4. **🔒 Password Requirements**
+   - **Rule**: Minimum 8 characters, maximum 100 characters
+   - **Enforcement**: Database constraint and pre-save validation
+   - **Security**: Automatically hashed with bcrypt before storage
 
-4. **Password Requirements**
-   - Minimum 8 characters, maximum 100 characters
-   - Automatically hashed before storage
-
-5. **Email Validation**
-   - Must be valid email format
-   - Must be unique across all users
+5. **📧 Email Validation**
+   - **Rule**: Must be valid email format and unique across all users
+   - **Enforcement**: Database unique constraint and format validation
+   - **Purpose**: Ensures reliable user identification and communication
