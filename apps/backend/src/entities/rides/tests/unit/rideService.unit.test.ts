@@ -62,7 +62,7 @@ describe('RideService Unit Tests', () => {
             expect(result.reason).toContain('No active shift found'); // should fail without shift
         });
 
-        // Not sure if this test is really needed but copying from old tests
+        // Not sure if this test is really needed
         it('should return false when driver already has active ride', async () => {
             const DRIVER_ID = 'abc-123';
             const result = await RideService.canStartRide(DRIVER_ID);

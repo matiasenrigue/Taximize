@@ -2,24 +2,16 @@ import { sequelize, Model, DataTypes } from '../../shared/config/db';
 
 /**
  * Represents a pause period within a driver's shift.
- * 
- * Each pause tracks when a driver temporarily stopped working,
- * Pauses are always associated with a specific shift.
  */
 export class Pause extends Model {
 
     public id!: string;
     
-    /** Reference to the shift this pause belongs to */
     public shift_id!: string;
     
-    /** The exact time when this pause started */
-    public pause_start!: Date;
-    
-    /** The exact time when this pause ended */
+    public pause_start!: Date;    
     public pause_end!: Date;
     
-    /** Total duration of the pause in milliseconds */
     public duration_ms!: number;
     
     public created_at!: Date;    

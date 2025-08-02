@@ -8,7 +8,6 @@ import { TestHelpers } from '../../../../shared/tests/utils/testHelpers';
 
 TestHelpers.setupEnvironment();
 
-// Standard Dublin ride coords
 const DEFAULT_RIDE_REQUEST = {
     startLatitude: 53.349805,
     startLongitude: -6.260310,

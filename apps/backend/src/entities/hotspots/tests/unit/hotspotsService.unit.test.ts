@@ -35,7 +35,7 @@ describe('HotspotsService', () => {
             const mockHotspot = {
                 data: mockData,
                 createdAt: now,
-                created_at: now // stupid sequelize sometimes uses snake_case
+                created_at: now // sequelize sometimes uses snake_case
             };
 
             (Hotspots.findOne as jest.Mock).mockResolvedValue(mockHotspot);

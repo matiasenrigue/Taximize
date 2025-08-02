@@ -4,17 +4,17 @@ import { ShiftService } from '../shifts/shift.service';
 import { ensureBigintSafe } from '../../shared/utils/bigintSafety';
 
 /**
- * Handles the creation and retrieval of pause records based on shift signals.
- * Works with ShiftSignalService to track when drivers take breaks during their shifts.
+ * Handles the creation and retrieval of pause records based on shift signals
+ * Works with ShiftSignalService to track when drivers take breaks during their shifts
  */
 abstract class PauseService {
 
     /**
-     * Creates a pause record after a driver resumes work.
+     * Creates a pause record after a driver resumes work
      * 
-     * This method is called when a 'continue' signal is received.
+     * This method is called when a 'continue' signal is received
      * It looks back at the previous 'pause' signal to calculate
-     * the pause duration and create a complete pause record.
+     * the pause duration and create a complete pause record
      * 
      * @throws Error if no active shift found or invalid signal sequence
      */
@@ -56,7 +56,7 @@ abstract class PauseService {
 
 
     /**
-     * Retrieves current pause status and information for a driver.
+     * Retrieves current pause status and information for a driver
      * 
      * Provides real-time pause information including:
      * - Whether the driver is currently paused
@@ -121,10 +121,10 @@ abstract class PauseService {
     }
 
     /**
-     * Retrieves all pause records for a specific shift.
+     * Retrieves all pause records for a specific shift
      * 
      * Returns pauses in chronological order, useful for calculating
-     * total break time and analyzing pause patterns within a shift.
+     * total break time and analyzing pause patterns within a shift
      * 
      * @returns Array of pause records sorted by start time
      */

@@ -1,8 +1,7 @@
 import { sequelize, Model, DataTypes } from '../../shared/config/db';
 
 /**
- * Shift signals track state transitions during a driver's shift,
- * including when they start, pause, continue, or stop working.
+ * Shift signals track state transitions during a driver's shift.
  * 
  * Each signal is timestamped and linked to a specific shift.
  */
@@ -10,10 +9,8 @@ export class ShiftSignal extends Model {
 
     public id!: string;
     
-    /** The exact time when this signal was created */
     public timestamp!: Date;
     
-    /** Reference to the shift this signal belongs to */
     public shift_id!: string;
     
     /** The type of signal indicating the shift state change */

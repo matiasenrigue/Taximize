@@ -43,6 +43,7 @@ abstract class ShiftSignalHandler {
 
     /**
      * Executes the actual signal processing logic by calling the appropriate service method
+     * 
      * @param extraParams - Additional parameters specific to the signal type
      * @returns Promise resolving to the signal processing result
      */
@@ -51,6 +52,7 @@ abstract class ShiftSignalHandler {
 
     /**
      * Processes and sends a successful response to the client
+     * 
      * @param result - The result data from the signal processing
      * @param res - Express response object
      */
@@ -216,11 +218,13 @@ export class ShiftSignalController {
     private static endHandler = new EndShiftHandler();
     private static skipPauseHandler = new SkipPauseHandler();
 
+
     /**
      * @route POST /api/shifts/start-shift
      * @access Protected (requires authentication)
      */
     static startShift = ShiftSignalController.startHandler.handle;
+    
     
     /**
      * @route POST /api/shifts/pause-shift

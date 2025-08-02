@@ -3,8 +3,8 @@ import { getHotspotPredictions } from '../../shared/utils/dataApiClient';
 import moment from 'moment';
 
 /**
- * Manages hotspot prediction data with intelligent caching.
- * Fetches ML predictions from Flask API and caches for efficiency.
+ * Manages hotspot prediction data with intelligent caching
+ * Fetches ML predictions from Flask API and caches for efficiency
  */
 export class HotspotsService {
     
@@ -34,7 +34,7 @@ export class HotspotsService {
 
 
     /**
-     * Calls Flask ML API to get hotspot predictions.
+     * Calls Flask ML API to get hotspot predictions
      * @returns Transformed hotspot data or null on failure
      */
     static async hotspotsApiCall(): Promise<any | null> { 
@@ -66,7 +66,7 @@ export class HotspotsService {
 
 
     /**
-     * Fetches fresh hotspot predictions with retry logic.
+     * Fetches fresh hotspot predictions with retry logic
      * @returns Hotspot data on success, false on failure
      */
     static async fetchNewHotspotsData(): Promise<any | boolean> {
@@ -99,7 +99,7 @@ export class HotspotsService {
 
 
     /**
-     * Retrieves most recent cached hotspot data.
+     * Retrieves most recent cached hotspot data
      * @returns Cached data or false if none exists
      */
     static async retrieveCachedHotspotsData(): Promise<any | boolean> {
@@ -115,9 +115,9 @@ export class HotspotsService {
 
 
     /**
-     * Main entry point for hotspot data.
-     * Uses cached data if recent, otherwise fetches new predictions.
-     * Falls back to stale cache if API unavailable.
+     * Main entry point for hotspot data
+     * Uses cached data if recent, otherwise fetches new predictions
+     * Falls back to stale cache if API unavailable
      * @throws Error if no data available
      */
     static async getHotspotsData(): Promise<any> {

@@ -8,6 +8,7 @@ import { RideCoordinates } from './ride.types';
 import { RideValidators } from './ride.validators';
 import { RIDE_CONSTANTS } from './ride.constants';
 
+
 /**
  * Handles ride API endpoints - evaluation, start, end, and status.
  * All routes require authentication.
