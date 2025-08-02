@@ -1,4 +1,4 @@
-# Taxi Driver App
+# TaxiMize App
 
 > **Disclaimer**: AI has been used to generate `.md` documentation files
 
