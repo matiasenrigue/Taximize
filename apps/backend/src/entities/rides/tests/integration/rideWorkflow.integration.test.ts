@@ -6,7 +6,6 @@ import { TestHelpers } from '../../../../shared/tests/utils/testHelpers';
 
 TestHelpers.setupEnvironment();
 
-// Test coords around Dublin
 const RIDE_COORDS = {
     first: {
         startLatitude: 53.349805,

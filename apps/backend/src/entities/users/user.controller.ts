@@ -5,24 +5,16 @@ import { modelToResponse } from '../../shared/utils/caseTransformer';
 import { ResponseHandler } from '../../shared/utils/responseHandler';
 
 /**
- * Controller for user-related operations.
- * 
- * Handles HTTP requests for user information and profile management.
- * Currently provides endpoints for authenticated users to retrieve
- * their own profile information.
+ * Controller for user-related operations
  */
 export class UserController {
+
     /**
-     * Retrieves the current authenticated user's information.
-     * 
-     * Returns basic user profile data excluding sensitive information
-     * like passwords. The user object is pre-loaded by authentication
-     * middleware before this handler executes.
+     * Retrieves the current authenticated user's information excluding sensitive information
+     * The user object is pre-loaded by authentication middleware before this handler executes
      * 
      * @route GET /api/users/me
      * @access Protected (requires authentication)
-     * @param req - Express request with authenticated user attached
-     * @param res - Express response object
      * @returns User profile data (id, username, email, timestamps)
      * @throws 401 error if user is not authenticated
      */
@@ -36,7 +28,6 @@ export class UserController {
             throw new Error('User authentication required');
         }
 
-        // Prepare safe user data (excluding password)
         const userData = {
             id: user.id,
             username: user.username,
@@ -50,12 +41,10 @@ export class UserController {
 
 
     /**
-     * Retrieves the current user's preferences.
+     * Retrieves the current user's preferences
      * 
      * @route GET /api/users/preferences
      * @access Protected (requires authentication)
-     * @param req - Express request with authenticated user attached
-     * @param res - Express response object
      * @returns User preferences object
      */
     static getPreferences = asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -72,12 +61,10 @@ export class UserController {
 
     
     /**
-     * Updates the current user's preferences.
+     * Updates the current user's preferences
      * 
      * @route PUT /api/users/preferences
      * @access Protected (requires authentication)
-     * @param req - Express request with preferences in body
-     * @param res - Express response object
      * @returns Updated preferences object
      */
     static updatePreferences = asyncHandler(async (req: Request, res: Response): Promise<void> => {

@@ -1,31 +1,31 @@
-# Shifts API Documentation
+# ⏰ Shifts API
 
-## Overview
+## 📁 Entity Documentation
+**[View Shifts Entity README →](../../src/entities/shifts/README.md)** *(Signal-Based State Management and Business Rules)*
 
-The Shifts API manages driver work shifts, including starting, pausing, continuing, and ending shifts. It also provides endpoints to check current shift status and retrieve shift history. All endpoints require authentication.
+## 📋 Quick Reference
 
-**Base URL:** `/api/shifts`
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| [`/api/shifts/start-shift`](#start-shift) | POST | Begin new work shift | 🔐 Bearer |
+| [`/api/shifts/pause-shift`](#pause-shift) | POST | Take a break | 🔐 Bearer |
+| [`/api/shifts/continue-shift`](#continue-shift) | POST | Resume after break | 🔐 Bearer |
+| [`/api/shifts/end-shift`](#end-shift) | POST | Complete shift with stats | 🔐 Bearer |
+| [`/api/shifts/skip-pause`](#skip-pause) | POST | Reset break reminder timer | 🔐 Bearer |
+| [`/api/shifts/current`](#get-current-status) | GET | Check shift/ride status | 🔐 Bearer |
+| [`/api/shifts/debug`](#debug-status) | GET | Debug shift state | 🔐 Bearer |
+| [`/api/shifts/`](#get-all-shifts) | GET | List all driver shifts | 🔐 Bearer |
 
-**Authentication:** All endpoints require JWT token
+---
 
-## Endpoints
+## 🚀 Start Shift
 
-### 1. Start Shift
+**Endpoint:** `POST /api/shifts/start-shift`
 
-**Description:** Starts a new work shift for the authenticated driver. Prevents starting a new shift if one is already active. Optionally accepts a planned duration for the shift.
+Begins a new work shift. Only one active shift allowed per driver.
 
-**URL:** `POST /api/shifts/start-shift`
+### 📥 Request
 
-**Authentication:** Required (Bearer token)
-
-### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
-
-#### Request Body
 ```json
 {
   "timestamp": 1704123600000,
@@ -33,14 +33,8 @@ The Shifts API manages driver work shifts, including starting, pausing, continui
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| timestamp | number | No | Unix timestamp in milliseconds (defaults to current time) |
-| duration | number | No | Planned shift duration in milliseconds (e.g., 28800000 = 8 hours) |
+### 📤 Success Response (200)
 
-### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -49,7 +43,8 @@ The Shifts API manages driver work shifts, including starting, pausing, continui
 }
 ```
 
-#### Error Response (400 Bad Request)
+### ❌ Error Response (400)
+
 ```json
 {
   "success": false,
@@ -57,34 +52,20 @@ The Shifts API manages driver work shifts, including starting, pausing, continui
 }
 ```
 
-### Example Usage
-```bash
-curl -X POST http://localhost:3000/api/shifts/start-shift \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  -H "Content-Type: application/json" \
-  -d '{
-    "duration": 28800000
-  }'
-```
+### 📏 Limits
+- **Default Duration**: 8 hours
+- **Maximum Duration**: 12 hours
 
 ---
 
-### 2. Pause Shift
+## ⏸️ Pause Shift
 
-**Description:** Pauses the driver's active shift. Cannot pause if driver has an active ride or if shift is already paused. Used when drivers take breaks.
+**Endpoint:** `POST /api/shifts/pause-shift`
 
-**URL:** `POST /api/shifts/pause-shift`
+Temporarily pauses shift for breaks. Cannot pause during active ride.
 
-**Authentication:** Required (Bearer token)
+### 📥 Request
 
-### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
-
-#### Request Body
 ```json
 {
   "timestamp": 1704127200000,
@@ -92,14 +73,8 @@ curl -X POST http://localhost:3000/api/shifts/start-shift \
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| timestamp | number | No | Unix timestamp in milliseconds (defaults to current time) |
-| pauseDuration | number | No | Planned pause duration in milliseconds (e.g., 1800000 = 30 minutes) |
+### 📤 Success Response (200)
 
-### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -108,45 +83,29 @@ curl -X POST http://localhost:3000/api/shifts/start-shift \
 }
 ```
 
-#### Error Response (400 Bad Request)
-```json
-{
-  "success": false,
-  "error": "No active shift to pause or shift already paused, or driver has an active ride"
-}
-```
+### ⚠️ Validation Rules
+- ❌ Cannot pause if already paused
+- ❌ Cannot pause during active ride
+- ✅ Optional planned duration
 
 ---
 
-### 3. Continue Shift
+## ▶️ Continue Shift
 
-**Description:** Resumes a paused shift, allowing the driver to continue working after a break.
+**Endpoint:** `POST /api/shifts/continue-shift`
 
-**URL:** `POST /api/shifts/continue-shift`
+Resumes work after a break.
 
-**Authentication:** Required (Bearer token)
+### 📥 Request
 
-### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
-
-#### Request Body
 ```json
 {
   "timestamp": 1704129000000
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| timestamp | number | No | Unix timestamp in milliseconds (defaults to current time) |
+### 📤 Success Response (200)
 
-### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -155,45 +114,28 @@ curl -X POST http://localhost:3000/api/shifts/start-shift \
 }
 ```
 
-#### Error Response (400 Bad Request)
-```json
-{
-  "success": false,
-  "error": "No paused shift to continue"
-}
-```
+### 🔄 Side Effects
+- Saves pause period to database
+- Updates break statistics
 
 ---
 
-### 4. End Shift
+## 🏁 End Shift
 
-**Description:** Ends the driver's active shift and marks it as completed. Calculates and returns comprehensive shift statistics including total duration, work time, break time, number of breaks, average break duration, and total earnings.
+**Endpoint:** `POST /api/shifts/end-shift`
 
-**URL:** `POST /api/shifts/end-shift`
+Completes shift and calculates comprehensive statistics.
 
-**Authentication:** Required (Bearer token)
+### 📥 Request
 
-### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
-
-#### Request Body
 ```json
 {
   "timestamp": 1704152400000
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| timestamp | number | No | Unix timestamp in milliseconds (defaults to current time) |
+### 📤 Success Response (200)
 
-### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -209,54 +151,35 @@ curl -X POST http://localhost:3000/api/shifts/start-shift \
 }
 ```
 
-| Response Field | Type | Description |
-|---------------|------|-------------|
-| totalDuration | number | Total shift duration in milliseconds |
-| workTimeMs | number | Total working time in milliseconds (excludes breaks) |
-| breakTimeMs | number | Total break time in milliseconds |
-| numBreaks | number | Total number of breaks taken during the shift |
-| averageBreak | number | Average break duration in milliseconds |
-| totalEarnings | number | Total earnings for the shift in dollars |
+### 📊 Calculated Metrics
+- **totalDuration**: Total shift time (ms)
+- **workTimeMs**: Active work time (ms)
+- **breakTimeMs**: Total break time (ms)
+- **numBreaks**: Number of breaks taken
+- **averageBreak**: Average break duration (ms)
+- **totalEarnings**: Total earnings in dollars
 
-#### Error Response (400 Bad Request)
-```json
-{
-  "success": false,
-  "error": "No active shift to end"
-}
-```
+### 🧹 Important Note
+All shift signals are deleted after statistics are saved.
 
 ---
 
-### 5. Skip Pause
+## ⏭️ Skip Pause
 
-**Description:** Registers a zero-duration pause by creating pause and continue signals with the same timestamp. Used when drivers are prompted to take a break every 3 hours but choose to continue working. This prevents the break reminder from appearing again for another 3 hours.
+**Endpoint:** `POST /api/shifts/skip-pause`
 
-**URL:** `POST /api/shifts/skip-pause`
+Registers instant pause-continue to reset 3-hour break reminder.
 
-**Authentication:** Required (Bearer token)
+### 📥 Request
 
-### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
-
-#### Request Body
 ```json
 {
   "timestamp": 1704130800000
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| timestamp | number | No | Unix timestamp in milliseconds (defaults to current time) |
+### 📤 Success Response (200)
 
-### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -265,46 +188,28 @@ curl -X POST http://localhost:3000/api/shifts/start-shift \
 }
 ```
 
+### 💡 Use Case
+When prompted for mandatory break after 3 hours, drivers can skip to continue working and reset the timer.
+
 ---
 
-### 6. Get Current Shift Status
+## 📍 Get Current Status
 
-**Description:** Retrieves the current shift status including whether the driver is on shift, paused, and if they have an active ride. Provides comprehensive shift and ride information.
+**Endpoint:** `GET /api/shifts/current`
 
-**URL:** `GET /api/shifts/current`
+Retrieves comprehensive shift and ride status.
 
-**Authentication:** Required (Bearer token)
+### 📥 Request
 
-### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
-
-### Response
-
-#### Success Response - No Active Shift (200 OK)
+**Headers Required:**
 ```json
 {
-  "success": true,
-  "data": {
-    "isOnShift": false,
-    "shiftStart": null,
-    "isPaused": false,
-    "pauseStart": null,
-    "lastPauseEnd": null,
-    "duration": null,
-    "pauseDuration": null,
-    "isOnRide": false,
-    "rideStartLatitude": null,
-    "rideStartLongitude": null,
-    "rideDestinationAddress": null
-  }
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
-#### Success Response - Active Shift (200 OK)
+### 📤 Response - Active Shift (200)
+
 ```json
 {
   "success": true,
@@ -324,26 +229,37 @@ curl -X POST http://localhost:3000/api/shifts/start-shift \
 }
 ```
 
+### 📤 Response - No Active Shift (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "isOnShift": false,
+    "shiftStart": null,
+    "isPaused": false,
+    "pauseStart": null,
+    "lastPauseEnd": null,
+    "duration": null,
+    "pauseDuration": null,
+    "isOnRide": false,
+    "rideStartLatitude": null,
+    "rideStartLongitude": null,
+    "rideDestinationAddress": null
+  }
+}
+```
+
 ---
 
-### 7. Debug Shift Status
+## 🐛 Debug Status
 
-**Description:** Debug endpoint for troubleshooting shift and ride issues. Provides detailed information about active shifts and rides.
+**Endpoint:** `GET /api/shifts/debug`
 
-**URL:** `GET /api/shifts/debug`
+Detailed debugging information for troubleshooting.
 
-**Authentication:** Required (Bearer token)
+### 📤 Success Response (200)
 
-### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
-
-### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -370,24 +286,14 @@ curl -X POST http://localhost:3000/api/shifts/start-shift \
 
 ---
 
-### 8. Get All Shifts
+## 📋 Get All Shifts
 
-**Description:** Retrieves all shifts for the authenticated driver, including completed and active shifts. Returns raw database records with snake_case field names.
+**Endpoint:** `GET /api/shifts/`
 
-**URL:** `GET /api/shifts`
+Returns all driver shifts (active and completed).
 
-**Authentication:** Required (Bearer token)
+### 📤 Success Response (200)
 
-### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Authorization | string | Yes | Bearer token format: `Bearer <access_token>` |
-
-### Response
-
-#### Success Response (200 OK)
 ```json
 [
   {
@@ -404,48 +310,23 @@ curl -X POST http://localhost:3000/api/shifts/start-shift \
     "total_distance_km": 145.5,
     "total_earnings_cents": 12550,
     "planned_duration_ms": 28800000
-  },
-  {
-    "id": "990e8400-e29b-41d4-a716-446655440000",
-    "driver_id": "880e8400-e29b-41d4-a716-446655440000",
-    "shift_start": "2024-01-03T09:00:00.000Z",
-    "shift_end": null,
-    "total_duration_ms": null,
-    "work_time_ms": null,
-    "break_time_ms": null,
-    "num_breaks": null,
-    "avg_break_ms": null,
-    "total_rides": null,
-    "total_distance_km": null,
-    "total_earnings_cents": null,
-    "planned_duration_ms": 28800000
   }
 ]
 ```
 
 ---
 
-## Shift States
+## 🔄 State Management
 
-| State | Description |
-|-------|-------------|
-| Active | Shift is ongoing, driver can accept rides |
-| Paused | Shift is temporarily paused, driver cannot accept rides |
-| Completed | Shift has ended |
+### Valid State Transitions
 
-## Business Rules
+| Current State | Valid Actions | Invalid Actions |
+|--------------|---------------|-----------------|
+| No shift | `start` | `pause`, `continue`, `end` |
+| Active | `pause`, `end` | `start`, `continue` |
+| Paused | `continue`, `end` | `start`, `pause` |
 
-1. **One Active Shift**: Drivers can only have one active shift at a time
-2. **No Pause During Ride**: Cannot pause shift while on an active ride
-3. **Pause Reminders**: System prompts drivers to take breaks every 3 hours
-4. **Skip Pause**: Drivers can register a zero-duration pause to reset break timer
-
-## Error Codes
-
-| Status Code | Description |
-|-------------|-------------|
-| 200 | Success |
-| 400 | Bad Request - Invalid operation or state |
-| 401 | Unauthorized - Invalid or missing token |
-| 403 | Forbidden - Access denied |
-| 500 | Internal server error |
+### 🚧 Additional Constraints
+- 🚗 No signals during active ride
+- 🔒 Single active shift per driver
+- 🕐 Automatic cleanup on login

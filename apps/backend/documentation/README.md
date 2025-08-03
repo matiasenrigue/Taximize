@@ -1,34 +1,19 @@
 # Backend Documentation
 
-This directory contains comprehensive documentation for the taxi driver management system backend.
+## ⭐ Essential Reading
+
+> **[🔗 Entity Interactions & System Architecture](../src/entities/README.md)**  
+> **↑ START HERE** - Visual guide to understanding how all backend entities work together. This is the most important documentation for understanding the system's architecture.
 
 ## Contents
 
-### [API_Documentation/](./API_Documentation/)
-Complete API reference documentation including:
-- Authentication endpoints
-- User management
-- Shift tracking
-- Ride management  
-- ML-powered hotspot predictions
-- Analytics and statistics
-
-### [database_schema.md](./database_schema.md)
-PostgreSQL database schema documentation including:
-- Table structures
-- Relationships
-- Indexes and constraints
-
-### [testing.md](./testing.md)
-Testing strategy and results including:
-- Test-Driven Development (TDD) methodology
-- Four-phase testing approach
-- Test coverage and results
-
-### [security.md](./security.md)
-Comprehensive security documentation including:
-- Current security implementation
-- Critical vulnerabilities and issues
-- Security best practices
-- Recommendations and compliance guidelines
+- **[InstallationInstructions.md](./InstallationInstructions.md)** - Setup and installation guide
+- **[API_Documentation/](./API_Documentation/)** - API endpoints reference
+- **[database.md](./database.md)** - Database structure and schema
+- **[testing.md](./testing.md)** - Testing approach and results
+- **[security.md](./security.md)** - Security implementation and guidelines
+- **[performance.md](./performance.md)** - Performance analysis and optimization
+- **[ci-cd.md](./ci-cd.md)** - CI/CD pipeline documentation
+- **[environment_vars.md](./environment_vars.md)** - Environment variables configuration
+- **[media/](./media/)** - Screenshots and GIFs for documentation
 

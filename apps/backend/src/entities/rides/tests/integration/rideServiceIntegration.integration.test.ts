@@ -8,7 +8,6 @@ import { ExpiredDataCleanup } from '../../../shifts/utils/cleanup/expiredDataCle
 
 TestHelpers.setupEnvironment();
 
-// Dublin coordinates I use for testing
 const DEFAULT_COORDS = {
     startLat: 53.349805,
     startLng: -6.260310,

@@ -14,7 +14,6 @@ process.env.REFRESH_TOKEN_SECRET = 'test-refresh-token-secret';
 
 // had issues with tokens before when testing on GH, keeping these hardcoded for now
 
-// copied from auth tests
 async function createAuthenticatedUser(email: string = 'driver@test.com', username: string = 'testdriver') {
     const user = await User.create({
         email,
@@ -120,7 +119,6 @@ describe('Shift API', () => {
 
     describe('POST /api/shifts/continue-shift', () => {
         
-        // basically copy pasted from pause tests
         it('401 without auth', async () => {
             const response = await request(app)
                 .post('/api/shifts/continue-shift')

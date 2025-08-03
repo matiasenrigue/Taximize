@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 
 /**
- * Manages Redis connections for caching expensive operations.
+ * Manages Redis connections for caching expensive operations
  * 
  * The app works perfectly fine without Redis - if Redis is down,
  * we just skip caching and compute everything fresh.
@@ -11,8 +11,8 @@ class RedisClient {
     private isConnected = false;
 
     /**
-     * Tries to connect to Redis when the server starts.
-     * If Redis isn't available, we'll just run without caching.
+     * Tries to connect to Redis when the server starts
+     * If Redis isn't available, we'll just run without caching
      */
     async connect(): Promise<void> {
         if (this.client) return;
@@ -47,9 +47,9 @@ class RedisClient {
     }
 
     /**
-     * Fetches a value from cache.
+     * Fetches a value from cache
      * If Redis is down or the key doesn't exist, returns null
-     * and the calling code will compute the value fresh.
+     * and the calling code will compute the value fresh
      */
     async get(key: string): Promise<string | null> {
         if (!this.isConnected || !this.client) {
@@ -72,7 +72,7 @@ class RedisClient {
     }
 
     /**
-     * Stores a value in cache with an expiration time.
+     * Stores a value in cache with an expiration time
      * If Redis is down, this does nothing (and that's okay)
      */
     async setEx(key: string, seconds: number, value: string): Promise<void> {

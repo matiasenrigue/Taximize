@@ -4,31 +4,24 @@ import { sequelize } from '../../shared/config/db';
 
 
 export class User extends Model {
-    /** Unique identifier for the user (UUID v4) */
+
     public id!: string;
     
-    /** User's email address (must be unique) */
-    public email!: string;
+    // must be unique and valid email format
+    public email!: string; 
     
-    /** Display name for the user */
     public username!: string;
     
-    /** Hashed password (never stored in plain text) */
-    public password!: string;
+    // Hashed password
+    public password!: string; 
     
-    /** User preferences (theme, language, break warnings) */
+    // User preferences (theme, language, break warnings)
     public preferences!: {
         theme?: string;
         language?: string;
         breakWarnings?: boolean;
     };
 
-    /**
-     * Instance method to verify passwords.
-     * Compares a plain text password with the stored hash.
-     * @param entered - Plain text password to verify
-     * @returns Promise<boolean> - True if password matches
-     */
     public matchPassword!: (entered: string) => Promise<boolean>;
 }
 
@@ -70,10 +63,11 @@ User.init(
     }
 );
 
+
 /**
- * Hook that runs before saving a user.
+ * Hook that runs before saving a user
  * Automatically hashes the password if it has been changed,
- * ensuring passwords are never stored in plain text.
+ * ensuring passwords are never stored in plain text
  */
 User.beforeSave(async (user) => {
     if (user.changed('password')) {
@@ -83,9 +77,10 @@ User.beforeSave(async (user) => {
     }
 });
 
+
 /**
- * Adds password verification method to User instances.
- * Uses bcrypt to securely compare entered password with stored hash.
+ * Adds password verification method to User instances
+ * Uses bcrypt to securely compare entered password with stored hash
  */
 User.prototype.matchPassword = function (entered: string) {
     // @ts-ignore

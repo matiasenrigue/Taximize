@@ -10,6 +10,7 @@ export const initializeAssociations = () => {
     const Hotspots = require('../../entities/hotspots/hotspots.model').default;
 
     // Define associations directly here to avoid circular dependencies
+    
     // Shift has many signals
     Shift.hasMany(ShiftSignal, { 
         foreignKey: 'shift_id',

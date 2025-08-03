@@ -1,50 +1,56 @@
-# Users Module
+# Users
 
-This module handles user-related operations and data management.
+The Users module provides core user management functionality including profile data retrieval and preferences management. This foundational module serves as the primary interface for authenticated user operations, ensuring secure access to user data and personalization settings.
 
-## Overview
+## 📖 API Documentation
+**[View Complete API Reference →](../../../documentation/API_Documentation/users.md)**
 
-The users module provides endpoints for retrieving authenticated user information. All endpoints require authentication via JWT token in the Authorization header.
+<img src="../../../documentation/media/preferences.gif" alt="Analytics Dashboard" width="250"/>
 
-## Endpoints
 
-### GET /api/users/me
-Retrieves the current authenticated user's information.
+## 🏗️ Architecture
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid",
-    "username": "string",
-    "email": "string",
-    "createdAt": "ISO 8601 timestamp",
-    "updatedAt": "ISO 8601 timestamp"
-  }
-}
-```
+### 🔧 Components
 
-## User Model
+1. **User Model** (`user.model.ts`)
+   - Defines user data structure with automatic password hashing
+   - Includes secure password verification methods
 
-The User model includes:
-- `id` - UUID primary key
-- `email` - Unique email address
-- `username` - Display name
-- `password` - Hashed password (never exposed in API responses)
-- `createdAt` - Account creation timestamp
-- `updatedAt` - Last modification timestamp
+2. **User Controller** (`user.controller.ts`)
+   - REST API endpoints for user profile and preferences management
+   - Handles secure data retrieval with password exclusion
 
-## Authentication
+3. **User Routes** (`user.routes.ts`)
+   - Protected endpoints requiring authentication middleware
 
-All user endpoints require the `protect` middleware, which:
-1. Extracts the JWT token from the Authorization header
-2. Verifies the token signature
-3. Fetches the complete user record from the database
-4. Attaches the user instance to `req.user`
 
-## Security Notes
+### 🗃️ User Data Structure
 
-- Passwords are automatically hashed using bcrypt before storage
-- Password fields are never included in API responses
-- All endpoints require valid authentication tokens
+The User model provides:
+
+- **Core Identity**:
+  - `id` - UUID v4 primary key
+  - `email` - Unique email address with validation
+  - `username` - Display name for the user
+
+- **Security Features**:
+  - `password` - Automatically hashed using bcrypt 
+  - `matchPassword()` - Instance method for secure password verification
+
+- **Personalization**:
+  - `preferences` - JSON object storing user customizations:
+    - `theme` - UI theme preference
+    - `language` - Locale/language setting
+    - `breakWarnings` - Alert preference for work breaks
+
+### 🔐 Security Implementation
+
+1. **Password Security**:
+   - Automatic bcrypt hashing with 10 salt rounds
+   - Password validation (8-100 characters)
+   - Secure comparison via `matchPassword()` method
+
+2. **Authentication Protection**:
+   - All endpoints require `protect` middleware
+   - JWT token validation and user attachment
+   - Automatic password field exclusion from responses

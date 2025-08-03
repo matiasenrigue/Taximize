@@ -14,7 +14,7 @@ Database and caching configuration
 ### `/middleware`
 Express middleware implementations
 - `auth.middleware.ts` - JWT authentication for users
-- `driverAuth.middleware.ts` - JWT authentication for drivers
+- `driverAuth.middleware.ts` - Rquest validation for drivers
 - `validation.middleware.ts` - Request validation using express-validator
 - `error.middleware.ts` - Global error handling
 

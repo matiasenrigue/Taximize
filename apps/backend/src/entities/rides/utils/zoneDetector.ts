@@ -2,18 +2,12 @@ import zoneData from '../zone_coordinates_processed.json';
 
 /**
  * Represents a geographic zone in NYC.
- * 
- * Each zone corresponds to a specific area (like neighborhoods or districts)
- * and contains polygon data for geographic boundary detection.
  */
 interface Zone {
-    /** Unique identifier for the zone */
     id: number;
     
-    /** Human-readable name of the zone */
     name: string;
     
-    /** Borough the zone belongs to */
     borough: string;
     
     /** Central point of the zone */
@@ -31,12 +25,12 @@ interface Zone {
     }>;
 }
 
+
+
 /**
  * Checks if a point (latitude, longitude) is inside a polygon using the ray-casting algorithm
  * Based on: https://dev.to/boobo94/how-to-verify-if-point-of-coordinates-is-inside-polygon-javascript-10n6
  * 
- * @param lat - The latitude of the point
- * @param lon - The longitude of the point  
  * @param polygon - Array of coordinate pairs [lon, lat] forming the polygon
  * @returns boolean indicating if the point is inside the polygon
  */
@@ -59,12 +53,11 @@ function isPointInPolygon(lat: number, lon: number, polygon: Array<[number, numb
     return inside;
 }
 
+
 /**
  * Checks if a point is inside a polygon with holes
  * A point is inside if it's inside the exterior ring AND not inside any holes
  * 
- * @param lat - The latitude of the point
- * @param lon - The longitude of the point
  * @param polygonData - Polygon data with exterior and optional holes
  * @returns boolean indicating if the point is inside the polygon
  */
@@ -90,12 +83,11 @@ function isPointInPolygonWithHoles(
     return true;
 }
 
+
 /**
  * Finds which NYC zone/area a coordinate point belongs to
  * Uses pre-processed lat/lng polygons for efficient lookup
  * 
- * @param latitude - The latitude of the point
- * @param longitude - The longitude of the point
  * @returns The zone information if found, null otherwise
  */
 export function findZoneForCoordinate(latitude: number, longitude: number): Zone | null {
@@ -121,12 +113,9 @@ export function findZoneForCoordinate(latitude: number, longitude: number): Zone
     return null;
 }
 
+
 /**
  * Gets the zone names for origin and destination coordinates
- * @param originLat - Origin latitude
- * @param originLng - Origin longitude
- * @param destLat - Destination latitude
- * @param destLng - Destination longitude
  * @returns Object containing origin and destination zone names
  */
 export function getZonesForRide(

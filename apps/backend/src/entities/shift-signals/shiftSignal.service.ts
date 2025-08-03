@@ -1,15 +1,11 @@
-// Other services
 import { RideService } from '../rides/ride.service';
 import PauseService from '../shift-pauses/pause.service';
 import { ShiftService } from '../shifts/shift.service';
 
-// Models
 import ShiftSignal from './shiftSignal.model';
 import Shift from '../shifts/shift.model';
 
-// Utils
 import { ensureBigintSafe } from '../../shared/utils/bigintSafety';
-
 
 import { SignalValidation, Signal } from './utils/signalValidation';
 
@@ -17,10 +13,6 @@ import { SignalValidation, Signal } from './utils/signalValidation';
 
 /**
  * Service layer for managing shift signal operations.
- * 
- * This service handles the business logic for shift state transitions,
- * ensuring signals follow valid state machine rules and coordinating
- * with related services like rides, pauses, and shifts.
  */
 abstract class ShiftSignalService {
 
@@ -31,7 +23,6 @@ abstract class ShiftSignalService {
      * - Driver must not have an active ride
      * - The signal transition must follow valid state machine rules
      * 
-     * @param driverId - The unique identifier of the driver
      * @param newSignal - The signal type to validate ('start', 'stop', 'pause', 'continue')
      * @returns Promise<boolean> - True if the signal is valid
      * @throws Error if the signal transition is invalid
@@ -60,12 +51,6 @@ abstract class ShiftSignalService {
     /**
      * Records a shift signal in the database.
      * 
-     * Creates a new ShiftSignal record associated with the driver's active shift.
-     * For pause signals, can optionally store the planned pause duration.
-     * 
-     * @param driverId - The unique identifier of the driver
-     * @param timestamp - Unix timestamp when the signal occurred
-     * @param signal - The signal type to register
      * @param additionalData - Optional data (e.g., planned duration for pause signals)
      */
     static async registerSignal(driverId: string, timestamp: number, signal: string, additionalData?: number): Promise<void> {
@@ -90,7 +75,7 @@ abstract class ShiftSignalService {
      * ---------------------------------
      * 
      * The following methods handle specific signal types,
-     * each performing validation and executing appropriate business logic.
+     * each performing validation and executing appropriate business logic
      */
 
 
@@ -99,13 +84,11 @@ abstract class ShiftSignalService {
 
 
     /**
-     * Handles the start shift signal.
+     * Handles the start shift signal
      * 
-     * Creates a new shift for the driver and registers the start signal.
-     * Validates that the driver can start a shift (no active shift/ride).
+     * Creates a new shift for the driver and registers the start signal
+     * Validates that the driver can start a shift (no active shift/ride)
      * 
-     * @param driverId - The unique identifier of the driver
-     * @param timestamp - Unix timestamp when the shift starts
      * @param duration - Optional planned shift duration in milliseconds
      * @throws Error if driver already has an active shift or ride
      */
@@ -124,15 +107,13 @@ abstract class ShiftSignalService {
 
 
     /**
-     * Handles the stop/end shift signal.
+     * Handles the end shift signal.
      * 
      * Finalizes the active shift by:
      * - Computing all shift statistics (duration, earnings, breaks, etc.)
      * - Saving the shift data
      * - Cleaning up all associated shift signals
-     * 
-     * @param driverId - The unique identifier of the driver
-     * @param timestamp - Unix timestamp when the shift ends
+     *
      * @returns Shift summary with statistics (total duration, earnings, breaks, etc.)
      * @throws Error if no active shift exists
      */
@@ -173,11 +154,9 @@ abstract class ShiftSignalService {
     /**
      * Handles the pause shift signal.
      * 
-     * Marks the shift as paused without creating a separate pause record.
-     * The pause start time and duration are tracked via the shift signal itself.
+     * Marks the shift as paused without creating a separate pause record
+     * The pause start time and duration are tracked via the shift signal itself
      * 
-     * @param driverId - The unique identifier of the driver
-     * @param timestamp - Unix timestamp when the pause starts
      * @param pauseDuration - Optional planned pause duration in milliseconds
      * @throws Error if no active shift exists or shift is already paused
      */
@@ -188,11 +167,12 @@ abstract class ShiftSignalService {
 
         // Note: Pause tracking is handled via shift signals rather than
         // separate pause records. This simplifies the data model while
-        // maintaining full pause history through the signals.
+        // maintaining full pause history through the signals
 
         // Register the pause signal
         await this.registerSignal(driverId, timestamp, 'pause', pauseDuration);
     }
+
 
 
     /**
@@ -203,8 +183,6 @@ abstract class ShiftSignalService {
      * - Saving the completed pause period
      * - Registering the continue signal
      * 
-     * @param driverId - The unique identifier of the driver
-     * @param timestamp - Unix timestamp when the shift resumes
      * @throws Error if no paused shift exists to continue
      */
     static async handleContinueSignal(driverId: string, timestamp: number): Promise<void> {

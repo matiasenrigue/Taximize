@@ -4,10 +4,7 @@ import PauseService from '../../../shift-pauses/pause.service';
 import { ExpiredDataCleanup } from '../../utils/cleanup/expiredDataCleanup';
 import { sequelize } from '../../../../shared/config/db';
 
-/**
- * Unit tests for shift service
- * Note: Most of these fail without proper db mocking
- */
+
 
 // Set up test database before running tests
 beforeAll(async () => {

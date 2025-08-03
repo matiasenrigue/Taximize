@@ -62,7 +62,7 @@ export function formatDuration(startTime: Date, endTime: Date): string {
 }
 
 /** 
- * Returns 3-letter weekday abbreviation: "Sun", "Mon", etc.
+ * Returns 3-letter weekday abbreviation: "Sun", "Mon", etc
  */
 export function getWeekdayLabel(date: Date): string {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

@@ -1,10 +1,5 @@
-/**
- * Configuration constants for ride operations.
- * 
- * Contains validation bounds, timeouts, and default values
- * used throughout the ride management system.
- */
 export const RIDE_CONSTANTS = {
+
     /** Maximum duration before a ride is considered expired (4 hours) */
     EXPIRY_TIME_MS: 4 * 60 * 60 * 1000, // 4 hours
     
@@ -23,7 +18,7 @@ export const RIDE_CONSTANTS = {
     },
     
     /** Default rating when ML prediction is unavailable */
-    DEFAULT_RATING: null, // Indicates ML service is not available
+    DEFAULT_RATING: null, 
     
     /** Pagination limits for queries */
     QUERY_LIMITS: {
@@ -32,12 +27,8 @@ export const RIDE_CONSTANTS = {
     }
 };
 
-/**
- * Standard error messages for ride operations.
- * 
- * Provides consistent error messaging across the application
- * for various ride-related failure scenarios.
- */
+
+
 export const RIDE_ERRORS = {
     NOT_FOUND: 'Ride not found',
     ALREADY_ENDED: 'Ride is already ended',

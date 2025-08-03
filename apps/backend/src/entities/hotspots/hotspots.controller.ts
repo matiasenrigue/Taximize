@@ -4,7 +4,6 @@ import { HotspotsService } from './hotspots.service';
 
 /**
  * Handles HTTP requests for taxi hotspot predictions.
- * Provides real-time ML-based predictions for high-demand pickup zones.
  */
 export class HotspotsController {
         

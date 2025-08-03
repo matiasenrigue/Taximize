@@ -6,13 +6,13 @@ import { modelToResponse, requestToModel } from '../../shared/utils/caseTransfor
 import { ResponseHandler } from '../../shared/utils/responseHandler';
 
 /**
- * Handles HTTP requests for shift management.
- * All endpoints require authentication.
+ * Handles HTTP requests for shift management
+ * All endpoints require authentication
  */
 export class ShiftController {
 
     /**
-     * Get current shift status with ride info.
+     * Get current shift status with ride info
      * @route GET /api/shifts/current
      * @access Protected
      */
@@ -86,7 +86,7 @@ export class ShiftController {
 
     
     /**
-     * Debug endpoint for shift/ride troubleshooting.
+     * Debug endpoint for shift/ride troubleshooting
      * @route GET /api/shifts/debug
      * @access Protected
      */
@@ -142,7 +142,7 @@ export class ShiftController {
 
 
     /**
-     * Get all shifts for authenticated driver.
+     * Get all shifts for authenticated driver
      * @route GET /api/shifts
      * @access Protected
      */

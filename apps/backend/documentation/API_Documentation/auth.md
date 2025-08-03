@@ -1,36 +1,26 @@
-# Authentication API Documentation
+# 🔐 Authentication API
 
-## Overview
+## 📁 Entity Documentation
+**[View Auth Entity README →](../../src/entities/auth/README.md)** *(Architecture, Components, and Implementation Details)*
 
-The Authentication API handles user registration, login, and token refresh functionality. All authentication endpoints are publicly accessible but return JWT tokens for authenticated access to other API endpoints.
+## 📋 Quick Reference
 
-**Base URL:** `/api/auth`
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| [`/api/auth/signup`](#user-registration) | POST | Register new user account | ❌ |
+| [`/api/auth/signin`](#user-login) | POST | Login and get access token | ❌ |
+| [`/api/auth/refresh`](#refresh-token) | POST | Refresh expired access token | 🍪 Cookie |
 
-### Key Features:
-- Input validation using express-validator middleware
-- Dual-token authentication (access token + refresh token)
-- Secure HTTP-only cookies for refresh tokens
-- Automatic cleanup of expired data on login
-- Email normalization and input sanitization
+---
 
-## Endpoints
+## 🚀 User Registration
 
-### 1. User Registration (Sign Up)
+**Endpoint:** `POST /api/auth/signup`
 
-**Description:** Creates a new user account in the system. Validates email format and password strength before creating the user.
+Creates a new user account with email, username, and password validation.
 
-**URL:** `POST /api/auth/signup`
+### 📥 Request
 
-**Authentication:** Not required
-
-### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Content-Type | string | Yes | Must be `application/json` |
-
-#### Request Body
 ```json
 {
   "email": "user@example.com",
@@ -39,15 +29,8 @@ The Authentication API handles user registration, login, and token refresh funct
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| email | string | Yes | Valid email address (will be normalized) |
-| username | string | Yes | Unique username (minimum 3 characters) |
-| password | string | Yes | Minimum 8 characters |
+### 📤 Success Response (201)
 
-### Response
-
-#### Success Response (201 Created)
 ```json
 {
   "success": true,
@@ -59,7 +42,8 @@ The Authentication API handles user registration, login, and token refresh funct
 }
 ```
 
-#### Error Response (400 Bad Request)
+### ❌ Error Response (400)
+
 ```json
 {
   "success": false,
@@ -67,51 +51,21 @@ The Authentication API handles user registration, login, and token refresh funct
 }
 ```
 
-#### Validation Error Response (400 Bad Request)
-```json
-{
-  "success": false,
-  "errors": [
-    {
-      "type": "field",
-      "value": "",
-      "msg": "Email is required",
-      "path": "email",
-      "location": "body"
-    }
-  ]
-}
-```
-
-### Example Usage
-```bash
-curl -X POST http://localhost:3000/api/auth/signup \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "username": "johndoe",
-    "password": "securePassword123"
-  }'
-```
+### 🔍 Validation Rules
+- **Email**: Required, valid format, normalized to lowercase
+- **Username**: Required, minimum 3 characters
+- **Password**: Required, minimum 8 characters
 
 ---
 
-### 2. User Login (Sign In)
+## 🔑 User Login
 
-**Description:** Authenticates a user with email and password. Returns an access token and sets a refresh token as an HTTP-only cookie. Also triggers background cleanup of expired shifts and rides for the user.
+**Endpoint:** `POST /api/auth/signin`
 
-**URL:** `POST /api/auth/signin`
+Authenticates user and returns JWT access token. Sets refresh token as HTTP-only cookie.
 
-**Authentication:** Not required
+### 📥 Request
 
-### Request Parameters
-
-#### Headers
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| Content-Type | string | Yes | Must be `application/json` |
-
-#### Request Body
 ```json
 {
   "email": "user@example.com",
@@ -119,14 +73,8 @@ curl -X POST http://localhost:3000/api/auth/signup \
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| email | string | Yes | Registered email address (will be normalized) |
-| password | string | Yes | User's password |
+### 📤 Success Response (200)
 
-### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -137,15 +85,14 @@ curl -X POST http://localhost:3000/api/auth/signup \
 }
 ```
 
-**Note:** A refresh token is also set as an HTTP-only cookie with the following properties:
-- Name: `refreshToken`
-- Path: `/api/auth/refresh`
-- Expiry: 7 days
-- HttpOnly: true
-- Secure: true (in production)
-- SameSite: strict
+### 🍪 Cookie Set
+- **Name**: `refreshToken`
+- **Path**: `/api/auth/refresh`
+- **Expiry**: 7 days
+- **Flags**: HttpOnly, Secure (production), SameSite=strict
 
-#### Error Response (400 Bad Request)
+### ❌ Error Response (400)
+
 ```json
 {
   "success": false,
@@ -153,55 +100,24 @@ curl -X POST http://localhost:3000/api/auth/signup \
 }
 ```
 
-#### Validation Error Response (400 Bad Request)
-```json
-{
-  "success": false,
-  "errors": [
-    {
-      "type": "field",
-      "value": "",
-      "msg": "Email is required",
-      "path": "email",
-      "location": "body"
-    }
-  ]
-}
-```
-
-### Example Usage
-```bash
-curl -X POST http://localhost:3000/api/auth/signin \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "securePassword123"
-  }'
-```
+### 🧹 Side Effects
+- Triggers background cleanup of expired shifts and rides
+- Sets refresh token cookie for automatic token renewal
 
 ---
 
-### 3. Refresh Access Token
+## 🔄 Refresh Token
 
-**Description:** Uses the refresh token stored in HTTP-only cookie to generate a new access token. This endpoint is used when the access token expires.
+**Endpoint:** `POST /api/auth/refresh`
 
-**URL:** `POST /api/auth/refresh`
+Uses refresh token from cookie to generate new access token when current token expires.
 
-**Authentication:** Requires valid refresh token in cookie
+### 📥 Request
 
-### Request Parameters
+No body required - refresh token sent automatically via cookie
 
-#### Headers
-No additional headers required (cookie is sent automatically by browser)
+### 📤 Success Response (200)
 
-#### Cookies
-| Cookie | Type | Required | Description |
-|--------|------|----------|-------------|
-| refreshToken | string | Yes | Valid refresh token (automatically sent) |
-
-### Response
-
-#### Success Response (200 OK)
 ```json
 {
   "success": true,
@@ -211,7 +127,8 @@ No additional headers required (cookie is sent automatically by browser)
 }
 ```
 
-#### Error Response (401 Unauthorized)
+### ❌ Error Response (401)
+
 ```json
 {
   "success": false,
@@ -219,57 +136,11 @@ No additional headers required (cookie is sent automatically by browser)
 }
 ```
 
-#### Error Response (403 Forbidden)
+### ❌ Error Response (403)
+
 ```json
 {
   "success": false,
   "error": "Invalid refresh token"
 }
 ```
-
-### Example Usage
-```bash
-# Browser will automatically send the cookie
-curl -X POST http://localhost:3000/api/auth/refresh \
-  --cookie "refreshToken=your-refresh-token"
-```
-
----
-
-## Token Information
-
-### Access Token
-- Type: JWT (JSON Web Token)
-- Expiry: 15 minutes
-- Usage: Include in Authorization header as `Bearer <token>`
-
-### Refresh Token
-- Type: JWT stored as HTTP-only cookie
-- Expiry: 7 days
-- Usage: Automatically sent by browser to `/api/auth/refresh` endpoint
-
-## Error Codes
-
-| Status Code | Description |
-|-------------|-------------|
-| 201 | User created successfully |
-| 200 | Login successful / Token refreshed |
-| 400 | Bad request (validation errors, user exists, wrong credentials) |
-| 401 | Unauthorized (no refresh token) |
-| 403 | Forbidden (invalid refresh token) |
-
-## Validation Rules
-
-### Signup Validation
-- **Email**: Required, must be valid email format, normalized
-- **Username**: Required, minimum 3 characters, trimmed and escaped
-- **Password**: Required, minimum 8 characters
-
-### Signin Validation
-- **Email**: Required, must be valid email format, normalized
-- **Password**: Required
-
-### Notes
-- All validation errors return a 400 status with an `errors` array containing detailed field-level error information
-- Email addresses are automatically normalized (lowercase, trim whitespace)
-- Username input is sanitized to prevent XSS attacks
