@@ -75,7 +75,7 @@ AI-powered recommendations on optimal shift timing to maximize profitability. Ge
 
 ## 📚 **Detailed project structure:**
 - [Frontend Structure →](./apps/frontend/README.md)
-- [Backend Architecture →](./apps/backend/README.md)
+- [Backend Structure →](./apps/backend/README.md)
 - [Data Science Structure →](./data/README.md)
 
 
