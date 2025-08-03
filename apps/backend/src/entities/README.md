@@ -1,16 +1,14 @@
-# Entities
-
-This directory contains the core business entities and their associated logic for the backend application. Each entity is organized as a self-contained module with its own controllers, services, models, routes, and tests.
-
-> Link to the DB documentation file in backend/documentation
-
-## Entity Relationships and Interactions
+## 🔗 Entity Relationships and Interactions
 
 The backend follows a hierarchical data model where entities are interconnected through well-defined relationships. The following diagrams illustrate the three core interaction patterns in the system:
 
+> 📚 See the [Database Documentation](../../documentation/database.md) for detailed schema information
+
+> Disclaimer: AI has been used to generate these diagrams 
+
 ---
 
-### 1. Signal State Machine - Driver State Transitions
+### 1. 🚦 Signal State Machine - Driver State Transitions
 
 All driver state changes must pass through the SignalValidation gateway, which ensures only valid transitions occur. This prevents impossible states like starting multiple shifts or pausing when not working.
 
@@ -71,7 +69,7 @@ Example Signal Flow:
 
 ---
 
-### 2. Ride Eligibility System
+### 2. 🚗 Ride Eligibility System
 
 Rides have their own validation workflow separate from signals. A ride can only start if all three conditions are met: active shift, not paused, and no current ride.
 
@@ -167,7 +165,7 @@ Detailed Check Flow:
 
 ---
 
-### 3. Signal-to-Database Action Mapping
+### 3. 💾 Signal-to-Database Action Mapping
 
 Every signal and action triggers specific database operations. Shifts and rides follow a CREATE-UPDATE pattern, while pauses uniquely use retroactive creation - storing timestamps at pause start but only creating the database entry when the pause ends.
 
@@ -262,7 +260,7 @@ Time    Signal/Action       Database Effect
 
 ---
 
-### 4. Automatic Cleanup on Login
+### 4. 🧹 Automatic Cleanup on Login
 
 The system automatically manages stale data when drivers log in, ensuring abandoned shifts and rides don't accumulate in the database. This cleanup runs asynchronously without blocking the login process.
 
@@ -339,7 +337,7 @@ Important Notes:
 
 ---
 
-### Business Rules Enforcement
+### ⚖️ Business Rules Enforcement
 
 The system enforces these rules through database constraints and service-level validations:
 
@@ -347,3 +345,33 @@ The system enforces these rules through database constraints and service-level v
 2. **One Active Ride Rule**: Unique index on `rides` table where `end_time IS NULL`  
 3. **No Rides During Pause**: Validated by checking the last shift signal
 4. **Valid State Transitions**: Enforced by SignalValidation before any state change
+
+---
+
+## 🌟 Featured Capability: Persistent State Management
+
+One of the powerful features enabled by this architecture is **persistent state management**. The signal-based system allows the frontend to restart and restore the user exactly where they left off by tracking their last action and timestamp.
+
+### 🔄 State Persistence in Action
+
+The system maintains driver state across page reloads, app crashes, or network disconnections:
+
+> 🔍 **Notice**: Watch how page reloads maintain exact state - timers continue running and current page stays unchanged!
+
+
+<table>
+<tr>
+<td align="center">
+<strong>Break State Persistence</strong><br>
+<img src="../../documentation/media/reload-breaks.gif" alt="Break State Persistence" width="250"/><br>
+<em>Driver remains in break state after reload</em>
+</td>
+<td align="center">
+<strong>Ride State Persistence</strong><br>
+<img src="../../documentation/media/reload-ride.gif" alt="Ride State Persistence" width="250"/><br>
+<em>Active ride continues seamlessly after reload</em>
+</td>
+</tr>
+</table>
+
+

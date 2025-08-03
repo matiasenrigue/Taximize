@@ -4,8 +4,11 @@ A high-performance Node.js/TypeScript backend built with Express.js following en
 
 ## 📚 Documentation Index
 
+### ⭐ ESSENTIAL - Start Here
+> **[🔗 Entity Interactions & System Architecture](./src/entities/README.md)**  
+> **↑ MUST READ FIRST** - Comprehensive visual guide showing how all backend entities interact with each other through signals, validations, and database operations.
+
 ### 🏗️ Entity Documentation
-- **[🔗 Entity Interactions](./src/entities/README.md)** - How entities work together
 - **[🔐 Auth Module](./src/entities/auth/README.md)** - Authentication implementation
 - **[👤 Users Module](./src/entities/users/README.md)** - User management
 - **[🗺️ Hotspots Module](./src/entities/hotspots/README.md)** - Hotspot logic

@@ -1,5 +1,10 @@
 # Backend Documentation
 
+## ⭐ Essential Reading
+
+> **[🔗 Entity Interactions & System Architecture](../src/entities/README.md)**  
+> **↑ START HERE** - Visual guide to understanding how all backend entities work together. This is the most important documentation for understanding the system's architecture.
+
 ## Contents
 
 - **[InstallationInstructions.md](./InstallationInstructions.md)** - Setup and installation guide

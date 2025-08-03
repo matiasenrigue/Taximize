@@ -2,6 +2,8 @@
 
 This application uses PostgreSQL as its database management system, leveraging its robust features for data integrity, performance, and advanced data types like JSONB for optimal driver management and ride tracking.
 
+> 🔗 **See [Entity Interactions & System Architecture](../src/entities/README.md)** for visual diagrams showing how these entities interact with each other through signals, validations, and database operations.
+
 ## 📊 Entity Relationship Diagram
 
 ```mermaid
