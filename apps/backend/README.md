@@ -76,3 +76,14 @@ entities/[entity-name]/
 ├── 🛣️ [entity].routes.ts      # Express route definitions
 └── 🧪 tests/                  # Unit & integration tests
 ```
+
+
+## 📜 Scripts
+
+```bash
+npm run build       # 🔨 Compile TypeScript
+npm start           # 🚀 Start production server
+npm test            # 🧪 Run tests
+npm run create-db   # 🗄️ Initialize database
+npm run sync-db     # 🔄 Sync database models
+```

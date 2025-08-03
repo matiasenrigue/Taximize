@@ -1,6 +1,6 @@
 # TaxiMize App
 
-> **Disclaimer**: AI has been used to generate `.md` documentation files
+> **Disclaimer**: AI has been used to generate and improve `.md` documentation files under human supervision
 
 A comprehensive full-stack application designed for taxi drivers to efficiently manage their shifts, rides, and earnings. Built with modern technologies and optimized for real-world taxi operations in NYC.
 
@@ -15,22 +15,22 @@ A comprehensive full-stack application designed for taxi drivers to efficiently 
 ### 🎯 **Smart Hotspots**
 AI-powered passenger demand forecasting based on temporal and spatial patterns. The darker zones indicate higher probability of finding passengers, helping drivers optimize their positioning for maximum efficiency.
 
-<img src="apps/backend/documentation/media/Hotspots.gif" alt="Hotspots Demo" width="300"/>
+<img src="apps/backend/documentation/media/Hotspots.gif" alt="Hotspots Demo" width="250"/>
 
 ### ⭐ **Intelligent Ride Prediction**
 ML-powered ride evaluation system that estimates the economic value of each ride before acceptance. Get instant scoring from 1-5 stars to make informed decisions about which rides to accept.
 
 <table>
 <tr>
-<td><img src="apps/backend/documentation/media/3_stars_ride.gif" alt="3 Star Ride" width="300"/></td>
-<td><img src="apps/backend/documentation/media/5_stars_ride.gif" alt="5 Star Ride" width="300"/></td>
+<td><img src="apps/backend/documentation/media/3_stars_ride.gif" alt="3 Star Ride" width="250"/></td>
+<td><img src="apps/backend/documentation/media/5_stars_ride.gif" alt="5 Star Ride" width="250"/></td>
 </tr>
 </table>
 
 ### 📊 **Analytics Dashboard**
 Comprehensive statistics tracking your working vs idle time and detailed earnings analytics. View your performance metrics on weekly or monthly basis to optimize your driving strategy.
 
-<img src="apps/backend/documentation/media/stats.gif" alt="Analytics Dashboard" width="300"/>
+<img src="apps/backend/documentation/media/stats.gif" alt="Analytics Dashboard" width="250"/>
 
 ### 🔄 **Persistent State Management**
 Seamless app experience with full state persistence. Exit and return to the app without losing progress - counters, timers, and current page state are perfectly maintained across sessions.
@@ -39,8 +39,8 @@ Seamless app experience with full state persistence. Exit and return to the app 
 
 <table>
 <tr>
-<td><img src="apps/backend/documentation/media/reload-breaks.gif" alt="Break State Persistence" width="300"/></td>
-<td><img src="apps/backend/documentation/media/reload-ride.gif" alt="Ride State Persistence" width="300"/></td>
+<td><img src="apps/backend/documentation/media/reload-breaks.gif" alt="Break State Persistence" width="250"/></td>
+<td><img src="apps/backend/documentation/media/reload-ride.gif" alt="Ride State Persistence" width="250"/></td>
 </tr>
 </table>
 
@@ -50,7 +50,7 @@ Personalize your experience with:
 - 🌍 **Multi-language Support** - Currently available in English and German
 - ⏰ **Safety Notifications** - Configure automatic break reminders (every 3 hours for driver safety)
 
-<img src="apps/backend/documentation/media/preferences.gif" alt="Preferences Demo" width="300"/>
+<img src="apps/backend/documentation/media/preferences.gif" alt="Preferences Demo" width="250"/>
 
 
 ### 🕐 **Shift Starting Recommendation**
@@ -71,78 +71,41 @@ AI-powered recommendations on optimal shift timing to maximize profitability. Ge
 </tr>
 </table>
 
+---
 
-## 🛠️ Tech Stack
- 
-### Frontend
-- **Framework**: Next.js 15 with React 19
-- **Language**: TypeScript
-- **Styling**: CSS Modules
-- **Maps**: Google Maps API integration
-- **Charts**: Recharts for data visualization
-- **State Management**: React Hooks
-- **Internationalization**: next-intl
+## 📚 **Detailed project structure:**
+- [Frontend Structure →](./apps/frontend/README.md)
+- [Backend Architecture →](./apps/backend/README.md)
+- [Data Science Structure →](./data/README.md)
 
-### Backend
-- **Framework**: Express.js 5.1.0
-- **Language**: TypeScript
-- **Database**: PostgreSQL with Sequelize ORM
-- **Cache**: Redis for performance optimization
-- **Authentication**: JWT with bcrypt
-- **Testing**: Jest & Supertest
-- **Security**: Helmet.js, CORS, rate limiting
 
-### DevOps
-- **Containerization**: Docker with multi-stage builds
-- **Orchestration**: Docker Compose
-- **Package Management**: npm workspaces (monorepo)
+## 🛠️ Tech Stack Overview
 
-## Project Structure
+- **Frontend**: Next.js 15 with React 19, TypeScript, Google Maps integration
+- **Backend**: Express.js 5, PostgreSQL, Redis, JWT authentication
+- **Data Models**: Python, Flask API, XGBoost/LightGBM models
+- **DevOps**: Docker, Docker Compose, GitHub Actions CI/CD
+
+[Learn more about our CI/CD setup →](./apps/backend/documentation/ci-cd.md)
+
+
+## 📁 Project Structure
+
 ```
-├── market_research/                 #research for the report outside of lit review
-|   ├── Diksha -Forms to Look into        #Research looking through various forums and Persona Profiles
-|   ├── Ellie - Competitor Analysis       #Research into different ride hailing apps
 ├── apps/
-│   ├── backend/
-│   │   ├── src/
-│   │   ├── jest.config.js      # testing configuration
-│   │   ├── package.json
-│   │   └── tsconfig.json       # backend typescript configuration
-│   └── frontend/
-│       ├── __mocks__/          # testing - mocks to replace css-modules and files
-│       ├── app/                # app & pages
-│       ├── components/         # reusable components
-│       ├── dictionaries/       # multi-language - texts
-│       ├── hooks/              # custom hooks
-│       ├── i18n/               # multi-language - next-intl setup
-│       ├── public/             # static assets
-│       ├── .npmrc
-│       ├── .swcrc              # testing - SWC configuration (SWC compiles .tsx and .jsx to .js)
-│       ├── jest.config.ts      # testing configuration
-│       ├── jest.setup.ts       # testing - setup environment
-│       ├── middleware.ts       # multi-language - rerouting
-│       ├── next.config.ts
-│       ├── next.env.d.ts
-│       ├── package.json
-│       └── tsconfig.json       # frontend typescript configuration
-├── Data/
-│   ├── cleaning_exploration/       # EDA, notebooks, exploratory analysis
-│   │   └── zone_coordinates.csv    # Load zone → borough map (used for encoding)
-│   └── data_models_api/
-│       ├── combined_flask/         # Used for Integration
-│       ├── scoring_model/          # Scoring logic and model assets
-│       └── hotspot_model/          # Hotspot logic and model assets
-├── node_modules/               # shared modules, do not commit!
+│   ├── frontend/               # Next.js frontend application
+│   └── backend/                # Express.js backend API
+
+├── data/                       # Data science & ML models
+
+├── market_research/            # User research & competitor analysis
+
 ├── packages/
-│   └── shared/                 # shared code
-├── .gitignore
-├── .npmrc
-├── eslint.config.mjs
-├── package.json                # workspace configuration
-├── package-lock.json
-├── README.md
-└── tsconfig.base.json          # base typescript configuration
+│   └── shared/                 # Shared code between apps
+
+└── README.md                   # This file
 ```
+
 
 ## 📋 Prerequisites
 
@@ -156,8 +119,8 @@ AI-powered recommendations on optimal shift timing to maximize profitability. Ge
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository-url>
-cd taxi-driver-app
+git clone https://github.com/matiasenrigue/Taximize
+cd Taximize
 ```
 
 ### 2. Install Dependencies
@@ -167,176 +130,85 @@ npm install
 
 ### 3. Environment Setup
 
-Create `.env` files in both frontend and backend directories:
+Create environment files for each application:
 
-**Backend** (`apps/backend/.env`):
-```env
-DATABASE_URL=postgresql://username:password@localhost:5432/taxi_driver_db
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your-jwt-secret-key
-JWT_REFRESH_SECRET=your-jwt-refresh-secret
-PORT=3001
-NODE_ENV=development
-```
-
-**Frontend** (`apps/frontend/.env.local`):
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-```
+- **Backend**: Create `apps/backend/.env` ([see Backend environment variables →](./apps/backend/documentation/environment_vars.md))
+- **Frontend**: Create `apps/frontend/.env.local` ([see Frontend setup →](./apps/frontend/README.md#environment-variables))
+- **Data API**: No additional env setup required
 
 ### 4. Database Setup
-```bash
-# Create database
-createdb taxi_driver_db
 
-# Run migrations (from backend directory)
-cd apps/backend
-npm run migrate
-
-# Seed database (optional)
-npm run seed
-```
+[See Database Installation Guide →](./apps/backend/documentation/InstallationInstructions.md#database-setup)
 
 ### 5. Development
 
-Run both frontend and backend concurrently:
-```bash
-npm run dev
-```
+**Development setup for each component:**
+- [Frontend Development →](./apps/frontend/README.md#development-commands)
+- [Backend Development →](./apps/backend/README.md#-scripts)
+- [Data API Development →](./data/README.md#local-development)
 
-Or run individually:
-```bash
-# Frontend only
-npm run dev:frontend
-
-# Backend only
-npm run dev:backend
-```
-
-Access the application:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:3001
 
 ## 🧪 Testing
 
-Run all tests:
-```bash
-npm test
-```
+**Testing documentation:**
+- [Frontend Testing →](./apps/frontend/README.md#running-tests)
+- [Backend Testing →](./apps/backend/documentation/testing.md)
 
-Run tests for specific workspace:
-```bash
-# Frontend tests
-npm run test:frontend
 
-# Backend tests
-npm run test:backend
-```
+## 📚 API Documentation
 
-## 📦 Package Management
+### Backend API Routes
+- [Authentication API →](./apps/backend/documentation/API_Documentation/auth.md)
+- [Users API →](./apps/backend/documentation/API_Documentation/users.md)
+- [Shifts API →](./apps/backend/documentation/API_Documentation/shifts.md)
+- [Rides API →](./apps/backend/documentation/API_Documentation/rides.md)
+- [Hotspots API →](./apps/backend/documentation/API_Documentation/hotspots.md)
+- [Stats API →](./apps/backend/documentation/API_Documentation/stats.md)
 
-**Always** install packages for a specific workspace:
-```bash
-# Frontend packages
-npm install <package> --workspace=apps/frontend
+### Data Science API Routes
+- [ML Model APIs →](./data/README.md#api-endpoints)
+- [Trip Scoring Endpoints →](./data/README.md#trip-scoring-endpoints)
+- [Hotspot Prediction →](./data/README.md#hotspot-prediction-endpoint)
 
-# Backend packages
-npm install <package> --workspace=apps/backend
-
-# Shared packages
-npm install <package> --workspace=packages/shared
-```
-
-## 🔌 API Documentation
-
-### Authentication Endpoints
-- `POST /auth/signup` - Register new user
-- `POST /auth/signin` - Login user
-- `POST /auth/refresh` - Refresh access token
-- `POST /auth/signout` - Logout user
-
-### Shift Management
-- `POST /shifts/start` - Start a new shift
-- `POST /shifts/pause` - Pause current shift
-- `POST /shifts/continue` - Continue paused shift
-- `POST /shifts/end` - End current shift
-- `GET /shifts/current` - Get current shift status
-- `GET /shifts/:id` - Get shift details
-
-### Ride Operations
-- `POST /rides/evaluate` - ML-powered ride evaluation
-- `POST /rides/start` - Start a new ride
-- `POST /rides/end` - End current ride
-- `GET /rides/:id` - Get ride details
-
-### Zone Management
-- `GET /zones` - Get all NYC taxi zones
-- `GET /zones/:id` - Get specific zone details
-- `POST /zones/lookup` - Find zone by coordinates
 
 ## 🐳 Docker Deployment
 
-### Using Docker Compose (Recommended)
+### Using Docker Compose
 ```bash
-# Build and start all services
-docker-compose up --build
+# Build and start all services (including nginx, database, redis)
+docker-compose -f docker-compose.nginx.yml up --build
 
 # Run in detached mode
-docker-compose up -d
+docker-compose -f docker-compose.nginx.yml up -d
 
 # Stop all services
-docker-compose down
+docker-compose -f docker-compose.nginx.yml down
 ```
 
-### Individual Docker Builds
+**Note**: The docker-compose file includes:
+- Nginx reverse proxy (port 80)
+- PostgreSQL database
+- Redis cache
+- Backend API
+- Frontend application
+- ML/Data API service
 
-**Backend**:
-```bash
-cd apps/backend
-docker build -t taxi-backend .
-docker run -p 3001:3001 --env-file .env taxi-backend
-```
+## 📊 Additional Resources
 
-**Frontend**:
-```bash
-cd apps/frontend
-docker build -t taxi-frontend .
-docker run -p 3000:3000 --env-file .env.local taxi-frontend
-```
+### Database & Architecture
+- [Database Schema →](./apps/backend/documentation/database.md)
+- [Entity Relationships →](./apps/backend/src/entities/README.md)
+- [Security Guidelines →](./apps/backend/documentation/security.md)
+- [Performance Analysis →](./apps/backend/documentation/performance.md)
 
-## 🚀 Production Deployment
+### Development Resources
+- [Backend Installation →](./apps/backend/documentation/InstallationInstructions.md)
+- [Testing Strategy →](./apps/backend/documentation/testing.md)
+- [Environment Variables →](./apps/backend/documentation/environment_vars.md)
+- [CI/CD Pipeline →](./apps/backend/documentation/ci-cd.md)
+- [Backend Overview →](./apps/backend/documentation/README.md)
+- [API Documentation Index →](./apps/backend/documentation/API_Documentation/README.md)
 
-### Environment Variables
-Ensure all production environment variables are properly set:
-- Use strong, unique JWT secrets
-- Configure production database credentials
-- Set `NODE_ENV=production`
-- Configure CORS for your domain
-
-### Database Migrations
-```bash
-# Run migrations in production
-NODE_ENV=production npm run migrate --workspace=apps/backend
-```
-
-### Security Checklist
-- ✅ HTTPS enabled
-- ✅ Environment variables secured
-- ✅ Database credentials protected
-- ✅ Rate limiting configured
-- ✅ CORS properly configured
-- ✅ JWT secrets rotated regularly
-
-## 📊 Database Schema
-
-### Core Tables
-- **users** - User authentication and profiles
-- **shifts** - Work session tracking
-- **rides** - Individual trip records
-- **shift_signals** - State transitions
-- **shift_pauses** - Break time tracking
-- **hotspots** - Zone data storage
 
 ## 🗂️ Project Resources
 

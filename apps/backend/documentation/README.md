@@ -2,6 +2,7 @@
 
 ## Contents
 
+- **[InstallationInstructions.md](./InstallationInstructions.md)** - Setup and installation guide
 - **[API_Documentation/](./API_Documentation/)** - API endpoints reference
 - **[database.md](./database.md)** - Database structure and schema
 - **[testing.md](./testing.md)** - Testing approach and results

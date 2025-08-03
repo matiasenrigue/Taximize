@@ -48,19 +48,3 @@ src/
 - **[📊 Stats API](../documentation/API_Documentation/stats.md)** - Analytics endpoints
 
 
-## 📜 Scripts
-
-```bash
-npm run build       # 🔨 Compile TypeScript
-npm start           # 🚀 Start production server
-npm test            # 🧪 Run tests
-npm run create-db   # 🗄️ Initialize database
-npm run sync-db     # 🔄 Sync database models
-```
-
-## 💻 Tech Stack
-
-- 🌐 Express.js with TypeScript
-- 🗄️ Sequelize ORM with PostgreSQL
-- 🔑 JWT authentication
-- 🧪 Jest for testing
